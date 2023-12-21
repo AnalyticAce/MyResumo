@@ -4,10 +4,6 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain.chains import LLMChain
 
-
-
-import json
-
 def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY):
     template = f"""
     You are an advanced and sophisticated AI model trained to optimize resumes based on a specific job description. 
@@ -16,7 +12,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     The user's existing resume is as follows:
     {resume_content}
 
-    The job description the user is interested in is as follows:
+    The job description the user is applying to the job description as follows:
     {job_description}
 
     Your task is to generate a revised resume that is tailored to the job description. 
@@ -27,7 +23,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     {{
     "user_information": {{
         "name": "",
-        "job_title": "",
+        "main_job_title": "",
         "profile_description": "",
         "email": "",
         "linkedin": "",
