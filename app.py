@@ -1,11 +1,11 @@
 from helper.toast_message import get_random_toast
-from helper.tools import get_binary_file_downloader_link, pdf_to_text, load_lottie
+from helper.tools import get_file_data, pdf_to_text, load_lottie
 from helper.openai_utils import *
 from helper.html_pdf import *
 import streamlit as st
 import tempfile, os
 import random
-import requests
+import time
 from streamlit_lottie import st_lottie
 # Set the page configuration
 st.set_page_config(
@@ -21,6 +21,7 @@ lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba
 lottie_3 = load_lottie('https://lottie.host/a3571103-ff5b-453c-9117-d4f441880eb2/4qGZQ5PSek.json')
 lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
 lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
+lottie_6 = load_lottie('https://lottie.host/d7d89f38-1f7f-4554-b08e-944f582f015d/ruDEKuRXKZ.json')
 
 lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
 
@@ -105,7 +106,7 @@ elif st.session_state.page == 'generate':
     st.title('***Upload your Resume***')
     st.write("**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**")
     st.write("***:blue[Tip]*** : If you don't have a resume you can download the template below and fill out the template below with your informations")
-    st.markdown(get_binary_file_downloader_link('template.pdf', 'Resume Template'), unsafe_allow_html=True)
+    #st.markdown(get_file_data('template.pdf', 'Resume Template'), unsafe_allow_html=True)
     uploaded_file = st.file_uploader("***Choose a PDF file***", type="pdf")
     
     if uploaded_file is not None:
@@ -158,6 +159,10 @@ elif st.session_state.page == 'generate':
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
     
     
+    if generation:
+        print('Done')
+        st.session_state.page = 'loading'
+        st.experimental_rerun()
     #if generation:
     #    resume_content = temp_file
     #    tone = resume_tone
@@ -169,3 +174,19 @@ elif st.session_state.page == 'generate':
     #    else:
     #        st.info("Template 2 is not available for the moment")
     #"""    
+elif st.session_state.page == 'loading':
+    
+    st_lottie(lottie_5, speed=1, key="animation")
+    time.sleep(10)
+    #st_lottie(lottie_6, speed=1, key="done")
+    #time.sleep(3)
+    st.session_state.page = 'done'
+    st.experimental_rerun()
+
+elif st.session_state.page == 'done':
+    col1, col2, col3 = st.columns([1,2,1])
+
+    with col2:
+        st_lottie(lottie_6, height=300, speed=1, key="done")
+        file_data = get_file_data('uploaded_file.pdf')
+        st.download_button('Download PDF File', file_data, 'Resume.pdf', 'application/pdf')

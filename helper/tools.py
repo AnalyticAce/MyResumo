@@ -1,10 +1,8 @@
 import streamlit as st
 import base64
-from pdf2image import convert_from_path
 from PIL import Image
 import PyPDF2
 import requests
-
 
 def load_lottie(url): 
     req = requests.get(url)
@@ -12,13 +10,10 @@ def load_lottie(url):
         None
     return req.json()
 
-def get_binary_file_downloader_link(file, file_label='File'):
+def get_file_data(file):
     with open(file, 'rb') as f:
         data = f.read()
-    bin_str = base64.b64encode(data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{file_label}">Download {file_label}</a>'
-    
-    return href
+    return data
 
 def pdf_to_text(file):
     
