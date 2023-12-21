@@ -67,7 +67,7 @@ if st.session_state.page == 'home':
 
     if submitted:
         if not OPENAI_API_KEY:
-            st.info("Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here]((https://platform.openai.com/account/api-keys).")
+            st.info("Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here](https://platform.openai.com/account/api-keys).")
             st.stop()
 
         st.session_state.OPENAI_API_KEY = OPENAI_API_KEY
@@ -140,7 +140,7 @@ elif st.session_state.page == 'generate':
     st.divider()
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
     
-    
+    """
     if generation:
         resume_content = temp_file
         tone = resume_tone
@@ -151,6 +151,4 @@ elif st.session_state.page == 'generate':
             st.success('Your Resume is Successfully Generated')
         else:
             st.info("Template 2 is not available for the moment")
-        
-        
-# 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
+    """    
