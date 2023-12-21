@@ -87,7 +87,6 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
         with open('generated_resume.json', 'w') as json_file:
             json.dump(generated_resume_dict, json_file, indent=4)
 
-        # Return the generated resume JSON file path
         return 'generated_resume.json'
     except Exception as e:
         if "AuthenticationError" in str(e):

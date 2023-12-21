@@ -140,15 +140,15 @@ elif st.session_state.page == 'generate':
     st.divider()
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
     
-    """
-    if generation:
-        resume_content = temp_file
-        tone = resume_tone
-        resume_prompt = prompt_generate(resume_content, job_description, tone, OPENAI_API_KEY)
-        if resume_template == "Template 1":
-            resume_html = template_one_html(resume_prompt)
-            save_resume = html_to_pdf(resume_html)
-            st.success('Your Resume is Successfully Generated')
-        else:
-            st.info("Template 2 is not available for the moment")
-    """    
+    
+    #if generation:
+    #    resume_content = temp_file
+    #    tone = resume_tone
+    #    resume_prompt = prompt_generate(resume_content, job_description, tone, OPENAI_API_KEY)
+    #    if resume_template == "Template 1":
+    #        resume_html = template_one_html(resume_prompt)
+    #        save_resume = html_to_pdf(resume_html)
+    #        st.success('Your Resume is Successfully Generated')
+    #    else:
+    #        st.info("Template 2 is not available for the moment")
+    #"""    
