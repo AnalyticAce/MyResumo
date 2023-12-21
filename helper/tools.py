@@ -3,6 +3,14 @@ import base64
 from pdf2image import convert_from_path
 from PIL import Image
 import PyPDF2
+import requests
+
+
+def load_lottie(url): 
+    req = requests.get(url)
+    if req.status_code != 200:
+        None
+    return req.json()
 
 def get_binary_file_downloader_link(file, file_label='File'):
     with open(file, 'rb') as f:

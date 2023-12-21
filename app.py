@@ -1,10 +1,12 @@
 from helper.toast_message import get_random_toast
-from helper.tools import get_binary_file_downloader_link, pdf_to_text
+from helper.tools import get_binary_file_downloader_link, pdf_to_text, load_lottie
 from helper.openai_utils import *
 from helper.html_pdf import *
 import streamlit as st
 import tempfile, os
-
+import random
+import requests
+from streamlit_lottie import st_lottie
 # Set the page configuration
 st.set_page_config(
     page_title="MyResumo",
@@ -12,6 +14,15 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# load lottie files
+lottie_1 = load_lottie("https://lottie.host/dfe3e0ef-4fb3-4798-9f82-fc99376d49c4/gPgz773jxN.json")
+lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba/DPrE5rtPvz.json")
+lottie_3 = load_lottie('https://lottie.host/a3571103-ff5b-453c-9117-d4f441880eb2/4qGZQ5PSek.json')
+lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
+lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
+
+lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
 
 # Check if the 'page' key exists in the session state
 if 'page' not in st.session_state:
@@ -24,6 +35,12 @@ if st.session_state.page == 'home':
         st.toast(message, icon=icon)
         st.session_state.first_time = False
 
+    col1, col2, col3 = st.columns([1,2,1])
+
+    with col2:
+        #st_lottie(random.choice(lottie), height=300, key="lottie")
+        st_lottie(lottie_5, height=300, key="lottie")
+        
     with st.sidebar:
         st.header("👨‍💻 About the Author")
         st.write("""
@@ -54,7 +71,7 @@ if st.session_state.page == 'home':
 
     ⚠️ **Important:** Your OpenAI API KEY must be valid and belong to the :red[GPT 3.5 or 4 model] to move to the generate step.
 
-    Once you've input the your API KEY, voilà ! Dive deep into the generation of you Resume by pressing the Start Button and follow the intructions to build your tailored Resume . Let's transform your Experiences & Skills to art! 
+    Once you've input the your API KEY, voilà ! Dive deep into the generation of your Resume by pressing the ***:red[Start]*** Button and follow the intructions to build your tailored Resume . Let's transform your Experiences & Skills to art! 
     """)
 
     with st.expander("💡 Video Tutorial"):
