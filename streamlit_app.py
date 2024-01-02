@@ -92,7 +92,7 @@ if st.session_state.page == 'home':
         
         # Set the 'page' key to 'generate' and rerun the script
         st.session_state.page = 'generate'
-        st.experimental_rerun()
+        st.rerun()
 
 # Display the generate page
 elif st.session_state.page == 'generate':
@@ -162,7 +162,7 @@ elif st.session_state.page == 'generate':
     if generation:
         print('Done')
         st.session_state.page = 'loading'
-        st.experimental_rerun()
+        st.rerun()
     #if generation:
     #    resume_content = temp_file
     #    tone = resume_tone
@@ -186,7 +186,7 @@ elif st.session_state.page == 'loading':
 elif st.session_state.page == 'done':
     col1, col2, col3 = st.columns([1,2,1])
 
-    with col2:
+    with col1:
         st_lottie(lottie_6, height=300, speed=1, key="done")
         file_data = get_file_data('uploaded_file.pdf')
         st.download_button('Download PDF File', file_data, 'Resume.pdf', 'application/pdf')
