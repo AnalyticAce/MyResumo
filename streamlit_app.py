@@ -7,7 +7,8 @@ import tempfile, os
 import random
 import time
 from streamlit_lottie import st_lottie
-# Set the page configuration
+
+
 st.set_page_config(
     page_title="MyResumo",
     page_icon="🧠",
@@ -15,32 +16,33 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# with open("style.css") as f:
+#     st
 # load lottie files
-lottie_1 = load_lottie("https://lottie.host/dfe3e0ef-4fb3-4798-9f82-fc99376d49c4/gPgz773jxN.json")
-lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba/DPrE5rtPvz.json")
-lottie_3 = load_lottie('https://lottie.host/a3571103-ff5b-453c-9117-d4f441880eb2/4qGZQ5PSek.json')
-lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
-lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
-lottie_6 = load_lottie('https://lottie.host/d7d89f38-1f7f-4554-b08e-944f582f015d/ruDEKuRXKZ.json')
+# lottie_1 = load_lottie("https://lottie.host/dfe3e0ef-4fb3-4798-9f82-fc99376d49c4/gPgz773jxN.json")
+# lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba/DPrE5rtPvz.json")
+# lottie_3 = load_lottie('https://lottie.host/a3571103-ff5b-453c-9117-d4f441880eb2/4qGZQ5PSek.json')
+# lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
+# lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
+# lottie_6 = load_lottie('https://lottie.host/d7d89f38-1f7f-4554-b08e-944f582f015d/ruDEKuRXKZ.json')
 
-lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
+# lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
 
 # Check if the 'page' key exists in the session state
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# Display the home page
 if st.session_state.page == 'home':
     if 'first_time' not in st.session_state:
         message, icon = get_random_toast()
         st.toast(message, icon=icon)
         st.session_state.first_time = False
 
-    col1, col2, col3 = st.columns([1,2,1])
+    # col1, col2, col3 = st.columns([1,2,1])
 
-    with col2:
-        #st_lottie(random.choice(lottie), height=300, key="lottie")
-        st_lottie(lottie_5, height=300, key="lottie")
+    # with col2:
+    #     #st_lottie(random.choice(lottie), height=300, key="lottie")
+    #     st_lottie(lottie_5, height=300, key="lottie")
         
     with st.sidebar:
         st.header("👨‍💻 About the Author")
@@ -96,7 +98,6 @@ if st.session_state.page == 'home':
 
 # Display the generate page
 elif st.session_state.page == 'generate':
-    # Your generate page code goes here...
     OPENAI_API_KEY = st.session_state.get('OPENAI_API_KEY')
     
     if not OPENAI_API_KEY:
@@ -126,19 +127,12 @@ elif st.session_state.page == 'generate':
                 
         st.success('File Uploaded Successfully')
 
-        # Remember to remove the temporary file when done
-        # Waring use this link we can it may base problems in the future
         os.unlink(temp_file.name)
 
-    
-    # add description
-    #if uploaded_file is not None:
     
     st.title('***Add a Job Description***')
     st.write("**:red[Must Know]** : In this Section you are required to paste the **:blue[job description]** of the job you are applying too")
     job_description = st.text_area('***Enter the job description here***', height=300)
-    
-    #print(job_description)
         
     
     st.title('***Choose the Tone of your Resume***')
@@ -158,7 +152,6 @@ elif st.session_state.page == 'generate':
     st.divider()
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
     
-    
     if generation:
         print('Done')
         st.session_state.page = 'loading'
@@ -174,19 +167,19 @@ elif st.session_state.page == 'generate':
     #    else:
     #        st.info("Template 2 is not available for the moment")
     #"""    
-elif st.session_state.page == 'loading':
+# elif st.session_state.page == 'loading':
     
-    st_lottie(lottie_5, speed=1, key="animation")
-    time.sleep(10)
-    #st_lottie(lottie_6, speed=1, key="done")
-    #time.sleep(3)
-    st.session_state.page = 'done'
-    st.experimental_rerun()
+#     st_lottie(lottie_5, speed=1, key="animation")
+#     time.sleep(10)
+#     #st_lottie(lottie_6, speed=1, key="done")
+#     #time.sleep(3)
+#     st.session_state.page = 'done'
+#     st.experimental_rerun()
 
-elif st.session_state.page == 'done':
-    col1, col2, col3 = st.columns([1,2,1])
+# elif st.session_state.page == 'done':
+#     col1, col2, col3 = st.columns([1,2,1])
 
-    with col1:
-        st_lottie(lottie_6, height=300, speed=1, key="done")
-        file_data = get_file_data('uploaded_file.pdf')
-        st.download_button('Download PDF File', file_data, 'Resume.pdf', 'application/pdf')
+#     with col1:
+#         st_lottie(lottie_6, height=300, speed=1, key="done")
+#         file_data = get_file_data('uploaded_file.pdf')
+#         st.download_button('Download PDF File', file_data, 'Resume.pdf', 'application/pdf')
