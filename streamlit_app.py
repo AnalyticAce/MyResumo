@@ -16,8 +16,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# with open("style.css") as f:
-#     st
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
 # load lottie files
 # lottie_1 = load_lottie("https://lottie.host/dfe3e0ef-4fb3-4798-9f82-fc99376d49c4/gPgz773jxN.json")
 # lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba/DPrE5rtPvz.json")
