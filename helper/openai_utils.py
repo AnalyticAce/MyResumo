@@ -63,7 +63,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
             "company": "",
             "start_date": "",
             "end_date": "",
-            "tasks": []
+            "four_tasks": []
         }},
         ...
         ],
@@ -105,7 +105,6 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     )
 
     response_text = response.choices[0].text.strip()
-    #print("Response text:", response_text)
     try:
         result_json = json.loads(response_text)
     except json.JSONDecodeError as e:

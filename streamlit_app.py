@@ -24,12 +24,11 @@ with open("style.css") as f:
 # lottie_2 = load_lottie("https://lottie.host/a3af983f-6f84-4ad1-a8e7-f005d779faba/DPrE5rtPvz.json")
 # lottie_3 = load_lottie('https://lottie.host/a3571103-ff5b-453c-9117-d4f441880eb2/4qGZQ5PSek.json')
 # lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
-# lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
+lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
 # lottie_6 = load_lottie('https://lottie.host/d7d89f38-1f7f-4554-b08e-944f582f015d/ruDEKuRXKZ.json')
 
 # lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
 
-# Check if the 'page' key exists in the session state
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
@@ -39,11 +38,11 @@ if st.session_state.page == 'home':
         st.toast(message, icon=icon)
         st.session_state.first_time = False
 
-    # col1, col2, col3 = st.columns([1,2,1])
+    col1, col2, col3 = st.columns([1,2,1])
 
-    # with col2:
-    #     #st_lottie(random.choice(lottie), height=300, key="lottie")
-    #     st_lottie(lottie_5, height=300, key="lottie")
+    with col2:
+        #st_lottie(random.choice(lottie), height=300, key="lottie")
+        st_lottie(lottie_5, height=300, key="lottie")
         
     with st.sidebar:
         st.header("👨‍💻 About the Author")
@@ -57,15 +56,16 @@ if st.session_state.page == 'home':
         st.subheader("🔗 Connect with Me", anchor=False)
         st.markdown(
             """
-            - 🐙 [Source Code](https://github.com/Sven-Bo/streamlit-quiztube/)
-            - 👔 [LinkedIn](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
+            - 🐙 [Source Code](https://github.com/AnalyticAce/MyResumo)
+            - 👔 [Connect With me](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
+            - 🍕 [Buy me a Pizza](https://www.buymeacoffee.com/dossehdossB)
             """
         )
 
         st.divider()
         "Made with ♥ in Cotonou, Benin Republic"
 
-    st.title("Search Job. :blue[MyRe]:red[sumo]. Get Hired", anchor=False)
+    st.title("Search Job. :blue[MyRe]:red[sumo] . Get Hired", anchor=False)
     """
     Are you looking for a way to make your resume stand out from the crowd ? Do you want to impress your potential employers with your skills and achievements ? If yes, then **MyResumo** is the perfect tool for you!
 
@@ -93,11 +93,9 @@ if st.session_state.page == 'home':
 
         st.session_state.OPENAI_API_KEY = OPENAI_API_KEY
         
-        # Set the 'page' key to 'generate' and rerun the script
         st.session_state.page = 'generate'
         st.rerun()
 
-# Display the generate page
 elif st.session_state.page == 'generate':
     OPENAI_API_KEY = st.session_state.get('OPENAI_API_KEY')
     
@@ -169,7 +167,7 @@ elif st.session_state.page == 'generate':
             st.success('Your Resume is Successfully Generated')
         else:
             st.info("Template 2 is not available for the moment")
-    #"""    
+
 # elif st.session_state.page == 'loading':
     
 #     st_lottie(lottie_5, speed=1, key="animation")
