@@ -166,8 +166,7 @@ elif st.session_state.page == 'generate':
             resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language)
             
             "**:red[Resume Generated 🔃...]**"
-            
-            print(resume_prompt)
+
         if resume_template == "Template 1":
             pass
             #resume_html = template_one_html(resume_prompt)
