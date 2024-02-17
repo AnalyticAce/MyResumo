@@ -1,10 +1,14 @@
+# import json
+# import streamlit as st
+# from langchain.chat_models import ChatOpenAI
+# from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+# from langchain.chains import LLMChain
+
+import openai
 import json
-import streamlit as st
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-from langchain.chains import LLMChain
 
 def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY):
+    openai.api_key = OPENAI_API_KEY
     template = f"""
     You are an advanced and sophisticated Interviewer and Recruiter powered with an AI model trained to optimize resumes based on a specific job description. 
     Your task is to enhance the user's existing resume by incorporating relevant keywords from the job description, valuing their past jobs or projects, and ensuring it aligns with the job requirements. 
@@ -91,33 +95,21 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     
     Please ensure that the tone of the resume matches the provided tone parameter: {tone}.
     
-    NB: You are to only reply the output (structured result) nothing else, Not even an inductory sentence to the output.    """
+    NB: You are to only reply the output (structured result) nothing else, Not even an inductory sentence to the output."""
+
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo-instruct",
+        prompt=template,
+        temperature=0.7
+        ,max_tokens=1000
+    )
+
+    response_text = response.choices[0].text.strip()
+    #print("Response text:", response_text)
     try:
-        system_message_prompt = SystemMessagePromptTemplate.from_template(template)
-        human_message_prompt = HumanMessagePromptTemplate.from_template("{text}")
-        chat_prompt = ChatPromptTemplate.from_messages(
-            [system_message_prompt, human_message_prompt]
-        )
-        chain = LLMChain(
-            llm=ChatOpenAI(openai_api_key=OPENAI_API_KEY),
-            prompt=chat_prompt,
-        )
-        
-        # Run the LangChain model with resume_content as the input data
-        generated_resume = chain.run(resume_content)
+        result_json = json.loads(response_text)
+    except json.JSONDecodeError as e:
+        print("Error decoding JSON:", e)
+        result_json = None
 
-        # Convert the generated resume to a Python dictionary
-        generated_resume_dict = json.loads(generated_resume)
-
-        # Save the dictionary as a JSON file
-        with open('generated_resume.json', 'w') as json_file:
-            json.dump(generated_resume_dict, json_file, indent=4)
-
-        return 'generated_resume.json'
-    except Exception as e:
-        if "AuthenticationError" in str(e):
-            st.error("Incorrect API key provided. Please check and update your API key.")
-            st.stop()
-        else:
-            st.error(f"An error occurred: {str(e)}")
-            st.stop()
+    return result_json

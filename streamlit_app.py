@@ -47,11 +47,11 @@ if st.session_state.page == 'home':
         
     with st.sidebar:
         st.header("👨‍💻 About the Author")
-        st.write("""
+        """
         **DOSSEH Shalom** is a Problem Solver, Fintech enthusiast, coder and innovator. Driven by passion and a love to solve real life problems, he created this app to make job search more interactive and easier.
 
         Connect, contribute, or just say hi!
-        """)
+        """
 
         st.divider()
         st.subheader("🔗 Connect with Me", anchor=False)
@@ -63,10 +63,10 @@ if st.session_state.page == 'home':
         )
 
         st.divider()
-        st.write("Made with ♥ in Cotonou, Benin Republic")
+        "Made with ♥ in Cotonou, Benin Republic"
 
     st.title("Search Job. :blue[MyRe]:red[sumo]. Get Hired", anchor=False)
-    st.write("""
+    """
     Are you looking for a way to make your resume stand out from the crowd ? Do you want to impress your potential employers with your skills and achievements ? If yes, then **MyResumo** is the perfect tool for you!
 
     **How does it work?** 🤔
@@ -76,7 +76,7 @@ if st.session_state.page == 'home':
     ⚠️ **Important:** Your OpenAI API KEY must be valid and belong to the :red[GPT 3.5 or 4 model] to move to the generate step.
 
     Once you've input the your API KEY, voilà ! Dive deep into the generation of your Resume by pressing the ***:red[Start]*** Button and follow the intructions to build your tailored Resume . Let's transform your Experiences & Skills to art! 
-    """)
+    """
 
     with st.expander("💡 Video Tutorial"):
         with st.spinner("Loading video.."):
@@ -108,33 +108,23 @@ elif st.session_state.page == 'generate':
     st.title('***Upload your Resume***')
     st.write("**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**")
     st.write("***:blue[Tip]*** : If you don't have a resume you can download the template below and fill out the template below with your informations")
-    #st.markdown(get_file_data('template.pdf', 'Resume Template'), unsafe_allow_html=True)
     uploaded_file = st.file_uploader("***Choose a PDF file***", type="pdf")
     
     if uploaded_file is not None:
-        # Read the file from the UploadedFile object
         file_bytes = uploaded_file.read()
-        
-        # Create a temporary file and write the contents of the uploaded file to it
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(file_bytes)
         temp_file.close()
 
-        # Now you can use the path of the temp_file with your pdf_to_text function
         text = pdf_to_text(temp_file.name)
-            
-        for tx in text:
-            print(tx)
-                
+        
         st.success('File Uploaded Successfully')
 
         os.unlink(temp_file.name)
 
-    
     st.title('***Add a Job Description***')
     st.write("**:red[Must Know]** : In this Section you are required to paste the **:blue[job description]** of the job you are applying too")
     job_description = st.text_area('***Enter the job description here***', height=300)
-        
     
     st.title('***Choose the Tone of your Resume***')
     st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
@@ -146,27 +136,39 @@ elif st.session_state.page == 'generate':
     resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
     
     if resume_template == "Template 1":
-        print("hello")
+        pass
     else:
         st.info("Template 2 is not available for the moment")
     
     st.divider()
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
-    
+
     if generation:
-        print('Done')
-        st.session_state.page = 'loading'
-        st.rerun()
-    #if generation:
-    #    resume_content = temp_file
-    #    tone = resume_tone
-    #    resume_prompt = prompt_generate(resume_content, job_description, tone, OPENAI_API_KEY)
-    #    if resume_template == "Template 1":
-    #        resume_html = template_one_html(resume_prompt)
-    #        save_resume = html_to_pdf(resume_html)
-    #        st.success('Your Resume is Successfully Generated')
-    #    else:
-    #        st.info("Template 2 is not available for the moment")
+        with st.status("***:blue[Generate Resume 🤖...]***"):
+            "**:red[Reading Resume informations 🕵️‍♂️...]**"
+            
+            resume_content = temp_file
+            
+            "**:blue[Fetching Job Description 🔗.]**"
+            "**:red[Applying Resume Tone  🔗.]**"
+            
+            tone = resume_tone
+            
+            "**:blue[Generating Resume 🔃...]**"
+            
+            resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY)
+            
+            "**:red[Resume Generated 🔃...]**"
+            
+            print(resume_prompt)
+        if resume_template == "Template 1":
+            pass
+            #resume_html = template_one_html(resume_prompt)
+            #print(resume_html)
+            #save_resume = html_to_pdf(resume_html)
+            st.success('Your Resume is Successfully Generated')
+        else:
+            st.info("Template 2 is not available for the moment")
     #"""    
 # elif st.session_state.page == 'loading':
     
