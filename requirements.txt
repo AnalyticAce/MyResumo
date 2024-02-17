@@ -1,9 +1,7 @@
-openai==0.28.0
-Pillow==9.5.0
-Pillow==10.1.0
-Pillow==10.2.0
-protobuf==4.21.12
-PyPDF2==3.0.1
-Requests==2.31.0
-streamlit==1.29.0
-streamlit_lottie==0.0.5
+openai
+Pillow
+protobuf
+PyPDF2
+Requests
+streamlit
+streamlit_lottie

@@ -168,11 +168,12 @@ elif st.session_state.page == 'generate':
             "**:red[Resume Generated 🔃...]**"
 
         if resume_template == "Template 1":
+            st.success('Your Resume is Successfully Selected')
             pass
             #resume_html = template_one_html(resume_prompt)
             #print(resume_html)
             #save_resume = html_to_pdf(resume_html)
-            st.success('Your Resume is Successfully Generated')
+            
         else:
             st.info("Template 2 is not available for the moment")
 
