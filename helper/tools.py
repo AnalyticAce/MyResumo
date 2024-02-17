@@ -23,7 +23,7 @@ def get_file_data(file):
 @st.cache_data(show_spinner=False)
 def pdf_to_text(file):
     with open(file, "rb") as pdf:
-        reader = PyPDF2.PdfFileReader(pdf, strict=False)
+        reader = PyPDF2.PdfReader(pdf, strict=False)
         
         pdf_text = []
         
