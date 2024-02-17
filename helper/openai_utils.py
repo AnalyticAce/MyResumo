@@ -1,13 +1,30 @@
-# import json
-# import streamlit as st
-# from langchain.chat_models import ChatOpenAI
-# from langchain.prompts.chat import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-# from langchain.chains import LLMChain
-
 import openai
 import json
+import streamlit as st 
+import requests
 
-def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY):
+@st.cache_data(show_spinner=False)
+def is_valid_openai_key(api_key):
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.post(
+            "https://api.openai.com/v1/engines/gpt-3.5-turbo-instruct/completions",
+            headers=headers,
+            json={"prompt": "Hello, world!", "max_tokens": 5}
+        )
+        response.raise_for_status()
+        return True
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Error:",errt)
+    except requests.exceptions.RequestException as err:
+        print("Something went wrong",err)
+    return False
+
+@st.cache_data(show_spinner=False)
+def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language):
     openai.api_key = OPENAI_API_KEY
     template = f"""
     You are an advanced and sophisticated Interviewer and Recruiter powered with an AI model trained to optimize resumes based on a specific job description. 
@@ -19,6 +36,9 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     The job description the user is applying to the job description as follows:
     {job_description}
 
+    The resume is to be generated in the language below:
+    {language}
+    
     Below are some tips to follow:
     Tip: Match the skills in your resume to the exact spelling in the job description. Prioritize skills that appear most frequently in the job description.
     Tip: Prioritize hard skills in your resume to get interviews, and then showcase your soft skills in the interview to get jobs.
@@ -100,8 +120,8 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     response = openai.Completion.create(
         engine="gpt-3.5-turbo-instruct",
         prompt=template,
-        temperature=0.7
-        ,max_tokens=1000
+        temperature=0.7,
+        max_tokens=1000
     )
 
     response_text = response.choices[0].text.strip()
@@ -109,6 +129,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
         result_json = json.loads(response_text)
     except json.JSONDecodeError as e:
         print("Error decoding JSON:", e)
+        st.error('Error occured when generating resume, **Please Press the Generate Your Resume Button**', icon='🚨')
         result_json = None
 
     return result_json

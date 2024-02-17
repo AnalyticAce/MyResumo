@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-with open("style.css") as f:
+with open("style/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 # load lottie files
@@ -26,7 +26,6 @@ with open("style.css") as f:
 # lottie_4 = load_lottie('https://lottie.host/0cb6a992-b081-4183-9316-65bd6021a623/ZDEWF6R55F.json')
 lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
 # lottie_6 = load_lottie('https://lottie.host/d7d89f38-1f7f-4554-b08e-944f582f015d/ruDEKuRXKZ.json')
-
 # lottie = [lottie_1, lottie_2, lottie_4, lottie_5]
 
 if 'page' not in st.session_state:
@@ -57,7 +56,7 @@ if st.session_state.page == 'home':
         st.markdown(
             """
             - 🐙 [Source Code](https://github.com/AnalyticAce/MyResumo)
-            - 👔 [Connect With me](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
+            - 👔 [Contact me](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
             - 🍕 [Buy me a Pizza](https://www.buymeacoffee.com/dossehdossB)
             """
         )
@@ -88,9 +87,12 @@ if st.session_state.page == 'home':
 
     if submitted:
         if not OPENAI_API_KEY:
-            st.info("Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here](https://platform.openai.com/account/api-keys).")
+            st.warning("Please fill out the OpenAI API Key to proceed. If you don't have one, you can obtain it [here](https://platform.openai.com/account/api-keys).", icon='🔥')
             st.stop()
-
+        if not is_valid_openai_key(OPENAI_API_KEY):
+            st.error("Your API key is invalid. If you don't have one, you can obtain it [here](https://platform.openai.com/account/api-keys).", icon="🚨")
+            st.stop()
+        
         st.session_state.OPENAI_API_KEY = OPENAI_API_KEY
         
         st.session_state.page = 'generate'
@@ -100,12 +102,15 @@ elif st.session_state.page == 'generate':
     OPENAI_API_KEY = st.session_state.get('OPENAI_API_KEY')
     
     if not OPENAI_API_KEY:
-        st.warning("OpenAI API Key not found. Please enter the key on the home page.")
+        st.warning("OpenAI API Key not found. Please enter the key on the home page.", icon="🔥")
         st.stop()
 
     st.title('***Upload your Resume***')
-    st.write("**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**")
-    st.write("***:blue[Tip]*** : If you don't have a resume you can download the template below and fill out the template below with your informations")
+    
+    "**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**"
+    
+    st.info("***:blue[Tip]*** : If you don't have a [:red[RESUME]](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=drive_link) you can download the template below and fill out the template below with your informations",icon='ℹ️')
+    
     uploaded_file = st.file_uploader("***Choose a PDF file***", type="pdf")
     
     if uploaded_file is not None:
@@ -113,22 +118,25 @@ elif st.session_state.page == 'generate':
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(file_bytes)
         temp_file.close()
-
         text = pdf_to_text(temp_file.name)
         
         st.success('File Uploaded Successfully')
-
         os.unlink(temp_file.name)
 
     st.title('***Add a Job Description***')
     st.write("**:red[Must Know]** : In this Section you are required to paste the **:blue[job description]** of the job you are applying too")
     job_description = st.text_area('***Enter the job description here***', height=300)
-    
+
     st.title('***Choose the Tone of your Resume***')
     st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
-    resume_tone = st.selectbox("Select a Resume Tone", ["Creative", "Balanced", "Professional", "Expert"])
+    resume_tone = st.selectbox("Select a Resume Tone", ["Professional", "Creative", "Balanced",  "Expert"])
 
-    st.title('***Choose the Tone of your Resume Template***')
+    st.title('***Choose a Language***')
+    st.write("**:red[Must Know]** : In this Section you are asked to choose a language in which your resume that will be generated")
+    st.info('Advice: It is adviced to choose the source language of the resume uploaded', icon="ℹ️")
+    language = st.selectbox("Select a Language", ["English", "French"])
+    
+    st.title('***Choose the Tone of your Resume***')
     st.write("**:red[Must Know]** : In this Section you should choose the template you want")
     st.write("**:blue[See More]** : Click on the links below to see the templates, [Template 1](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=sharing) and [Template 2](https://drive.google.com/file/d/1QGlNrMSPW_BYuXGsvK4g_5T85rY9-IYV/view?usp=sharing)")
     resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
@@ -142,19 +150,20 @@ elif st.session_state.page == 'generate':
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation:
-        with st.status("***:blue[Generate Resume 🤖...]***"):
+        with st.status("***:blue[Generating Resume 📑...]***"):
             "**:red[Reading Resume informations 🕵️‍♂️...]**"
             
-            resume_content = temp_file
+            resume_content = temp_file.name
             
-            "**:blue[Fetching Job Description 🔗.]**"
-            "**:red[Applying Resume Tone  🔗.]**"
+            "**:blue[Fetching Job Description 📑.]**"
+            
+            "**:red[Applying Resume Tone  🗣️.]**"
             
             tone = resume_tone
             
             "**:blue[Generating Resume 🔃...]**"
             
-            resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY)
+            resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language)
             
             "**:red[Resume Generated 🔃...]**"
             
