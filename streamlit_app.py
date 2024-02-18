@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-with open("style/style.css") as f:
+with open("template/style/style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 # load lottie files
@@ -125,10 +125,17 @@ elif st.session_state.page == 'generate':
 
     st.title('***Add a Job Description***')
     st.write("**:red[Must Know]** : In this Section you are required to paste the **:blue[job description]** of the job you are applying too")
+    with st.expander(":smile: **Good to Know**"):
+        st.info("""When entering the job description, be sure to include key details such as required skills, responsibilities, qualifications, 
+        and any other relevant information. Providing a comprehensive job description will help tailor your resume more effectively to the position 
+        you're applying for. Remember, clarity and specificity in your job description will result in a more targeted and impactful resume. :memo:""")
+        
     job_description = st.text_area('***Enter the job description here***', height=300)
 
     st.title('***Choose the Tone of your Resume***')
     st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
+    with st.expander(":smile: **Good to Know**"):
+        st.info("Choose a tone that matches your desired resume style: 'Professional' for formal settings, 'Creative' for showcasing creativity, 'Balanced' for a mix, and 'Expert' for highlighting specialized expertise.", icon="ℹ️")
     resume_tone = st.selectbox("Select a Resume Tone", ["Professional", "Creative", "Balanced",  "Expert"])
 
     st.title('***Choose a Language***')
@@ -136,7 +143,7 @@ elif st.session_state.page == 'generate':
     st.info('Advice: It is adviced to choose the source language of the resume uploaded', icon="ℹ️")
     language = st.selectbox("Select a Language", ["English", "French"])
     
-    st.title('***Choose the Tone of your Resume***')
+    st.title('***Choose the a Template Resume***')
     st.write("**:red[Must Know]** : In this Section you should choose the template you want")
     st.write("**:blue[See More]** : Click on the links below to see the templates, [Template 1](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=sharing) and [Template 2](https://drive.google.com/file/d/1QGlNrMSPW_BYuXGsvK4g_5T85rY9-IYV/view?usp=sharing)")
     resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
@@ -150,6 +157,14 @@ elif st.session_state.page == 'generate':
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation:
+        if 'temp_file' not in locals() or not temp_file:
+            st.warning("Please upload a file before generating your resume.", icon='📑')
+            st.stop()
+        
+        if not job_description:
+            st.warning("Please enter the job description before generating your resume.", icon='📑')
+            st.stop()
+        
         with st.status("***:blue[Generating Resume 📑...]***"):
             "**:red[Reading Resume informations 🕵️‍♂️...]**"
             

@@ -114,6 +114,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     Generate a tailored resume that emphasizes relevant experiences, skills, and qualifications for the mentioned job. Ensure the output is in a well-structured JSON format.
     
     Please ensure that the tone of the resume matches the provided tone parameter: {tone}.
+    'Professional' for formal settings, 'Creative' for showcasing creativity, 'Balanced' for a mix, and 'Expert' for highlighting specialized expertise.
     
     NB: You are to only reply the output (structured result) nothing else, Not even an inductory sentence to the output."""
 
@@ -128,7 +129,7 @@ def generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY
     try:
         result_json = json.loads(response_text)
     except json.JSONDecodeError as e:
-        print("Error decoding JSON:", e)
+        #print("Error decoding JSON:", e)
         st.error('Error occured when generating resume, **Please Press the Generate Your Resume Button**', icon='🚨')
         result_json = None
 
