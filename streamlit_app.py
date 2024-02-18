@@ -134,9 +134,15 @@ elif st.session_state.page == 'generate':
 
     st.title('***Choose the Tone of your Resume***')
     st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
-    with st.expander(":smile: **Good to Know**"):
-        st.info("Choose a tone that matches your desired resume style: 'Professional' for formal settings, 'Creative' for showcasing creativity, 'Balanced' for a mix, and 'Expert' for highlighting specialized expertise.", icon="ℹ️")
     resume_tone = st.selectbox("Select a Resume Tone", ["Professional", "Creative", "Balanced",  "Expert"])
+    if resume_tone == 'Professional':
+        st.info("Professional tone is suitable for formal settings where professionalism is emphasized.", icon="ℹ️")
+    elif resume_tone == 'Creative':
+        st.info("Creative tone allows for showcasing creativity and personality in your resume.", icon="ℹ️")
+    elif resume_tone == 'Balanced':
+        st.info("Balanced tone strikes a mix between professionalism and creativity, suitable for various industries.", icon="ℹ️")
+    elif resume_tone == "Expert":
+        st.info("Expert tone is ideal for highlighting specialized expertise and technical skills in your resume.", icon="ℹ️")
 
     st.title('***Choose a Language***')
     st.write("**:red[Must Know]** : In this Section you are asked to choose a language in which your resume that will be generated")
