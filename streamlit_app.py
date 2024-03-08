@@ -1,7 +1,7 @@
 from helper.toast_message import get_random_toast
 from helper.tools import get_file_data, pdf_to_text, load_lottie
 from helper.openai_utils import *
-from helper.html_pdf import *
+# from helper.html_pdf import *
 import streamlit as st
 import tempfile, os
 import random
