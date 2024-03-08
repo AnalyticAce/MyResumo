@@ -8,7 +8,6 @@ import random
 import time
 from streamlit_lottie import st_lottie
 
-
 st.set_page_config(
     page_title="MyResumo",
     page_icon="🧠",
@@ -16,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-with open("template/style/style.css") as f:
+with open("Templates/style/project.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 # load lottie files
@@ -187,7 +186,7 @@ elif st.session_state.page == 'generate':
             resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language)
             
             "**:red[Resume Generated 🔃...]**"
-
+            st.write(resume_prompt)
         if resume_template == "Template 1":
             st.success('Your Resume is Successfully Selected')
             pass
