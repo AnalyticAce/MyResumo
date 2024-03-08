@@ -5,5 +5,3 @@ PyPDF2
 Requests
 streamlit
 streamlit_lottie
-weasyprint
-pdfkit
