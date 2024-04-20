@@ -71,7 +71,7 @@ if st.session_state.page == 'home':
     1. Enter your OpenAI API Key.
     2. Press the start button and follow the instructions.
 
-    ⚠️ **Important:** Your OpenAI API KEY must be valid and belong to the :red[GPT 3.5 or 4 model] to move to the generate step.
+    ⚠️ **Important:** Your OpenAI API KEY must be valid and belong to the :red[GPT 4 model] to move to the generate step.
 
     Once you've input the your API KEY, voilà ! Dive deep into the generation of your Resume by pressing the ***:red[Start]*** Button and follow the intructions to build your tailored Resume . Let's transform your Experiences & Skills to art! 
     """
