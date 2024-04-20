@@ -162,40 +162,41 @@ elif st.session_state.page == 'generate':
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation:
-        if 'temp_file' not in locals() or not temp_file:
-            st.warning("Please upload a file before generating your resume.", icon='📑')
-            st.stop()
+        st.title('***:blue[We are building...]***')
+        # if 'temp_file' not in locals() or not temp_file:
+        #     st.warning("Please upload a file before generating your resume.", icon='📑')
+        #     st.stop()
         
-        if not job_description:
-            st.warning("Please enter the job description before generating your resume.", icon='📑')
-            st.stop()
+        # if not job_description:
+        #     st.warning("Please enter the job description before generating your resume.", icon='📑')
+        #     st.stop()
         
-        with st.status("***:blue[Generating Resume 📑...]***"):
-            "**:red[Reading Resume informations 🕵️‍♂️...]**"
+        # with st.status("***:blue[Generating Resume 📑...]***"):
+        #     "**:red[Reading Resume informations 🕵️‍♂️...]**"
             
-            resume_content = temp_file.name
+        #     resume_content = temp_file.name
             
-            "**:blue[Fetching Job Description 📑.]**"
+        #     "**:blue[Fetching Job Description 📑.]**"
             
-            "**:red[Applying Resume Tone  🗣️.]**"
+        #     "**:red[Applying Resume Tone  🗣️.]**"
             
-            tone = resume_tone
+        #     tone = resume_tone
             
-            "**:blue[Generating Resume 🔃...]**"
+        #     "**:blue[Generating Resume 🔃...]**"
             
-            resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language)
+        #     resume_prompt = generate_resume_prompt(resume_content, job_description, tone, OPENAI_API_KEY, language)
             
-            "**:red[Resume Generated 🔃...]**"
-            st.write(resume_prompt)
-        if resume_template == "Template 1":
-            st.success('Your Resume is Successfully Selected')
-            pass
-            #resume_html = template_one_html(resume_prompt)
-            #print(resume_html)
-            #save_resume = html_to_pdf(resume_html)
+        #     "**:red[Resume Generated 🔃...]**"
+        #     st.write(resume_prompt)
+        # if resume_template == "Template 1":
+        #     st.success('Your Resume is Successfully Selected')
+        #     pass
+        #     #resume_html = template_one_html(resume_prompt)
+        #     #print(resume_html)
+        #     #save_resume = html_to_pdf(resume_html)
             
-        else:
-            st.info("Template 2 is not available for the moment")
+        # else:
+        #     st.info("Template 2 is not available for the moment")
 
 # elif st.session_state.page == 'loading':
     
