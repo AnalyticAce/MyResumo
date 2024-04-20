@@ -78,7 +78,7 @@ if st.session_state.page == 'home':
 
     with st.expander("💡 Video Tutorial"):
         with st.spinner("Loading video.."):
-            st.video("https://youtu.be/yzBr3L2BIto", format="video/mp4", start_time=0)
+            st.video("https://youtu.be/Tt08KmFfIYQ?si=e4iMZrdq16-cTO1z", format="video/mp4", start_time=0)
 
     with st.form("user_input"):
         OPENAI_API_KEY = st.text_input("Enter your OpenAI API Key:", placeholder="SK-XXXX", type='password')
