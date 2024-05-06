@@ -167,14 +167,14 @@ def create_resume(data):
     """
     return resume_html
     
-def perfect_css_style(file="style.css"):
+def perfect_css_style(file="style/style.css"):
     style = read_file(file)
     css = f"""
     {style}
     """
     return css
 
-def create_pdf(data, filename, style="style.css"):
+def create_pdf(data, filename, style="style/style.css"):
     try:
         font_config = FontConfiguration()
         html = HTML(string=f"""{create_resume(data)}""")

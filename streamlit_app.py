@@ -3,12 +3,10 @@ from helper.tools import (
 )
 from helper.toast_message import get_random_toast
 from helper.generate import generate_resume
-from helper.html_pdf import create_pdf
+from helper.resume import create_pdf
 import streamlit as st
 import tempfile, os
 from streamlit_lottie import st_lottie
-import dotenv
-from dotenv import load_dotenv
 
 API_KEY = os.environ.get('OCTO_AI_TOKEN')
 
@@ -19,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-with open("project.css") as f:
+with open("helper/style/project.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 # load lottie files
@@ -159,7 +157,7 @@ elif st.session_state.page == 'generate':
         with st.progress(0, text="Generating Resume..."):
             resume = pdf_to_text(temp_file.name)
             st.progress(10, text="Parsing Your Resume...")
-            template = create_prompt("helper/prompt.txt")
+            template = create_prompt("Utils/prompt.txt")
             st.progress(20, text="Creating Prompt...")
             description = job_description
             st.progress(30, text="Reading Resume informations...")
@@ -168,7 +166,7 @@ elif st.session_state.page == 'generate':
             result = generate_resume(template, resume, description, tone, language, API_KEY)
             st.progress(85, text="Retrieving Generated Resume...")
             if result is not None:
-                new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "helper/style.css")
+                new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "helper/style/style.css")
                 st.progress(90, text="Creating Resume PDF...")
                 st.progress(100, text="Done")
                 if new_resume:
