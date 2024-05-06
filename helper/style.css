@@ -1,0 +1,66 @@
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+header, section {
+    padding: 10px 20px;
+}
+
+header h1 {
+    font-size: 36px;
+    color: #333333;
+}
+
+header p, header a, section a {
+    font-size: 13px;
+    color: #333333;
+    text-decoration: none;
+}
+
+h2 {
+    font-size: 9px;
+    color: #333333;
+    border-bottom: 1px solid #dddddd;
+    padding-bottom: 5px;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    font-size: 12px;
+    color: #333333;
+}
+
+ul {
+    padding: 0;
+}
+
+ul li {
+    list-style: disc;
+    margin-bottom: 2px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media print {
+    body {
+        background-color: #ffffff;
+    }
+
+    header, section {
+        padding: 0;
+        border: none;
+    }
+
+    h2 {
+        font-size: 20px;
+        border-bottom: 1px solid #333333;
+    }
+}

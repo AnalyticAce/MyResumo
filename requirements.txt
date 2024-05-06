@@ -1,0 +1,7 @@
+openai
+Pillow
+protobuf
+PyPDF2
+Requests
+streamlit
+streamlit_lottie
