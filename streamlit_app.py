@@ -168,15 +168,13 @@ elif st.session_state.page == 'generate':
             result = generate_resume(template, resume, description, tone, language, API_KEY)
             st.progress(85, text="Retrieving Generated Resume...")
             if result is not None:
-                new_resume = create_pdf(result, f"{user_name.replace(' ', '_').lower()}_generated.pdf", "helper/style.css")
+                new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "helper/style.css")
                 st.progress(90, text="Creating Resume PDF...")
+                st.progress(100, text="Done")
                 if new_resume:
                     st.success("Resume PDF created successfully! Please click the button below to download your resume.")
-                    # st.download_button("Download Generated Resume", new_resume, "Click here to download", False)
-                    st.markdown(get_pdf_download_link(f"{user_name.replace(' ', '_').lower()}_generated.pdf", f"{user_name.replace(' ', '_').lower()}_generated"), unsafe_allow_html=True)
+                    with open(f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "rb") as f:
+                        pdf_data = f.read()
+                    st.download_button("Download Generated Resume", pdf_data, f"{user_name.replace(' ', '_').lower()}_generated.pdf", False)
                 else:
                     st.warning("Failed to generate the resume. Please try again.")
-                st.progress(100, text="Done")
-
-# load_dotenv()
-# api_key = os.environ.get('API_KEY')

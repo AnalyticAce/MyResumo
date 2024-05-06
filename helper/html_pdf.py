@@ -171,7 +171,12 @@ def perfect_css_style(file="style.css"):
     return css
 
 def create_pdf(data, filename, style="style.css"):
-    font_config = FontConfiguration()
-    html = HTML(string=f"""{create_resume(data)}""")
-    css = CSS(string=f'''{perfect_css_style(style)}''', font_config=font_config)
-    html.write_pdf(filename, stylesheets=[css], font_config=font_config)
+    try:
+        font_config = FontConfiguration()
+        html = HTML(string=f"""{create_resume(data)}""")
+        css = CSS(string=f'''{perfect_css_style(style)}''', font_config=font_config)
+        html.write_pdf(filename, stylesheets=[css], font_config=font_config)
+        return True
+    except Exception as e:
+        print(f"Failed to create PDF: {e}")
+        return False
