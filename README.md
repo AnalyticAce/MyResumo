@@ -59,9 +59,9 @@ This will start the Streamlit server, and you should be able to access **MyResum
 
 ## Contribution Guidelines
 
-We welcome contributions to Open Kitchen! If you'd like to contribute, please follow these guidelines:
+We welcome contributions to MyResumo! If you'd like to contribute, please follow these guidelines:
 
-1. **Fork the Repository**: Start by forking the OpenCuisine repository on GitHub.
+1. **Fork the Repository**: Start by forking the MyResumo repository on GitHub.
 
 2. **Clone the Forked Repository**: Clone your forked repository to your local machine using `git clone`.
 
@@ -78,7 +78,7 @@ We welcome contributions to Open Kitchen! If you'd like to contribute, please fo
 8. **Review and Merge**: The maintainers will review your pull request. Once approved, your changes will be merged into the main codebase.
 
 ## Contact
-For any inquiries or collaboration requests, please reach out to DOSSEH Shalom at LinkedIn.
+For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom](www.linkedin.com/in/shalom-dosseh-4a484a262) at LinkedIn.
 
 ## Disclaimer
 This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses.
