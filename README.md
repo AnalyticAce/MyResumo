@@ -6,7 +6,7 @@
 ## Features
 - **AI-Powered Customization**: Utilizes AI to analyze job descriptions and tailor your resume accordingly.
 - **Streamlit Integration**: Built with Streamlit for a seamless user experience.
-- **OctoAI API**: Incorporates OctoAI API for intelligent interactions and suggestions with the use of the model `Mixtral-8x22b-Instruct` which is the first open source model ever to reach GPT-4 quality on MT Bench.
+- **OctoAI API**: Incorporates OctoAI API for intelligent interactions and suggestions with the use of the model `Mixtral-8x22b-Instruct` which is the first open source model ever to reach GPT-4 quality on MT Bench. It has a context lenght of over `65,536 tokens`
 
 ## Technologies Used
 - Python
