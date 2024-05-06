@@ -18,8 +18,10 @@
 ## Demo
 Below are images showing how the app looks like:
 
+- Home Page
 ![Home Page](Images/home.png)
 
+- Main Page
 ![Main Page](Images/app.png)
 
 Below is a generated Resumes from the model.
