@@ -22,6 +22,11 @@ Below are images showing how the app looks like:
 
 ![Main Page](Images/app.png)
 
+Below is a generated Resumes from the model.
+![Result](Images/result.png)
+
+*Note :* Still working on the frontend of the resume generated this might not look great :)
+
 ## Running the Application
 
 To run **MyResumo**, you'll need to set up your environment and install the necessary dependencies.
