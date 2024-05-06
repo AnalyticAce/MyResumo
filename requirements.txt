@@ -1,7 +1,7 @@
-openai
-Pillow
-protobuf
-PyPDF2
-Requests
-streamlit
-streamlit_lottie
+octoai==1.0.2
+PyPDF2==3.0.1
+python-dotenv==1.0.1
+Requests==2.31.0
+streamlit==1.29.0
+streamlit_lottie==0.0.5
+weasyprint==62.0
