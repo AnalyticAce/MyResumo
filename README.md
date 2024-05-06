@@ -24,7 +24,7 @@ Below are images showing how the app looks like:
 - Main Page
 ![Main Page](Images/app.png)
 
-Below is a generated Resumes from the model. [See Full Resume]("Data/dosseh_shalom_generated.pdf")
+Below is a generated Resumes from the model. [See Full Resume](Data/dosseh_shalom_generated.pdf)
 <div align="center">
 <img alt="Result" src="Images/result.png">
 </div>
