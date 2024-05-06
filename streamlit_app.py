@@ -1,9 +1,9 @@
-from helper.tools import (
+from Helper.tools import (
     pdf_to_text, load_lottie, create_prompt, get_pdf_download_link
 )
-from helper.toast_message import get_random_toast
-from helper.generate import generate_resume
-from helper.resume import create_pdf
+from Helper.toast_message import get_random_toast
+from Helper.generate import generate_resume
+from Helper.resume import create_pdf
 import streamlit as st
 import tempfile, os
 from streamlit_lottie import st_lottie
