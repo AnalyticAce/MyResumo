@@ -18,7 +18,7 @@
 ## Demo
 Below is are images showing how the app look like
 [Home Page]("Images/home.png")
-[Main Page]("Images/app.png)
+[Main Page]("Images/app.png")
 
 ## Running the Application
 
