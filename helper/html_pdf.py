@@ -2,17 +2,21 @@ from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 import json
 from .tools import read_file
+import streamlit as st
 
 def parse_user_information(data):
     user_information = data["user_information"]
     if user_information["name"] == '':
-        return ""
+        # return ""
+        st.warning("Your resume that not be parsed, please change it template", icon="📑")
+        st.stop()
     if user_information["main_job_title"] == '':
         return ""
     if user_information["profile_description"] == '':
         return ""
     if user_information["email"] == '':
-        return ""
+        st.warning("Please include an email address in your resume", icon="📑")
+        st.stop()
     if user_information["linkedin"] == '':
         return ""
     if user_information["github"] == []:
