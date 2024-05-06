@@ -24,9 +24,9 @@ Below are images showing how the app looks like:
 - Main Page
 ![Main Page](Images/app.png)
 
-Below is a generated Resumes from the model.
-<div style="display: flex; justify-content: center;">
-    <img src="Images/result.png" alt="Result">
+Below is a generated Resumes from the model. [See Full Resume]("Data/dosseh_shalom_generated.pdf")
+<div align="center">
+<img alt="Result" src="Images/result.png">
 </div>
 
 *Note :* Still working on the frontend of the resume generated this might not look great :)
