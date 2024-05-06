@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-with open("helper/style/project.css") as f:
+with open("Helper/style/project.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     
 # load lottie files
@@ -60,20 +60,20 @@ if st.session_state.page == 'home':
 
     st.title("Search Job. :blue[MyRe]:red[sumo] . Get Hired", anchor=False)
     """
-    Are you looking for a way to make your resume stand out from the crowd ? Do you want to impress your potential employers with your skills and achievements ? If yes, then **MyResumo** is the perfect tool for you!
+    Are you looking to elevate your resume and capture the attention of your dream employer? **MyResumo** is here to transform your job application process!
 
     **How does it work?** 🤔
-    1. Enter your OpenAI API Key.
-    2. Press the start button and follow the instructions.
+    1. You can watch the video tutorial below to get started.
+    2. Hit the :red[Start] button and let the magic unfold.
 
-    ⚠️ **Important:** Your OpenAI API KEY must be valid and belong to the :red[GPT 3.5 or 4 model] to move to the generate step.
+    ⚠️ **Important:** MyResumo is porweb by :red[Mixtral-8x22b-Instruct model], the first open-source model to achieve GPT-4 level performance on MT Bench, with an impressive context length of over 65,536 tokens.
 
-    Once you've input the your API KEY, voilà ! Dive deep into the generation of your Resume by pressing the ***:red[Start]*** Button and follow the intructions to build your tailored Resume . Let's transform your Experiences & Skills to art! 
+    Voilà, You're all set! Press the ***:red[Start]*** Button and embark on the journey to craft a resume that's as unique as your professional story. Let's turn your skills and experiences into a masterpiece!
     """
 
     with st.expander("💡 Video Tutorial"):
         with st.spinner("Loading video.."):
-            st.video("https://youtu.be/yzBr3L2BIto", format="video/mp4", start_time=0)
+            st.video("https://youtu.be/Tt08KmFfIYQ?si=t0cCNrtydsyHMg3y", format="video/mp4", start_time=0)
 
     submitted = st.button("Start", type="primary")
 
@@ -166,7 +166,7 @@ elif st.session_state.page == 'generate':
             result = generate_resume(template, resume, description, tone, language, API_KEY)
             st.progress(85, text="Retrieving Generated Resume...")
             if result is not None:
-                new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "helper/style/style.css")
+                new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "Helper/style/style.css")
                 st.progress(90, text="Creating Resume PDF...")
                 st.progress(100, text="Done")
                 if new_resume:

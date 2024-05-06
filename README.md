@@ -15,6 +15,11 @@
 - Streamlit
 - OctoAI API
 
+## Demo
+Below is are images showing how the app look like
+[Home Page]("Images/home.png")
+[Main Page]("Images/app.png)
+
 ## Running the Application
 
 To run **MyResumo**, you'll need to set up your environment and install the necessary dependencies.
