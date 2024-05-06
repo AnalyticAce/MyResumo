@@ -97,4 +97,4 @@ We welcome contributions to MyResumo! If you'd like to contribute, please follow
 For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom](www.linkedin.com/in/shalom-dosseh-4a484a262) at LinkedIn.
 
 ## Disclaimer
-This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This app is in it beta version, there is still alot of room for improvements, issues will open in the following days to solve core bugs and fine turne the prompt for better outputs.
+This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
