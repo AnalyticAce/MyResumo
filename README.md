@@ -25,7 +25,9 @@ Below are images showing how the app looks like:
 ![Main Page](Images/app.png)
 
 Below is a generated Resumes from the model.
-![Result](Images/result.png)
+<div style="display: flex; justify-content: center;">
+    <img src="Images/result.png" alt="Result">
+</div>
 
 *Note :* Still working on the frontend of the resume generated this might not look great :)
 
