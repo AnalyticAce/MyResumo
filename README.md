@@ -15,7 +15,19 @@
 - Streamlit
 - OctoAI API
 
-## Demo
+## Python Libaries
+- octoai==1.0.2
+- opencv_contrib_python==4.8.0.74
+- pdf2image==1.16.3
+- PyPDF2==3.0.1
+- pytesseract==0.3.10
+- python-dotenv==1.0.1
+- Requests==2.31.0
+- streamlit==1.34.0
+- streamlit_lottie==0.0.5
+- weasyprint==62.1
+
+## Results
 Below are images showing how the app looks like:
 
 - Home Page
@@ -71,6 +83,14 @@ After setting up the environment variables, you can run the app using Streamlit:
 streamlit run streamlit_app.py
 ```
 
+```bash
+└─$ streamlit run streamlit_app.py
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://10.50.5.194:8501
+```
 This will start the Streamlit server, and you should be able to access **MyResumo** at `http://localhost:8501` in your web browser.
 
 ## Contribution Guidelines

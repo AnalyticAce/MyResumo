@@ -1,11 +1,11 @@
 from Helper.tools import (
-    pdf_to_text, load_lottie, create_prompt, get_pdf_download_link
+    load_lottie, create_prompt
 )
 from Helper.toast_message import get_random_toast
 from Helper.generate import generate_resume
 from Helper.resume import create_pdf
 from Helper.vision import (
-    pdf_to_image, save_images, delete_image, ocr_image
+    save_images, delete_image, ocr_image
 )
 import streamlit as st
 from pdf2image import convert_from_path
