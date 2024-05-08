@@ -7,11 +7,11 @@ from Helper.resume import create_pdf
 from Helper.vision import (
     save_images, delete_image, ocr_image
 )
-import streamlit as st
 from pdf2image import convert_from_path
-import tempfile, os
+import tempfile, os, streamlit as st
 from streamlit_lottie import st_lottie
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 API_KEY = os.getenv("OCTO_AI_TOKEN")
@@ -187,5 +187,6 @@ elif st.session_state.page == 'generate':
                     with open(f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "rb") as f:
                         pdf_data = f.read()
                     st.download_button("Download Generated Resume", pdf_data, f"{user_name.replace(' ', '_').lower()}_generated.pdf", False)
+                    os.remove(f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf")
                 else:
                     st.warning("Failed to generate the resume. Please try again.")
