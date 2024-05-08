@@ -82,7 +82,7 @@ After setting up the environment variables, you can run the app using Streamlit:
 ```bash
 streamlit run streamlit_app.py
 ```
-
+If successfully executed the message below should show up
 ```bash
 └─$ streamlit run streamlit_app.py
 
