@@ -2,7 +2,7 @@ from Helper.tools import (
     load_lottie, create_prompt
 )
 from Helper.toast_message import get_random_toast
-from Helper.generate import generate_resume
+from Helper.generate import generate_resume, extract_keywords
 from Helper.resume import create_pdf
 from Helper.vision import (
     save_images, delete_image, ocr_image
@@ -176,7 +176,10 @@ elif st.session_state.page == 'generate':
             st.progress(30, text="Reading Resume informations...")
             tone = resume_tone
             st.progress(60, text="Generating Resume...")
-            result = generate_resume(template, resume, description, tone, language, API_KEY)
+            key_words = extract_keywords(description)
+            st.progress(75, text="Extract keywords from resume...")
+            result = generate_resume(template, resume, description,
+                    tone, language, API_KEY, key_words)
             st.progress(85, text="Retrieving Generated Resume...")
             if result is not None:
                 new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "Helper/style/style.css")

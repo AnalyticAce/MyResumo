@@ -16,16 +16,18 @@
 - OctoAI API
 
 ## Python Libaries
-- octoai==1.0.2
-- opencv_contrib_python==4.8.0.74
-- pdf2image==1.16.3
-- PyPDF2==3.0.1
-- pytesseract==0.3.10
-- python-dotenv==1.0.1
-- Requests==2.31.0
-- streamlit==1.34.0
-- streamlit_lottie==0.0.5
-- weasyprint==62.1
+- `nltk==3.8.1`
+- `octoai==1.0.2`
+- `opencv_contrib_python==4.8.0.74`
+- `pdf2image==1.16.3`
+- `PyPDF2==3.0.1`
+- `pytesseract==0.3.10`
+- `python-dotenv==1.0.1`
+- `rake_nltk==1.0.6`
+- `Requests==2.31.0`
+- `streamlit==1.34.0`
+- `streamlit_lottie==0.0.5`
+- `weasyprint==62.1`
 
 ## Results
 Below are images showing how the app looks like:
