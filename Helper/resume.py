@@ -6,21 +6,6 @@ import streamlit as st
 
 def parse_user_information(data):
     user_information = data["user_information"]
-    if user_information["name"] == '':
-        # return ""
-        st.warning("Your resume that not be parsed, please change it template", icon="📑")
-        st.stop()
-    if user_information["main_job_title"] == '':
-        return ""
-    if user_information["profile_description"] == '':
-        return ""
-    if user_information["email"] == '':
-        st.warning("Please include an email address in your resume", icon="📑")
-        st.stop()
-    if user_information["linkedin"] == '':
-        return ""
-    if user_information["github"] == []:
-        return ""
     user_information_html = f"""
     <header>
         <h1 style="text-align: center;">{user_information['name']}</h1>

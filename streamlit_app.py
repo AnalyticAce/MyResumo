@@ -4,11 +4,17 @@ from Helper.tools import (
 from Helper.toast_message import get_random_toast
 from Helper.generate import generate_resume
 from Helper.resume import create_pdf
+from Helper.vision import (
+    pdf_to_image, save_images, delete_image, ocr_image
+)
 import streamlit as st
+from pdf2image import convert_from_path
 import tempfile, os
 from streamlit_lottie import st_lottie
+from dotenv import load_dotenv
 
-API_KEY = os.environ.get('OCTO_AI_TOKEN')
+load_dotenv()
+API_KEY = os.getenv("OCTO_AI_TOKEN")
 
 st.set_page_config(
     page_title="MyResumo",
@@ -98,9 +104,9 @@ elif st.session_state.page == 'generate':
         temp_file = tempfile.NamedTemporaryFile(delete=False)
         temp_file.write(file_bytes)
         temp_file.close()
-        text = pdf_to_text(temp_file.name)
+        images = convert_from_path(temp_file.name)
 
-        st.session_state.resume_content = text
+        st.session_state.resume_content = images
         
         st.success('File Uploaded Successfully')
         os.unlink(temp_file.name)
@@ -155,7 +161,14 @@ elif st.session_state.page == 'generate':
             st.stop()
         
         with st.progress(0, text="Generating Resume..."):
-            resume = pdf_to_text(temp_file.name)
+            if not temp_file:
+                st.warning("Please upload a file before generating your resume.", icon='📑')
+                st.stop()
+
+            save_images_name = save_images(images, temp_file.name)
+            texts = ocr_image(save_images_name)
+            resume = " ".join(texts)
+            delete_image(save_images_name)
             st.progress(10, text="Parsing Your Resume...")
             template = create_prompt("Utils/prompt.txt")
             st.progress(20, text="Creating Prompt...")
