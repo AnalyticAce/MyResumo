@@ -58,10 +58,10 @@ To run **MyResumo**, you'll need to set up your environment and install the nece
 To run our app, first we need to set up our environment variable, we can do this by:
 
 - Get an OctoAI API token by following [these instructions](https://octo.ai/docs/getting-started/how-to-create-octoai-api-token/).
-- Create and Export your API token to your environment
+- Create and paste your API token in the file called `.env` in this directory. See an example in the [`.env.example`](.env.example) file.
 
 ```bash
-export OCTO_AI_TOKEN=<your key here>
+OCTO_AI_TOKEN=<your key here>
 ```
 
 ### Running the App
