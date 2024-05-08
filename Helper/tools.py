@@ -1,7 +1,4 @@
-import streamlit as st
-import PyPDF2
-import requests
-import base64
+import PyPDF2, requests, base64, streamlit as st
 
 @st.cache_resource(show_spinner=False)
 def load_lottie(url): 

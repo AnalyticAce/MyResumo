@@ -2,7 +2,6 @@ from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 import json
 from .tools import read_file
-import streamlit as st
 
 def parse_user_information(data):
     user_information = data["user_information"]

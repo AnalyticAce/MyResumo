@@ -1,17 +1,16 @@
 from Helper.tools import (
     load_lottie, create_prompt
 )
-from Helper.toast_message import get_random_toast
-from Helper.generate import generate_resume, extract_keywords
-from Helper.resume import create_pdf
 from Helper.vision import (
     save_images, delete_image, ocr_image
 )
+from Helper.toast_message import get_random_toast
+from Helper.generate import generate_resume, extract_keywords
+from Helper.resume import create_pdf
 from pdf2image import convert_from_path
 import tempfile, os, streamlit as st
 from streamlit_lottie import st_lottie
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 API_KEY = os.getenv("OCTO_AI_TOKEN")
@@ -175,15 +174,15 @@ elif st.session_state.page == 'generate':
             description = job_description
             st.progress(30, text="Reading Resume informations...")
             tone = resume_tone
-            st.progress(60, text="Generating Resume...")
+            st.progress(50, text="Generating Resume...")
             key_words = extract_keywords(description)
-            st.progress(75, text="Extract keywords from resume...")
+            st.progress(65, text="Extract keywords from Job Description...")
             result = generate_resume(template, resume, description,
                     tone, language, API_KEY, key_words)
-            st.progress(85, text="Retrieving Generated Resume...")
+            st.progress(75, text="Retrieving Generated Resume...")
             if result is not None:
                 new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "Helper/style/style.css")
-                st.progress(90, text="Creating Resume PDF...")
+                st.progress(80, text="Creating Resume PDF...")
                 st.progress(100, text="Done")
                 if new_resume:
                     st.success("Resume PDF created successfully! Please click the button below to download your resume.")

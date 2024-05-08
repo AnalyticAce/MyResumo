@@ -1,7 +1,5 @@
 from pdf2image import convert_from_path
-import cv2
-import os
-import pytesseract
+import cv2, os, pytesseract
 
 def pdf_to_image(pdf_file):
     images = convert_from_path(pdf_file)
