@@ -35,7 +35,7 @@ class AppSection:
                 )
 
                 st.divider()
-                "Made with ♥ in Cotonou, Benin Republic"
+                st.write("Made with ♥ in Cotonou, Benin Republic")
 
     def app_intro(self):
         st.title("Search Job. :blue[MyRe]:red[sumo] . Get Hired", anchor=False)
