@@ -1,5 +1,3 @@
-import random
-
 TOAST_MESSAGES = [
     ("Here's to hoping your job search is shorter than a Vine video!", "🍷"),
     ("May your resume be as impressive as your LinkedIn profile!", "🤩"),
@@ -32,7 +30,3 @@ TOAST_MESSAGES = [
     ("Here's to finding a job that doesn't require you to wear a suit!", "🕴️"),
     ("May your job search be as easy as finding a four-leaf clover!", "🍀")
 ]
-
-def get_random_toast():
-    """Returns a random toast message and icon."""
-    return random.choice(TOAST_MESSAGES)

@@ -1,7 +1,7 @@
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
+from .tools import ToolKit
 import json
-from .tools import read_file
 
 def parse_user_information(data):
     user_information = data["user_information"]
@@ -150,9 +150,10 @@ def create_resume(data):
     </html>
     """
     return resume_html
-    
+
 def perfect_css_style(file="style/style.css"):
-    style = read_file(file)
+    tool = ToolKit()
+    style = tool.read_file(file)
     css = f"""
     {style}
     """
