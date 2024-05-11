@@ -2,9 +2,15 @@ import streamlit as st
 
 class AppSection:
     def __init__(self) -> None:
+        """
+        Initializes an instance of the AppSection class.
+        """
         pass
 
     def app_config(self):
+        """
+        Configures the Streamlit app settings.
+        """
         st.set_page_config(
             page_title="MyResumo",
             page_icon="🧠",
@@ -15,29 +21,35 @@ class AppSection:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
     def side_info(self):
-            with st.sidebar:
-                st.header("👨‍💻 About the Author")
-                st.write(
+        """
+        Displays the sidebar information.
+        """
+        with st.sidebar:
+            st.header("👨‍💻 About the Author")
+            st.write(
+            """
+            **DOSSEH Shalom** is a Problem Solver, Fintech enthusiast, coder and innovator. Driven by passion and a love to solve real life problems, he created this app to make job search more interactive and easier.
+
+            Connect, contribute, or just say hi!
+            """)
+
+            st.divider()
+            st.subheader("🔗 Connect with Me", anchor=False)
+            st.markdown(
                 """
-                **DOSSEH Shalom** is a Problem Solver, Fintech enthusiast, coder and innovator. Driven by passion and a love to solve real life problems, he created this app to make job search more interactive and easier.
+                - 🐙 [Source Code](https://github.com/AnalyticAce/MyResumo)
+                - 👔 [Contact me](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
+                - 🍕 [Buy me a Pizza](https://www.buymeacoffee.com/dossehdossB)
+                """
+            )
 
-                Connect, contribute, or just say hi!
-                """)
-
-                st.divider()
-                st.subheader("🔗 Connect with Me", anchor=False)
-                st.markdown(
-                    """
-                    - 🐙 [Source Code](https://github.com/AnalyticAce/MyResumo)
-                    - 👔 [Contact me](https://www.linkedin.com/in/shalom-dosseh-4a484a262/)
-                    - 🍕 [Buy me a Pizza](https://www.buymeacoffee.com/dossehdossB)
-                    """
-                )
-
-                st.divider()
-                st.write("Made with ♥ in Cotonou, Benin Republic")
+            st.divider()
+            st.write("Made with ♥ in Cotonou, Benin Republic")
 
     def app_intro(self):
+        """
+        Displays the app introduction section.
+        """
         st.title("Search Job. :blue[MyRe]:red[sumo] . Get Hired", anchor=False)
         st.write("""
         Are you looking to elevate your resume and capture the attention of your dream employer? **MyResumo** is here to transform your job application process!
@@ -52,6 +64,9 @@ class AppSection:
         """)
 
     def username(self):
+        """
+        Displays the username input section.
+        """
         st.title('***Enter your Name***')
         st.write("**:red[Must Know]** : In this Section you are asked to enter your name")
         user_name = st.text_input('***Enter your Name***', help='Enter your Name')
@@ -59,6 +74,9 @@ class AppSection:
         return user_name
 
     def uploadfile(self):
+        """
+        Displays the file upload section.
+        """
         st.title('***Upload your Resume***')
         "**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**"
         st.info("***:blue[Tip]*** : If you don't have a [:red[RESUME]](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=drive_link) you can download the template below and fill out the template below with your informations",icon='ℹ️')
@@ -66,6 +84,9 @@ class AppSection:
         return uploaded_file
 
     def description(self):
+        """
+        Displays the job description input section.
+        """
         st.title('***Add a Job Description***')
         st.write("**:red[Must Know]** : In this Section you are required to paste the **:blue[job description]** of the job you are applying too")
         with st.expander(":smile: **Good to Know**"):
@@ -77,6 +98,9 @@ class AppSection:
         return job_description
 
     def resume_option(self):
+        """
+        Displays the resume tone selection section.
+        """
         st.title('***Choose the Tone of your Resume***')
         st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
         resume_tone = st.selectbox("Select a Resume Tone", ["Professional", "Creative", "Balanced",  "Expert"])
@@ -91,6 +115,9 @@ class AppSection:
         return resume_tone
 
     def language_opt(self):
+        """
+        Displays the language selection section.
+        """
         st.title('***Choose a Language***')
         st.write("**:red[Must Know]** : In this Section you are asked to choose a language in which your resume that will be generated")
         st.info('Advice: It is adviced to choose the source language of the resume uploaded', icon="ℹ️")
@@ -98,6 +125,9 @@ class AppSection:
         return language
 
     def resume_temp(self):
+        """
+        Displays the resume template selection section.
+        """
         st.title('***Choose the a Template Resume***')
         st.write("**:red[Must Know]** : In this Section you should choose the template you want")
         st.write("**:blue[See More]** : Click on the links below to see the templates, [Template 1](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=sharing) and [Template 2](https://drive.google.com/file/d/1QGlNrMSPW_BYuXGsvK4g_5T85rY9-IYV/view?usp=sharing)")

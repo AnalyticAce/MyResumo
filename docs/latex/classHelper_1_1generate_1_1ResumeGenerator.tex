@@ -1,0 +1,88 @@
+\doxysection{Helper.\+generate.\+Resume\+Generator Class Reference}
+\hypertarget{classHelper_1_1generate_1_1ResumeGenerator}{}\label{classHelper_1_1generate_1_1ResumeGenerator}\index{Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classHelper_1_1generate_1_1ResumeGenerator_a9960cc078aa8de7eb8dcbdca2aae372b}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, API\+\_\+\+KEY, job\+\_\+description)
+\item 
+\mbox{\hyperlink{classHelper_1_1generate_1_1ResumeGenerator_a479b1f8a86f6d278c4b9f69b3bf5919a}{extract\+\_\+json}} (self, text)
+\item 
+\mbox{\hyperlink{classHelper_1_1generate_1_1ResumeGenerator_a4125be254ed785c3be9a5e3fffcca2ea}{extract\+\_\+keywords}} (self)
+\item 
+\mbox{\hyperlink{classHelper_1_1generate_1_1ResumeGenerator_ad150dfd610d5466f8a012990a0d0baba}{generate\+\_\+resume}} (self, template, resume\+\_\+content, tone, language, key\+\_\+words)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_a4879749c3c733c8f0e36d47c7bffb75a}\label{classHelper_1_1generate_1_1ResumeGenerator_a4879749c3c733c8f0e36d47c7bffb75a} 
+{\bfseries client}
+\item 
+\Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_a9906ecf3c7059ca4fdd3e1a5afa91999}\label{classHelper_1_1generate_1_1ResumeGenerator_a9906ecf3c7059ca4fdd3e1a5afa91999} 
+{\bfseries job\+\_\+description}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_a9960cc078aa8de7eb8dcbdca2aae372b}\label{classHelper_1_1generate_1_1ResumeGenerator_a9960cc078aa8de7eb8dcbdca2aae372b} 
+\index{Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily Helper.\+generate.\+Resume\+Generator.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{API\+\_\+\+KEY,  }\item[{}]{job\+\_\+description }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Initialize the ResumeGenerator class.
+
+Parameters:
+- API_KEY (str): The API key for OctoAI.
+- job_description (str): The job description for generating the resume.
+\end{DoxyVerb}
+ 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_a479b1f8a86f6d278c4b9f69b3bf5919a}\label{classHelper_1_1generate_1_1ResumeGenerator_a479b1f8a86f6d278c4b9f69b3bf5919a} 
+\index{Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}!extract\_json@{extract\_json}}
+\index{extract\_json@{extract\_json}!Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}}
+\doxysubsubsection{\texorpdfstring{extract\_json()}{extract\_json()}}
+{\footnotesize\ttfamily Helper.\+generate.\+Resume\+Generator.\+extract\+\_\+json (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{text }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Extracts a valid JSON string from the given text.
+
+Parameters:
+- text (str): The text to extract the JSON string from.
+
+Returns:
+- str: The extracted JSON string.
+\end{DoxyVerb}
+ \Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_a4125be254ed785c3be9a5e3fffcca2ea}\label{classHelper_1_1generate_1_1ResumeGenerator_a4125be254ed785c3be9a5e3fffcca2ea} 
+\index{Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}!extract\_keywords@{extract\_keywords}}
+\index{extract\_keywords@{extract\_keywords}!Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}}
+\doxysubsubsection{\texorpdfstring{extract\_keywords()}{extract\_keywords()}}
+{\footnotesize\ttfamily Helper.\+generate.\+Resume\+Generator.\+extract\+\_\+keywords (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Extracts keywords from the job description using RAKE algorithm.
+
+Returns:
+- str: The extracted keywords in JSON format.
+\end{DoxyVerb}
+ \Hypertarget{classHelper_1_1generate_1_1ResumeGenerator_ad150dfd610d5466f8a012990a0d0baba}\label{classHelper_1_1generate_1_1ResumeGenerator_ad150dfd610d5466f8a012990a0d0baba} 
+\index{Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}!generate\_resume@{generate\_resume}}
+\index{generate\_resume@{generate\_resume}!Helper.generate.ResumeGenerator@{Helper.generate.ResumeGenerator}}
+\doxysubsubsection{\texorpdfstring{generate\_resume()}{generate\_resume()}}
+{\footnotesize\ttfamily Helper.\+generate.\+Resume\+Generator.\+generate\+\_\+resume (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{template,  }\item[{}]{resume\+\_\+content,  }\item[{}]{tone,  }\item[{}]{language,  }\item[{}]{key\+\_\+words }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Generates a resume using the given template, resume content, tone, language, and keywords.
+
+Parameters:
+- template (str): The template for the resume.
+- resume_content (str): The content of the resume.
+- tone (str): The tone to be applied to the resume.
+- language (str): The language of the new resume.
+- key_words (str): The keywords and ratings in dictionary format.
+
+Returns:
+- str: The generated resume.
+\end{DoxyVerb}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/dosseh/\+Data/\+Project/\+My\+Resumo/\+Helper/generate.\+py\end{DoxyCompactItemize}

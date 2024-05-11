@@ -36,3 +36,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run Streamlit Server
       run: streamlit run streamlit_app.py
+    
+    - name: Wait for Streamlit Server
+      run: sleep 100
+    
+    - name: Quit Streamlit Server
+      run: pkill streamlit

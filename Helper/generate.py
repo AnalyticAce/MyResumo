@@ -5,10 +5,26 @@ from rake_nltk import Rake
 
 class ResumeGenerator:
     def __init__(self, API_KEY, job_description):
+        """
+        Initialize the ResumeGenerator class.
+
+        Parameters:
+        - API_KEY (str): The API key for OctoAI.
+        - job_description (str): The job description for generating the resume.
+        """
         self.client = OctoAI(api_key=API_KEY,)
         self.job_description = job_description
 
     def extract_json(self, text):
+        """
+        Extracts a valid JSON string from the given text.
+
+        Parameters:
+        - text (str): The text to extract the JSON string from.
+
+        Returns:
+        - str: The extracted JSON string.
+        """
         start = text.find("{")
         end = text.rfind("}") + 1
         json_text = text[start:end]
@@ -20,6 +36,12 @@ class ResumeGenerator:
         return json_text
 
     def extract_keywords(self):
+        """
+        Extracts keywords from the job description using RAKE algorithm.
+
+        Returns:
+        - str: The extracted keywords in JSON format.
+        """
         try:
             nltk.data.find('tokenizers/punkt')
         except LookupError:
@@ -37,6 +59,19 @@ class ResumeGenerator:
         return json.dumps(keywords_dict)
     
     def generate_resume(self, template, resume_content, tone, language, key_words):
+        """
+        Generates a resume using the given template, resume content, tone, language, and keywords.
+
+        Parameters:
+        - template (str): The template for the resume.
+        - resume_content (str): The content of the resume.
+        - tone (str): The tone to be applied to the resume.
+        - language (str): The language of the new resume.
+        - key_words (str): The keywords and ratings in dictionary format.
+
+        Returns:
+        - str: The generated resume.
+        """
         completion = self.client.text_gen.create_chat_completion(
             max_tokens=10000,
             messages=[
