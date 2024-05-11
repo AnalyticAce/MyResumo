@@ -61,7 +61,8 @@ def handle_generate_page(app, API_KEY):
     resume_tone = app.resume_option()
     language = app.language_opt()
     resume_template = app.resume_temp()
-
+    # color_code = app.color_picker()
+    
     if resume_template == "Template 1":
         template_1 = True
         st.success('Your Resume is Successfully Selected')

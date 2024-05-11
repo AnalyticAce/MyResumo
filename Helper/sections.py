@@ -133,3 +133,17 @@ class AppSection:
         st.write("**:blue[See More]** : Click on the links below to see the templates, [Template 1](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=sharing) and [Template 2](https://drive.google.com/file/d/1QGlNrMSPW_BYuXGsvK4g_5T85rY9-IYV/view?usp=sharing)")
         resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
         return resume_template
+
+    def color_picker(self):
+        """
+        Displays the color picker section.
+        """
+        st.title('***Choose a Color Scheme***')
+        st.write("**:red[Must Know]** : In this Section you are asked to choose a color scheme for your resume")
+        st.info('Advice: Choose colors that align with your personal brand or the industry you are applying to.', icon="ℹ️")
+        color_code = st.color_picker("Choose a Color", "#000000")
+        st.write('The current color is', color_code)
+        with st.expander(":smile: **Good to Know**"):
+            st.write('***:red[Notice]*** : The color selection will be applied to the section headers.')
+            st.image('Images/color_picker.png')
+        return color_code
