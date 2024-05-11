@@ -61,8 +61,7 @@ def handle_generate_page(app, API_KEY):
     resume_tone = app.resume_option()
     language = app.language_opt()
     resume_template = app.resume_temp()
-    # color_code = app.color_picker()
-    
+    color_code = app.colorpicker("color_key_2")
     if resume_template == "Template 1":
         template_1 = True
         st.success('Your Resume is Successfully Selected')
@@ -81,9 +80,9 @@ def handle_generate_page(app, API_KEY):
             st.warning("Please enter the job description before generating your resume.", icon='📑')
             st.stop()
         
-        generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool)
+        generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code)
 
-def generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool):
+def generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code):
     with st.progress(0, text="Generating Resume..."):
         if not temp_file:
             st.warning("Please upload a file before generating your resume.", icon='📑')
@@ -101,14 +100,13 @@ def generate_resume(temp_file, images, job_description, resume_tone, language, A
         tone = resume_tone
         st.progress(50, text="Generating Resume...")
         gen = ResumeGenerator(API_KEY, description)
-        
         key_words = gen.extract_keywords()
         st.progress(65, text="Extract keywords from Job Description...")
         result = gen.generate_resume(template, resume,
                 tone, language, key_words)
         st.progress(75, text="Retrieving Generated Resume...")
         if result is not None:
-            new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "Helper/style/style.css")
+            new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", color_code)
             st.progress(80, text="Creating Resume PDF...")
             st.progress(100, text="Done")
             if new_resume:

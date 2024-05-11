@@ -134,7 +134,7 @@ class AppSection:
         resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
         return resume_template
 
-    def color_picker(self):
+    def colorpicker(self, key="color_key"):
         """
         Displays the color picker section.
         """

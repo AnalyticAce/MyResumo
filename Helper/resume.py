@@ -24,8 +24,10 @@ def parse_experiences(data):
     experiences_html = "<section><h2>EXPERIENCE</h2>"
     for experience in experiences:
         experience_html = f"""
-        <h3>{experience['job_title']} at {experience['company']} - {experience['start_date']} to {experience['end_date']}</h3>
-        <ul>
+        <div style="display: flex; justify-content: space-between; margin-top: 0;">
+            <p><strong>{experience['job_title']} - <i>{experience['company']}</i></strong></p>
+            <p>{experience['start_date']} to {experience['end_date']}</p>
+        </div>
         """
         for task in experience["four_tasks"]:
             experience_html += f"<li>{task}</li>"
@@ -40,15 +42,16 @@ def parse_education(data):
         return ""
     education_html = "<section><h2>EDUCATION</h2>"
     for institution in education:
-        description = institution.get('description', '')
         institution_html = f"""
-        <h3>{institution['degree']} at {institution['institution']} - {institution['start_date']} to {institution['end_date']}</h3>
-        <p>{description}</p>
+        <div style="display: flex; justify-content: space-between; margin-top: 0;">
+            <p><strong>{institution['degree']} - <i>{institution['institution']}</i></strong></p>
+            <p>{institution['start_date']} to {institution['end_date']}</p>
+        </div>
+        <p style="margin-top: 0;">{institution['description']}</p>
         """
         education_html += institution_html
     education_html += "</section>"
     return education_html
-
 
 def parse_skills(data):
     skills = data["user_information"]["skills"]
@@ -97,11 +100,15 @@ def parse_certificate(data):
     certifications = data["certificate"]
     if certifications == []:
         return ""
-    certifications_html = "<section><h2>CERTIFICATIONS</h2>"
+    certifications_html = "<section><h2>CERTIFICATES</h2>"
     for certification in certifications:
         certification_html = f"""
-        <h3>{certification['name']} at {certification['institution']} - {certification['date']}</h3>
-        <p>{certification['description']}</p>
+        <h3 style="margin-top: 0; margin-bottom: 0;"><i>{certification['institution']}</i></h3>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0;">
+            <h3>{certification['name']}</h3>
+            <p>{certification['date']}</p>
+        </div>
+        <p style="margin-top: 0;">{certification['description']}</p>
         """
         certifications_html += certification_html
     certifications_html += "</section>"
@@ -151,19 +158,83 @@ def create_resume(data):
     """
     return resume_html
 
-def perfect_css_style(file="style/style.css"):
-    tool = ToolKit()
-    style = tool.read_file(file)
+def perfect_css_style(color_code):
     css = f"""
-    {style}
+    body {{
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 14px;
+        line-height: 1.5;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+    }}
+
+    header, section {{
+        padding: 10px 20px;
+    }}
+
+    header h1 {{
+        font-size: 36px;
+        color: {color_code};
+    }}
+
+    header p, header a, section a {{
+        font-size: 14px;
+        color: #333333;
+        text-decoration: none;
+    }}
+
+    h2 {{
+        font-size: 9px;
+        color: #333333;
+        border-bottom: 1px solid #dddddd;
+        padding-bottom: 5px;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }}
+
+    h3 {{
+        font-size: 12px;
+        color: #333333;
+    }}
+
+    ul {{
+        padding: 0;
+    }}
+
+    ul li {{
+        list-style: inside;
+        margin-bottom: 2px;
+    }}
+
+    a:hover {{
+        text-decoration: underline;
+    }}
+
+    @media print {{
+        body {{
+            background-color: #ffffff;
+        }}
+
+        header, section {{
+            padding: 0;
+            border: none;
+        }}
+
+        h2 {{
+            font-size: 20px;
+            color: {color_code};
+            border-bottom: 2px solid {color_code};
+        }}
+    }}
     """
     return css
 
-def create_pdf(data, filename, style="style/style.css"):
+def create_pdf(data, filename, color_code="#000000"):
     try:
         font_config = FontConfiguration()
         html = HTML(string=f"""{create_resume(data)}""")
-        css = CSS(string=f'''{perfect_css_style(style)}''', font_config=font_config)
+        css = CSS(string=f'''{perfect_css_style(color_code)}''', font_config=font_config)
         html.write_pdf(filename, stylesheets=[css], font_config=font_config)
         return True
     except Exception as e:
