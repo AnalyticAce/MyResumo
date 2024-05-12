@@ -91,19 +91,26 @@ def generate_resume(temp_file, images, job_description, resume_tone, language, A
         save_images_name = vision.save_images(images, temp_file.name)
         texts = vision.ocr_image(save_images_name)
         resume = " ".join(texts)
+        print("Resume: ", resume, "\n\n\n\n")
         vision.delete_image(save_images_name)
         st.progress(10, text="Parsing Your Resume...")
-        template = tool.create_prompt("Utils/prompt.txt")
+        prompt = tool.create_prompt("Utils/test.txt")
+        print("Prompt: ", prompt, "\n\n\n\n")
         st.progress(20, text="Creating Prompt...")
         description = job_description
+        print("Description: ", description, "\n\n\n\n")
         st.progress(30, text="Reading Resume informations...")
         tone = resume_tone
+        print("Tone: ", tone, "\n\n\n\n")
         st.progress(50, text="Generating Resume...")
         gen = ResumeGenerator(API_KEY, description)
-        key_words = gen.extract_keywords()
+        prompt_1 = tool.create_prompt("Utils/keywords.txt")
+        key_words = gen.extract_keywords_ai(prompt_1)
+        print("Keywords: ", key_words, "\n\n\n\n")
         st.progress(65, text="Extract keywords from Job Description...")
-        result = gen.generate_resume(template, resume,
+        result = gen.generate_resume(prompt, resume,
                 tone, language, key_words)
+        print("Result: ", result, "\n\n\n\n")
         st.progress(75, text="Retrieving Generated Resume...")
         if result is not None:
             new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", color_code)

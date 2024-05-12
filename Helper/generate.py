@@ -81,11 +81,11 @@ class ResumeGenerator:
                 ),
                 ChatMessage(
                     content=f"""
-                    User Resume:
+                    User's Resume:
                     {resume_content}
                     Job Description:
                     {self.job_description}
-                    Job Description Keywords and Ratings in Dict Format:
+                    Job Description Keywords:
                     {key_words}
                     Tone to be applied:
                     {tone}
@@ -101,3 +101,34 @@ class ResumeGenerator:
         )
 
         return self.extract_json(completion.choices[0].message.content)
+    
+    def extract_keywords_ai(self, prompt):
+        """
+        Extracts keywords from the job description using the AI model.
+        
+        Parameters:
+        - prompt (str): The prompt for extracting the keywords.
+        
+        Returns:
+        - str: The extracted keywords in text format.
+        """
+        completion = self.client.text_gen.create_chat_completion(
+            max_tokens=4000,
+            messages=[
+                ChatMessage(
+                    content=f"""{prompt}
+                    """,
+                    role="system"
+                ),
+                ChatMessage(
+                    content=f"{self.job_description}",
+                    role="user"
+                )
+            ],
+            model="mixtral-8x22b-instruct",
+            presence_penalty=0,
+            temperature=0.1,
+            top_p=0.9
+        )
+
+        return completion.choices[0].message.content
