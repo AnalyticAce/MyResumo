@@ -125,7 +125,6 @@ def main() -> None:
     API_KEY, app, tool, lottie_5 = setup()
     if 'page' not in st.session_state:
         st.session_state.page = 'home'
-
     if st.session_state.page == 'home':
         handle_home_page(tool, lottie_5, app)
     elif st.session_state.page == 'generate':

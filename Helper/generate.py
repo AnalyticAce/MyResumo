@@ -4,7 +4,7 @@ import json, nltk
 from rake_nltk import Rake
 
 class ResumeGenerator:
-    def __init__(self, API_KEY, job_description):
+    def __init__(self, API_KEY: str, job_description: str) -> None:
         """
         Initialize the ResumeGenerator class.
 
@@ -15,7 +15,7 @@ class ResumeGenerator:
         self.client = OctoAI(api_key=API_KEY,)
         self.job_description = job_description
 
-    def extract_json(self, text):
+    def extract_json(self, text: str) -> dict:
         """
         Extracts a valid JSON string from the given text.
 
@@ -35,7 +35,7 @@ class ResumeGenerator:
             return None
         return json_text
 
-    def extract_keywords(self):
+    def extract_keywords(self) -> str:
         """
         Extracts keywords from the job description using RAKE algorithm.
 
@@ -58,9 +58,10 @@ class ResumeGenerator:
                 keywords_dict.update({keyword: rating})
         return json.dumps(keywords_dict)
     
-    def generate_resume(self, template, resume_content, tone, language, key_words):
+    def generate_resume(self, prompt: str, resume_content: str,
+                tone: str, language: str, key_words: str) -> dict:
         """
-        Generates a resume using the given template, resume content, tone, language, and keywords.
+        Generates a resume using the given prompt, resume content, tone, language, and keywords.
 
         Parameters:
         - template (str): The template for the resume.
@@ -76,7 +77,7 @@ class ResumeGenerator:
             max_tokens=10000,
             messages=[
                 ChatMessage(
-                    content=f"{template}",
+                    content=f"{prompt}",
                     role="system"
                 ),
                 ChatMessage(
@@ -102,7 +103,7 @@ class ResumeGenerator:
 
         return self.extract_json(completion.choices[0].message.content)
     
-    def extract_keywords_ai(self, prompt):
+    def extract_keywords_ai(self, prompt: str) -> str:
         """
         Extracts keywords from the job description using the AI model.
         
