@@ -41,7 +41,7 @@ jobs:
       run: streamlit run streamlit_app.py &
       
     - name: Wait for Streamlit Server
-      run: sleep 100
+      run: sleep 20
       
     - name: Quit Streamlit Server
       run: pkill streamlit
