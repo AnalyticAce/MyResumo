@@ -101,7 +101,7 @@ def generate_resume(temp_file: str, images: str, job_description: str,
         st.progress(30, text="Reading Resume informations...")
         tone = resume_tone
         st.progress(50, text="Generating Resume...")
-        gen = ResumeGenerator(API_KEY, description)
+        gen = ResumeGenerator(API_KEY, description, "mixtral-8x22b-instruct")
         prompt_1 = tool.create_prompt("Utils/keywords.txt")
         key_words = gen.extract_keywords_ai(prompt_1)
         st.progress(65, text="Extract keywords from Job Description...")

@@ -4,25 +4,34 @@ import json, nltk
 from rake_nltk import Rake
 
 class ResumeGenerator:
-    def __init__(self, API_KEY: str, job_description: str) -> None:
+    def __init__(self, API_KEY: str, job_description: str, model_name: str,
+        presence_penalty=0, temperature=0.1, top_p=0.9) -> None:
         """
         Initialize the ResumeGenerator class.
 
         Parameters:
+        ----------
         - API_KEY (str): The API key for OctoAI.
         - job_description (str): The job description for generating the resume.
+        - model_name (str): The name of the model to use for generating the resume.
         """
         self.client = OctoAI(api_key=API_KEY,)
         self.job_description = job_description
+        self.model_name = model_name
+        self.presence_penalty = presence_penalty
+        self.temperature = temperature
+        self.top_p = top_p
 
     def extract_json(self, text: str) -> dict:
         """
         Extracts a valid JSON string from the given text.
 
         Parameters:
+        -----------
         - text (str): The text to extract the JSON string from.
 
         Returns:
+        -------
         - str: The extracted JSON string.
         """
         start = text.find("{")
@@ -40,6 +49,7 @@ class ResumeGenerator:
         Extracts keywords from the job description using RAKE algorithm.
 
         Returns:
+        -------
         - str: The extracted keywords in JSON format.
         """
         try:
@@ -64,6 +74,7 @@ class ResumeGenerator:
         Generates a resume using the given prompt, resume content, tone, language, and keywords.
 
         Parameters:
+        ----------
         - template (str): The template for the resume.
         - resume_content (str): The content of the resume.
         - tone (str): The tone to be applied to the resume.
@@ -71,6 +82,7 @@ class ResumeGenerator:
         - key_words (str): The keywords and ratings in dictionary format.
 
         Returns:
+        -------
         - str: The generated resume.
         """
         completion = self.client.text_gen.create_chat_completion(
@@ -95,10 +107,10 @@ class ResumeGenerator:
                     role="user"
                 )
             ],
-            model="mixtral-8x22b-instruct",
-            presence_penalty=0,
-            temperature=0.1,
-            top_p=0.9
+            model=self.model_name,
+            presence_penalty=self.presence_penalty,
+            temperature=self.temperature,
+            top_p=self.top_p
         )
 
         return self.extract_json(completion.choices[0].message.content)
@@ -108,9 +120,11 @@ class ResumeGenerator:
         Extracts keywords from the job description using the AI model.
         
         Parameters:
+        ----------
         - prompt (str): The prompt for extracting the keywords.
         
         Returns:
+        -------
         - str: The extracted keywords in text format.
         """
         completion = self.client.text_gen.create_chat_completion(
@@ -126,10 +140,10 @@ class ResumeGenerator:
                     role="user"
                 )
             ],
-            model="mixtral-8x22b-instruct",
-            presence_penalty=0,
-            temperature=0.1,
-            top_p=0.9
+            model=self.model_name,
+            presence_penalty=self.presence_penalty,
+            temperature=self.temperature,
+            top_p=self.top_p
         )
 
         return completion.choices[0].message.content
