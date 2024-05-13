@@ -29,10 +29,10 @@ def handle_home_page(tool, lottie_5, app):
     
     app.side_info()
     app.app_intro()
-    with st.expander("💡 Video Tutorial"):
-        with st.spinner("Loading video.."):
-            st.video("https://youtu.be/Tt08KmFfIYQ?si=t0cCNrtydsyHMg3y", format="video/mp4", start_time=0)
-
+    # with st.expander("💡 Video Tutorial"):
+    #     with st.spinner("Loading video.."):
+    #         st.video("https://youtu.be/Tt08KmFfIYQ?si=t0cCNrtydsyHMg3y", format="video/mp4", start_time=0)
+    
     submitted = st.button("Start", type="primary")
 
     if submitted:
