@@ -1,6 +1,6 @@
 from Helper.tools import ToolKit, load_lottie
 from Helper.generate import ResumeGenerator
-from Helper.resume import create_pdf#InformationParser
+from Helper.resume import create_pdf
 from Helper.sections import AppSection
 from Helper.vision import Vision
 import tempfile, os, streamlit as st
@@ -16,7 +16,7 @@ def setup():
     lottie_5 = load_lottie("https://lottie.host/d45005f6-3383-4016-825f-f0448df04c74/eSlPEZ9dfK.json")
     return API_KEY, app, tool, lottie_5
 
-def handle_home_page(tool, lottie_5, app):
+def handle_home_page(tool : ToolKit, lottie_5: str, app: AppSection):
     if 'first_time' not in st.session_state:
         message, icon = tool.get_random_toast()
         st.toast(message, icon=icon)
@@ -39,7 +39,7 @@ def handle_home_page(tool, lottie_5, app):
         st.session_state.page = 'generate'
         st.rerun()
 
-def handle_generate_page(app, API_KEY):
+def handle_generate_page(app: AppSection, API_KEY: str) -> None:
     user_name = app.username()
     uploaded_file = app.uploadfile()
 
@@ -61,7 +61,7 @@ def handle_generate_page(app, API_KEY):
     resume_tone = app.resume_option()
     language = app.language_opt()
     resume_template = app.resume_temp()
-    color_code = app.colorpicker("color_key_2")
+    color_code = app.colorpicker()
     if resume_template == "Template 1":
         template_1 = True
         st.success('Your Resume is Successfully Selected')
@@ -82,7 +82,9 @@ def handle_generate_page(app, API_KEY):
         
         generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code)
 
-def generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code):
+def generate_resume(temp_file: str, images: str, job_description: str,
+        resume_tone: str, language: str, API_KEY: str, user_name: str, 
+        vision: str, tool: str, color_code: str) -> None:
     with st.progress(0, text="Generating Resume..."):
         if not temp_file:
             st.warning("Please upload a file before generating your resume.", icon='📑')
@@ -91,26 +93,20 @@ def generate_resume(temp_file, images, job_description, resume_tone, language, A
         save_images_name = vision.save_images(images, temp_file.name)
         texts = vision.ocr_image(save_images_name)
         resume = " ".join(texts)
-        print("Resume: ", resume, "\n\n\n\n")
         vision.delete_image(save_images_name)
         st.progress(10, text="Parsing Your Resume...")
         prompt = tool.create_prompt("Utils/test.txt")
-        print("Prompt: ", prompt, "\n\n\n\n")
         st.progress(20, text="Creating Prompt...")
         description = job_description
-        print("Description: ", description, "\n\n\n\n")
         st.progress(30, text="Reading Resume informations...")
         tone = resume_tone
-        print("Tone: ", tone, "\n\n\n\n")
         st.progress(50, text="Generating Resume...")
         gen = ResumeGenerator(API_KEY, description)
         prompt_1 = tool.create_prompt("Utils/keywords.txt")
         key_words = gen.extract_keywords_ai(prompt_1)
-        print("Keywords: ", key_words, "\n\n\n\n")
         st.progress(65, text="Extract keywords from Job Description...")
         result = gen.generate_resume(prompt, resume,
                 tone, language, key_words)
-        print("Result: ", result, "\n\n\n\n")
         st.progress(75, text="Retrieving Generated Resume...")
         if result is not None:
             new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", color_code)
@@ -125,7 +121,7 @@ def generate_resume(temp_file, images, job_description, resume_tone, language, A
             else:
                 st.warning("Failed to generate the resume. Please try again.")
 
-def main():
+def main() -> None:
     API_KEY, app, tool, lottie_5 = setup()
     if 'page' not in st.session_state:
         st.session_state.page = 'home'

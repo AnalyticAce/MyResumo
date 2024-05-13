@@ -3,7 +3,7 @@ from weasyprint.text.fonts import FontConfiguration
 from .tools import ToolKit
 import json
 
-def parse_user_information(data):
+def parse_user_information(data: dict) -> str:
     user_information = data["user_information"]
     user_information_html = f"""
     <header>
@@ -17,7 +17,7 @@ def parse_user_information(data):
     """
     return user_information_html
 
-def parse_experiences(data):
+def parse_experiences(data: dict) -> str:
     experiences = data["user_information"]["experiences"]
     if experiences == []:
         return ""
@@ -36,7 +36,7 @@ def parse_experiences(data):
     experiences_html += "</section>"
     return experiences_html
 
-def parse_education(data):
+def parse_education(data: dict) -> str:
     education = data["user_information"]["education"]
     if education == []:
         return ""
@@ -53,7 +53,7 @@ def parse_education(data):
     education_html += "</section>"
     return education_html
 
-def parse_skills(data):
+def parse_skills(data: dict) -> str:
     skills = data["user_information"]["skills"]
     if skills["hard_skills"] == [] and skills["soft_skills"] == []:
         return ""
@@ -68,7 +68,7 @@ def parse_skills(data):
     skills_html += "</ul></section>"
     return skills_html
 
-def parse_projects(data):
+def parse_projects(data: dict) -> str:
     projects = data["projects"]
     if projects == []:
         return ""
@@ -86,7 +86,7 @@ def parse_projects(data):
     projects_html += "</section>"
     return projects_html
 
-def parse_hobbies(data):
+def parse_hobbies(data: dict) -> str:
     if data["user_information"]["hobbies"] == []:
         return ""
     hobbies = data["user_information"]["hobbies"]
@@ -96,7 +96,7 @@ def parse_hobbies(data):
     hobbies_html += "</ul></section>"
     return hobbies_html
 
-def parse_certificate(data):
+def parse_certificate(data: dict) -> str:
     certifications = data["certificate"]
     if certifications == []:
         return ""
@@ -114,7 +114,7 @@ def parse_certificate(data):
     certifications_html += "</section>"
     return certifications_html
 
-def parse_extra_curricular_activities(data):
+def parse_extra_curricular_activities(data: dict) -> str:
     extra_curricular_activities = data["extra_curricular_activities"]
     if extra_curricular_activities == []:
         return ""
@@ -128,7 +128,7 @@ def parse_extra_curricular_activities(data):
     extra_curricular_activities_html += "</section>"
     return extra_curricular_activities_html
 
-def create_resume(data):
+def create_resume(data : str) -> str:
     data = json.loads(data)
     user_information_html = parse_user_information(data)
     experiences_html = parse_experiences(data)
@@ -158,7 +158,7 @@ def create_resume(data):
     """
     return resume_html
 
-def perfect_css_style(color_code):
+def perfect_css_style(color_code : str) -> str:
     css = f"""
     body {{
         font-family: 'Times New Roman', Times, serif;
@@ -230,7 +230,7 @@ def perfect_css_style(color_code):
     """
     return css
 
-def create_pdf(data, filename, color_code="#000000"):
+def create_pdf(data: str, filename: str, color_code="#000000") -> bool:
     try:
         font_config = FontConfiguration()
         html = HTML(string=f"""{create_resume(data)}""")

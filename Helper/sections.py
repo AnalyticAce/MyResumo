@@ -7,7 +7,7 @@ class AppSection:
         """
         pass
 
-    def app_config(self):
+    def app_config(self) -> None:
         """
         Configures the Streamlit app settings.
         """
@@ -20,7 +20,7 @@ class AppSection:
         with open("Helper/style/project.css") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-    def side_info(self):
+    def side_info(self) -> None:
         """
         Displays the sidebar information.
         """
@@ -46,7 +46,7 @@ class AppSection:
             st.divider()
             st.write("Made with ♥ in Cotonou, Benin Republic")
 
-    def app_intro(self):
+    def app_intro(self) -> None:
         """
         Displays the app introduction section.
         """
@@ -63,7 +63,7 @@ class AppSection:
         Voilà, You're all set! Press the ***:red[Start]*** Button and embark on the journey to craft a resume that's as unique as your professional story. Let's turn your skills and experiences into a masterpiece!
         """)
 
-    def username(self):
+    def username(self) -> str:
         """
         Displays the username input section.
         """
@@ -73,7 +73,7 @@ class AppSection:
         st.info("***:blue[Tip]*** : Your name will be used to name the generated resume under the following format :red[*username_genenated.pdf*]",icon='ℹ️')
         return user_name
 
-    def uploadfile(self):
+    def uploadfile(self) -> str:
         """
         Displays the file upload section.
         """
@@ -83,7 +83,7 @@ class AppSection:
         uploaded_file = st.file_uploader("***Choose a PDF file***", type="pdf")
         return uploaded_file
 
-    def description(self):
+    def description(self) -> str:
         """
         Displays the job description input section.
         """
@@ -97,7 +97,7 @@ class AppSection:
         job_description = st.text_area('***Enter the job description here***', height=300)
         return job_description
 
-    def resume_option(self):
+    def resume_option(self) -> str:
         """
         Displays the resume tone selection section.
         """
@@ -114,7 +114,7 @@ class AppSection:
             st.info("Expert tone is ideal for highlighting specialized expertise and technical skills in your resume.", icon="ℹ️")
         return resume_tone
 
-    def language_opt(self):
+    def language_opt(self) -> str:
         """
         Displays the language selection section.
         """
@@ -124,7 +124,7 @@ class AppSection:
         language = st.selectbox("Select a Language", ["English", "French"])
         return language
 
-    def resume_temp(self):
+    def resume_temp(self) -> str:
         """
         Displays the resume template selection section.
         """
@@ -134,7 +134,7 @@ class AppSection:
         resume_template = st.radio("Select a Resume Template", ["Template 1", "Template 2"])
         return resume_template
 
-    def colorpicker(self, key="color_key"):
+    def colorpicker(self) -> str:
         """
         Displays the color picker section.
         """
