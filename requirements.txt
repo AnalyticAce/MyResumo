@@ -2,6 +2,8 @@ nltk==3.8.1
 octoai==1.0.2
 opencv_contrib_python==4.8.0.74
 pdf2image==1.16.3
+Pillow==9.5.0
+Pillow==10.3.0
 PyPDF2==3.0.1
 pytesseract==0.3.10
 python-dotenv==1.0.1
