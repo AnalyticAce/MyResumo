@@ -42,7 +42,7 @@ Below are images showing how the app looks like:
 
 Below is a generated Resumes from the model. [See Full Resume](Data/dosseh_shalom_generated.pdf)
 <div align="center">
-    <img alt="Result" src="Images/result.png">
+    <img alt="Result" src="Images/result_.png">
 </div>
 
 *Note :* Still working on the frontend of the resume generated this might not look great :)
