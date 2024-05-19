@@ -1,3 +1,2 @@
-helper/__pycache__/
 .env
-Tests/notebooks
+tests/
