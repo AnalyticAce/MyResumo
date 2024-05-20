@@ -128,4 +128,4 @@ For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom]
 > [!IMPORTANT]
 >
 > This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
-> and continuously evolve an aspiration of where I'm going.
+> app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
