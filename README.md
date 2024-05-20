@@ -47,6 +47,11 @@ Below is a generated Resumes from the model. [See Full Resume](Data/dosseh_shalo
 
 *Note :* Still working on the frontend of the resume generated this might not look great :)
 
+> [!DISCLAIMER]
+>
+> This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
+> app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
+
 ## Running the Application
 
 To run **MyResumo**, you'll need to set up your environment and install the necessary dependencies.
@@ -119,8 +124,3 @@ We welcome contributions to MyResumo! If you'd like to contribute, please follow
 
 ## Contact
 For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom](www.linkedin.com/in/shalom-dosseh-4a484a262) at LinkedIn.
-
-> [!WARNING]
->
-> This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
-> app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
