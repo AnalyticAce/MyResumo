@@ -47,7 +47,7 @@ Below is a generated Resumes from the model. [See Full Resume](Data/dosseh_shalo
 
 *Note :* Still working on the frontend of the resume generated this might not look great :)
 
-> [!DISCLAIMER]
+> [!URGENT]
 >
 > This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
 > app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
