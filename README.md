@@ -127,5 +127,5 @@ For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom]
 
 > [!IMPORTANT]
 >
-> Nothing here is actually implemented yet; I just feel the need to write down
+> This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
 > and continuously evolve an aspiration of where I'm going.
