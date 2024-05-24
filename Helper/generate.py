@@ -40,7 +40,7 @@ class ResumeGenerator:
         try:
             json.loads(json_text)
         except json.JSONDecodeError:
-            print(f'Invalid JSON string: {json_text}')
+            # print(f'Invalid JSON string: {json_text}')
             return None
         return json_text
 
@@ -53,13 +53,14 @@ class ResumeGenerator:
         - str: The extracted keywords in JSON format.
         """
         try:
-            nltk.data.find('tokenizers/punkt')
+            libs = ["punkt", "stopwords", "tokenizers/punkt", "corpora/stopwords"]
+            nltk.data.find(libs[2])
         except LookupError:
-            nltk.download('punkt')
+            nltk.download(libs[0])
         try:
-            nltk.data.find('corpora/stopwords')
+            nltk.data.find(libs[3])
         except LookupError:
-            nltk.download('stopwords')
+            nltk.download(libs[1])
         r = Rake()
         r.extract_keywords_from_text(self.job_description)
         keywords_dict = {}

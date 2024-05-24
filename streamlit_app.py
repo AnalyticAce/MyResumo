@@ -95,29 +95,32 @@ def generate_resume(temp_file: str, images: str, job_description: str,
         resume = " ".join(texts)
         vision.delete_image(save_images_name)
         st.progress(10, text="Parsing Your Resume...")
-        prompt = tool.create_prompt("Utils/test.txt")
+        prompt_file = "Utils/test.txt"
+        prompt = tool.create_prompt(prompt_file)
         st.progress(20, text="Creating Prompt...")
         description = job_description
         st.progress(30, text="Reading Resume informations...")
         tone = resume_tone
         st.progress(50, text="Generating Resume...")
         gen = ResumeGenerator(API_KEY, description, "mixtral-8x22b-instruct")
-        prompt_1 = tool.create_prompt("Utils/keywords.txt")
+        key_word_file = "Utils/keywords.txt"
+        prompt_1 = tool.create_prompt(key_word_file)
         key_words = gen.extract_keywords_ai(prompt_1)
         st.progress(65, text="Extract keywords from Job Description...")
         result = gen.generate_resume(prompt, resume,
                 tone, language, key_words)
         st.progress(75, text="Retrieving Generated Resume...")
         if result is not None:
-            new_resume = create_pdf(result, f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", color_code)
+            file_format = f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf"
+            new_resume = create_pdf(result, file_format, color_code)
             st.progress(80, text="Creating Resume PDF...")
             st.progress(100, text="Done")
             if new_resume:
                 st.success("Resume PDF created successfully! Please click the button below to download your resume.")
-                with open(f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf", "rb") as f:
+                with open(file_format, "rb") as f:
                     pdf_data = f.read()
-                st.download_button("Download Generated Resume", pdf_data, f"{user_name.replace(' ', '_').lower()}_generated.pdf", False)
-                os.remove(f"Data/{user_name.replace(' ', '_').lower()}_generated.pdf")
+                st.download_button("Download Generated Resume", pdf_data, file_format, False)
+                os.remove(file_format)
             else:
                 st.warning("Failed to generate the resume. Please try again.")
 

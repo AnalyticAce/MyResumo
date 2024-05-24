@@ -238,5 +238,5 @@ def create_pdf(data: str, filename: str, color_code="#000000") -> bool:
         html.write_pdf(filename, stylesheets=[css], font_config=font_config)
         return True
     except Exception as e:
-        print(f"Failed to create PDF: {e}")
+        # print(f"Failed to create PDF: {e}")
         return False
