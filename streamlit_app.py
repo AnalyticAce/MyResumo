@@ -3,7 +3,7 @@ from Helper.generate import ResumeGenerator
 from Helper.resume import create_pdf
 from Helper.sections import AppSection
 from Helper.vision import Vision
-import tempfile, os, streamlit as st
+import tempfile, os, subprocess, streamlit as st
 from streamlit_lottie import st_lottie
 from dotenv import load_dotenv
 
@@ -72,9 +72,12 @@ def handle_generate_page(app: AppSection, API_KEY: str) -> None:
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation and template_1:
-        path = os.system('which tesseract')
-        st.write(path)
-        print(path)
+        try:
+            path = subprocess.check_output(['which', 'tesseract'])
+            print(path)
+        except subprocess.CalledProcessError:
+            print("Tesseract not found in PATH")
+
         # if 'temp_file' not in locals() or not temp_file:
         #     st.warning("Please upload a file before generating your resume.", icon='📑')
         #     st.stop()
