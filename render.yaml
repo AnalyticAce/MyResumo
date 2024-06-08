@@ -1,4 +1,3 @@
-# Exported from Render on 2024-06-08T01:05:30Z
 services:
 - type: web
   name: myresumo
