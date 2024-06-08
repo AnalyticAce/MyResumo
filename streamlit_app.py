@@ -72,19 +72,24 @@ def handle_generate_page(app: AppSection, API_KEY: str) -> None:
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation and template_1:
-        if 'temp_file' not in locals() or not temp_file:
-            st.warning("Please upload a file before generating your resume.", icon='📑')
-            st.stop()
+        import os
+        path = os.system('which tesseract')
+        st.write(path)
+        print(path)
+        # if 'temp_file' not in locals() or not temp_file:
+        #     st.warning("Please upload a file before generating your resume.", icon='📑')
+        #     st.stop()
         
-        if not job_description:
-            st.warning("Please enter the job description before generating your resume.", icon='📑')
-            st.stop()
+        # if not job_description:
+        #     st.warning("Please enter the job description before generating your resume.", icon='📑')
+        #     st.stop()
         
-        generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code)
+        # generate_resume(temp_file, images, job_description, resume_tone, language, API_KEY, user_name, vision, tool, color_code)
 
 def generate_resume(temp_file: str, images: str, job_description: str,
         resume_tone: str, language: str, API_KEY: str, user_name: str, 
         vision: str, tool: str, color_code: str) -> None:
+
     with st.progress(0, text="Generating Resume..."):
         if not temp_file:
             st.warning("Please upload a file before generating your resume.", icon='📑')
