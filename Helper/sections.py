@@ -28,7 +28,7 @@ class AppSection:
             st.header("👨‍💻 About the Author")
             st.write(
             """
-            **DOSSEH Shalom** is a Problem Solver, Fintech enthusiast, coder and innovator. Driven by passion and a love to solve real life problems, he created this app to make job search more interactive and easier.
+            **DOSSEH Shalom** is a Problem Solver, Fintech enthusiast, coder and innovator. Driven by passion and a love to solve real-life problems, he created this app to make job search more interactive and easier.
 
             Connect, contribute, or just say hi!
             """)
@@ -58,7 +58,7 @@ class AppSection:
         1. You can watch the video tutorial below to get started.
         2. Hit the :red[Start] button and let the magic unfold.
 
-        ⚠️ **Important:** MyResumo is porweb by :red[Mixtral-8x22b-Instruct model], the first open-source model to achieve GPT-4 level performance on MT Bench, with an impressive context length of over 65,536 tokens.
+        ⚠️ **Important:** MyResumo is powered by :red[Mixtral-8x22b-Instruct model], the first open-source model to achieve GPT-4 level performance on MT Bench, with an impressive context length of over 65,536 tokens.
 
         Voilà, You're all set! Press the ***:red[Start]*** Button and embark on the journey to craft a resume that's as unique as your professional story. Let's turn your skills and experiences into a masterpiece!
         """)
@@ -78,8 +78,8 @@ class AppSection:
         Displays the file upload section.
         """
         st.title('***Upload your Resume***')
-        "**:red[Must Know]** : In this Section you are required to upload an already made resume or a pdf file with all necessary informations **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**"
-        st.info("***:blue[Tip]*** : If you don't have a [:red[RESUME]](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=drive_link) you can download the template below and fill out the template below with your informations",icon='ℹ️')
+        "**:red[Must Know]** : In this section you are required to upload an already made resume or a pdf file with all necessary information **:blue[Skills]**, **:blue[Experiences]**, **:blue[Educations]**, **:blue[Projects]**, **:blue[Certifications]**, **:blue[Languages]**, **:blue[etc...]**"
+        st.info("***:blue[Tip]*** : If you don't have a [:red[RESUME]](https://drive.google.com/file/d/1TNbjuxwviQE_cqV9dMNfZqXxxMGAGdN1/view?usp=drive_link) you can download the template below and fill out the template below with your information",icon='ℹ️')
         uploaded_file = st.file_uploader("***Choose a PDF file***", type="pdf")
         return uploaded_file
 
@@ -102,7 +102,7 @@ class AppSection:
         Displays the resume tone selection section.
         """
         st.title('***Choose the Tone of your Resume***')
-        st.write("**:red[Must Know]** : In this Section you are asked to choose the tone of the resume that will be generated")
+        st.write("**:red[Must Know]** : In this Section, you are asked to choose the tone of the resume that will be generated")
         resume_tone = st.selectbox("Select a Resume Tone", ["Professional", "Creative", "Balanced",  "Expert"])
         if resume_tone == 'Professional':
             st.info("Professional tone is suitable for formal settings where professionalism is emphasized.", icon="ℹ️")
@@ -119,8 +119,8 @@ class AppSection:
         Displays the language selection section.
         """
         st.title('***Choose a Language***')
-        st.write("**:red[Must Know]** : In this Section you are asked to choose a language in which your resume that will be generated")
-        st.info('Advice: It is adviced to choose the source language of the resume uploaded', icon="ℹ️")
+        st.write("**:red[Must Know]** : In this Section you are asked to choose a language in which your resume will be generated")
+        st.info('Advice: It is advised to choose the source language of the resume uploaded', icon="ℹ️")
         language = st.selectbox("Select a Language", ["English", "French"])
         return language
 
@@ -139,7 +139,7 @@ class AppSection:
         Displays the color picker section.
         """
         st.title('***Choose a Color Scheme***')
-        st.write("**:red[Must Know]** : In this Section you are asked to choose a color scheme for your resume")
+        st.write("**:red[Must Know]** : In this Section, you are asked to choose a color scheme for your resume")
         st.info('Advice: Choose colors that align with your personal brand or the industry you are applying to.', icon="ℹ️")
         color_code = st.color_picker("Choose a Color", "#000000")
         st.write('The current color is', color_code)
