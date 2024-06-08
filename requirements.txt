@@ -10,7 +10,7 @@ rake_nltk==1.0.6
 Requests==2.31.0
 streamlit==1.34.0
 streamlit_lottie==0.0.5
-weasyprint==62.1
+weasyprint==61.2
 pangocffi==0.2.0
 pydyf==0.10.0
 cffi==1.16.0
