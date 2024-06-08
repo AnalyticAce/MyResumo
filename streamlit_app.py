@@ -72,7 +72,6 @@ def handle_generate_page(app: AppSection, API_KEY: str) -> None:
     generation = st.button('***:blue[Generate Yo]:red[ur Resume]***', help='Hover over me!')
 
     if generation and template_1:
-        import os
         path = os.system('which tesseract')
         st.write(path)
         print(path)
