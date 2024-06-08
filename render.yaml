@@ -8,7 +8,11 @@ services:
   - key: OCTO_AI_TOKEN
     sync: false
   region: frankfurt
-  buildCommand: pip install -r requirements.txt; pip install openai==0.28; pip install
-    pytesseract==0.3.10
+  buildCommand: |
+    pip install -r requirements.txt
+    pip install openai==0.28
+    pip install pytesseract==0.3.10
+    wget https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
+    mv eng.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
   startCommand: streamlit run streamlit_app.py
 version: "1"
