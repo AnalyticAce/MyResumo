@@ -7,13 +7,7 @@ services:
   envVars:
   - key: OCTO_AI_TOKEN
     sync: false
-  - key: TESSDATA_PREFIX
-    value: ./tessdata
   region: frankfurt
-  buildCommand: |
-    pip install -r requirements.txt
-    pip install openai==0.28
-    pip install pytesseract==0.3.10
-    wget https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata
-  startCommand: streamlit run streamlit_app.py
+  buildCommand: bash build.sh
+  startCommand: bash -c 'export TESSDATA_PREFIX=/usr/local/share/tessdata && streamlit run streamlit_app.py'
 version: "1"
