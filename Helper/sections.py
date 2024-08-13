@@ -58,7 +58,7 @@ class AppSection:
         1. You can watch the video tutorial below to get started.
         2. Hit the :red[Start] button and let the magic unfold.
 
-        ⚠️ **Important:** MyResumo is porweb by :red[Mixtral-8x22b-Instruct model], the first open-source model to achieve GPT-4 level performance on MT Bench, with an impressive context length of over 65,536 tokens.
+        ⚠️ **Important:** MyResumo is porwered by the latest model of Meta :red[Meta-llama-3.1-405b-instruct], this open-source model achieves GPT-4 level performance on MT Bench, with an impressive context length of over 131,072 tokens.
 
         Voilà, You're all set! Press the ***:red[Start]*** Button and embark on the journey to craft a resume that's as unique as your professional story. Let's turn your skills and experiences into a masterpiece!
         """)
@@ -147,3 +147,24 @@ class AppSection:
             st.write('***:red[Notice]*** : The color selection will be applied to the section headers.')
             st.image('Images/color_picker.png')
         return color_code
+    
+    def resume_section_picker(self) -> str:
+        """
+        Displays the resume section picker section.
+        """
+        st.title('***Choose the Sections to Include in your Resume***')
+        st.write("**:red[Must Know]** : In this Section you are asked to choose the sections that will be included in your resume. This section will appear in the order you select.")
+        st.info('Advice: Select sections that best showcase your skills and experiences.', icon="ℹ️")
+        resume_section = ['Experiences', 'Education', 'Skills', 'Projects', 'Hobbies', 'Certificates', 'Extra Curricular Activities']
+        pre_selected = ['Experiences', 'Education', 'Skills', 'Projects', 'Certificates']
+        sections = st.multiselect("Select Sections", resume_section, default=pre_selected)
+        return sections
+    
+    def additional_info(self) -> str:
+        """
+        Displays the additional information section.
+        """
+        st.title('***Add Additional Information***')
+        st.write("**:red[Must Know]** : In this Section you are asked to provide any additional information you would like to include in your resume")
+        additional_info = st.text_area('***Enter Additional Information***', help='Enter Additional Information')
+        return additional_info

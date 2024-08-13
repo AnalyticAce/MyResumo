@@ -4,7 +4,7 @@ import json, nltk
 from rake_nltk import Rake
 
 class ResumeGenerator:
-    def __init__(self, API_KEY: str, job_description: str, model_name: str,
+    def __init__(self, API_KEY: str, job_description: str, model_name: str = "mixtral-8x7b-instruct",
         presence_penalty=0, temperature=0.1, top_p=0.9) -> None:
         """
         Initialize the ResumeGenerator class.
@@ -70,7 +70,8 @@ class ResumeGenerator:
         return json.dumps(keywords_dict)
     
     def generate_resume(self, prompt: str, resume_content: str,
-                tone: str, language: str, key_words: str) -> dict:
+                tone: str, language: str, key_words: str = "", 
+                additional_info: str = None) -> dict:
         """
         Generates a resume using the given prompt, resume content, tone, language, and keywords.
 
@@ -87,7 +88,7 @@ class ResumeGenerator:
         - str: The generated resume.
         """
         completion = self.client.text_gen.create_chat_completion(
-            max_tokens=10000,
+            max_tokens=100000,
             messages=[
                 ChatMessage(
                     content=f"{prompt}",
@@ -104,7 +105,9 @@ class ResumeGenerator:
                     Tone to be applied:
                     {tone}
                     Language of the new resume:
-                    {language}""",
+                    {language}
+                    User's Additional Information:
+                    {additional_info}""",
                     role="user"
                 )
             ],
@@ -117,17 +120,6 @@ class ResumeGenerator:
         return self.extract_json(completion.choices[0].message.content)
     
     def extract_keywords_ai(self, prompt: str) -> str:
-        """
-        Extracts keywords from the job description using the AI model.
-        
-        Parameters:
-        ----------
-        - prompt (str): The prompt for extracting the keywords.
-        
-        Returns:
-        -------
-        - str: The extracted keywords in text format.
-        """
         completion = self.client.text_gen.create_chat_completion(
             max_tokens=4000,
             messages=[

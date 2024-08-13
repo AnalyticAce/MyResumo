@@ -1,7 +1,6 @@
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 from .tools import ToolKit
-import json
 
 def parse_user_information(data: dict) -> str:
     user_information = data["user_information"]
@@ -128,16 +127,23 @@ def parse_extra_curricular_activities(data: dict) -> str:
     extra_curricular_activities_html += "</section>"
     return extra_curricular_activities_html
 
-def create_resume(data : str) -> str:
+import json
+
+def create_resume(data: str, resume_sections: list) -> str:
     data = json.loads(data)
-    user_information_html = parse_user_information(data)
-    experiences_html = parse_experiences(data)
-    education_html = parse_education(data)
-    skills_html = parse_skills(data)
-    projects_html = parse_projects(data)
-    hobbies_html = parse_hobbies(data)
-    certificates_html = parse_certificate(data)
-    extra_curricular_activities_html = parse_extra_curricular_activities(data)
+
+    section_map = {
+        'Experiences': parse_experiences(data),
+        'Education': parse_education(data),
+        'Skills': parse_skills(data),
+        'Projects': parse_projects(data),
+        'Hobbies': parse_hobbies(data),
+        'Certificates': parse_certificate(data),
+        'ExtraCurricularActivities': parse_extra_curricular_activities(data)
+    }
+
+    selected_sections_html = "".join(section_map[section] for section in resume_sections if section in section_map)
+    
     resume_html = f"""
     <!DOCTYPE html>
     <html>
@@ -145,14 +151,8 @@ def create_resume(data : str) -> str:
         <link rel="stylesheet" href="index.css">
     </head>
     <body>
-        {user_information_html}
-        {experiences_html}
-        {education_html}
-        {certificates_html}
-        {projects_html}
-        {extra_curricular_activities_html}
-        {skills_html}
-        {hobbies_html}
+        {parse_user_information(data)}
+        {selected_sections_html}
     </body>
     </html>
     """
@@ -230,10 +230,10 @@ def perfect_css_style(color_code : str) -> str:
     """
     return css
 
-def create_pdf(data: str, filename: str, color_code="#000000") -> bool:
+def create_pdf(data: str, filename: str, resume_sections: list[str], color_code="#000000") -> bool:
     try:
         font_config = FontConfiguration()
-        html = HTML(string=f"""{create_resume(data)}""")
+        html = HTML(string=f"""{create_resume(data, resume_sections)}""")
         css = CSS(string=f'''{perfect_css_style(color_code)}''', font_config=font_config)
         html.write_pdf(filename, stylesheets=[css], font_config=font_config)
         return True
