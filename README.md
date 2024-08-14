@@ -123,4 +123,4 @@ We welcome contributions to MyResumo! If you'd like to contribute, please follow
 8. **Review and Merge**: The maintainers will review your pull request. Once approved, your changes will be merged into the main codebase.
 
 ## Contact
-For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom](https://www.linkedin.com/in/shalom-dosseh-4a484a262) at LinkedIn.
+For any inquiries or collaboration requests, please reach out to [DOSSEH Shalom](www.linkedin.com/in/shalom-dosseh-4a484a262) at LinkedIn.

@@ -1,0 +1,13 @@
+services:
+- type: web
+  name: myresumo
+  runtime: python
+  repo: https://github.com/AnalyticAce/MyResumo
+  plan: free
+  envVars:
+  - key: OCTO_AI_TOKEN
+    sync: false
+  region: frankfurt
+  buildCommand: bash build.sh
+  startCommand: bash -c 'export TESSDATA_PREFIX=/usr/local/share/tessdata && streamlit run streamlit_app.py'
+version: "1"
