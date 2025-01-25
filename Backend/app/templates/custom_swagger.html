@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+        }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .swagger-ui .topbar {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem;
+        }
+        
+        .swagger-ui .info .title {
+            color: var(--secondary-color);
+            font-size: 2.5em;
+        }
+        
+        .swagger-ui .opblock {
+            border-radius: 8px;
+            margin: 0 0 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .swagger-ui .opblock.opblock-post { background: rgba(74, 144, 226, 0.1); }
+        .swagger-ui .opblock.opblock-get { background: rgba(97, 175, 254, 0.1); }
+        .swagger-ui .opblock.opblock-put { background: rgba(252, 161, 48, 0.1); }
+        .swagger-ui .opblock.opblock-delete { background: rgba(249, 62, 62, 0.1); }
+        
+        .swagger-ui .btn.execute {
+            background-color: var(--primary-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "{{ openapi_url }}",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "BaseLayout",
+                defaultModelsExpandDepth: 1,
+                displayRequestDuration: true,
+                docExpansion: "none",
+                filter: true,
+                tryItOutEnabled: true
+            });
+            window.ui = ui;
+        }
+    </script>
+</body>
+</html>

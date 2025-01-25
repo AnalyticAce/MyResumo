@@ -10,47 +10,14 @@
 - **Streamlit Integration**: Built with Streamlit for a seamless user experience.
 - **OctoAI API**: Incorporates OctoAI API for intelligent interactions and suggestions with the use of the model `Mixtral-8x22b-Instruct` which is the first open source model ever to reach GPT-4 quality on MT Bench. It has a context lenght of over `65,536 tokens`
 
-## Technologies Used
-- Python
-- HTML
-- CSS
-- Streamlit
-- OctoAI API
-
-## Python Libaries
-- `nltk==3.8.1`
-- `octoai==1.0.2`
-- `opencv_contrib_python==4.8.0.74`
-- `pdf2image==1.16.3`
-- `PyPDF2==3.0.1`
-- `pytesseract==0.3.10`
-- `python-dotenv==1.0.1`
-- `rake_nltk==1.0.6`
-- `Requests==2.31.0`
-- `streamlit==1.34.0`
-- `streamlit_lottie==0.0.5`
-- `weasyprint==62.1`
-
 ## Results
 Below are images showing how the app looks like:
 
 - Home Page
-![Home Page](Images/home.png)
+![Home Page](.github/assets/home.png)
 
 - Main Page
-![Main Page](Images/app.png)
-
-Below is a generated Resumes from the model. [See Full Resume](Data/dosseh_shalom_generated.pdf)
-<div align="center">
-    <img alt="Result" src="Images/result_.png">
-</div>
-
-*Note :* Still working on the frontend of the resume generated this might not look great :)
-
-> [!CAUTION]
->
-> This app uses LLM models, which may generate unpredictable responses. Always use caution and common sense when following the generated responses. This
-> app is in it beta version, there is still alot of room for improvements, issues will be opened in the following days to solve core bugs and fine turne the prompt for better outputs.
+![Main Page](.github/assets/app.png)
 
 ## Running the Application
 
@@ -87,20 +54,6 @@ OCTO_AI_TOKEN=<your key here>
 
 ### Running the App
 After setting up the environment variables, you can run the app using Streamlit:
-
-```bash
-streamlit run streamlit_app.py
-```
-If successfully executed the message below should show up
-```bash
-└─$ streamlit run streamlit_app.py
-
-  You can now view your Streamlit app in your browser.
-
-  Local URL: http://localhost:8501
-  Network URL: http://10.50.5.194:8501
-```
-This will start the Streamlit server, and you should be able to access **MyResumo** at `http://localhost:8501` in your web browser.
 
 ## Contribution Guidelines
 

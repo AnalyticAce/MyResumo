@@ -6,15 +6,6 @@ from rake_nltk import Rake
 class ResumeGenerator:
     def __init__(self, API_KEY: str, job_description: str, model_name: str = "mixtral-8x7b-instruct",
         presence_penalty=0, temperature=0.1, top_p=0.9) -> None:
-        """
-        Initialize the ResumeGenerator class.
-
-        Parameters:
-        ----------
-        - API_KEY (str): The API key for OctoAI.
-        - job_description (str): The job description for generating the resume.
-        - model_name (str): The name of the model to use for generating the resume.
-        """
         self.client = OctoAI(api_key=API_KEY,)
         self.job_description = job_description
         self.model_name = model_name
@@ -23,35 +14,16 @@ class ResumeGenerator:
         self.top_p = top_p
 
     def extract_json(self, text: str) -> dict:
-        """
-        Extracts a valid JSON string from the given text.
-
-        Parameters:
-        -----------
-        - text (str): The text to extract the JSON string from.
-
-        Returns:
-        -------
-        - str: The extracted JSON string.
-        """
         start = text.find("{")
         end = text.rfind("}") + 1
         json_text = text[start:end]
         try:
             json.loads(json_text)
         except json.JSONDecodeError:
-            # print(f'Invalid JSON string: {json_text}')
             return None
         return json_text
 
     def extract_keywords(self) -> str:
-        """
-        Extracts keywords from the job description using RAKE algorithm.
-
-        Returns:
-        -------
-        - str: The extracted keywords in JSON format.
-        """
         try:
             libs = ["punkt", "stopwords", "tokenizers/punkt", "corpora/stopwords"]
             nltk.data.find(libs[2])
@@ -72,21 +44,6 @@ class ResumeGenerator:
     def generate_resume(self, prompt: str, resume_content: str,
                 tone: str, language: str, key_words: str = "", 
                 additional_info: str = None) -> dict:
-        """
-        Generates a resume using the given prompt, resume content, tone, language, and keywords.
-
-        Parameters:
-        ----------
-        - template (str): The template for the resume.
-        - resume_content (str): The content of the resume.
-        - tone (str): The tone to be applied to the resume.
-        - language (str): The language of the new resume.
-        - key_words (str): The keywords and ratings in dictionary format.
-
-        Returns:
-        -------
-        - str: The generated resume.
-        """
         completion = self.client.text_gen.create_chat_completion(
             max_tokens=100000,
             messages=[
