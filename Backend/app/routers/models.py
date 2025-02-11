@@ -13,8 +13,6 @@ class TokenData(BaseModel):
     def validate_username(cls, value):
         if len(value) < 3 or len(value) > 50:
             raise ValueError('username must be between 3 and 50 characters')
-        if not value.isalnum():
-            raise ValueError('username must be alphanumeric')
         return value
 
 class User(BaseModel):
