@@ -4,7 +4,6 @@ from pymongo.errors import DuplicateKeyError
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 import httpx
 from fastapi.responses import RedirectResponse
-from app.routers.models import UserInDB
 from app.utils.auth_utils import create_access_token
 from app.db.user_repo import UserRepository
 from fastapi import BackgroundTasks
@@ -175,12 +174,15 @@ async def oauth_callback(
     except Exception as e:
         logger.error(f"OAuth error: {str(e)}")
         raise HTTPException(500, detail="Authentication process failed")
+    
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
 
 async def handle_user_creation(
     username: str,
     email: str,
     profile_picture: str
-) -> UserInDB:
+) -> None:
     try:
         existing_user = await user_repo.get_user(username)
         
@@ -225,3 +227,6 @@ async def handle_user_creation(
             status_code=500,
             detail="Failed to complete user registration"
         )
+    
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
