@@ -28,7 +28,7 @@ oauth2_router = APIRouter(
         200: {"description": "Success response"},
         400: {"description": "Bad Request"},
         401: {"description": "Unauthorized access"},
-        409: {"description": "full_name already exists"},
+        409: {"description": "username already exists"},
     }
 )
 
@@ -113,17 +113,17 @@ async def oauth_callback(
             token_data = await exchange_code(provider, code, client)
             user_data, email = await get_user_info(provider, token_data["access_token"], client)
             
-            full_name = user_data.get("name")
+            username = user_data.get("name")
 
             user = await handle_user_creation(
-                full_name=full_name,
+                username=username,
                 email=email or user_data.get("email"),
                 provider=provider,
                 profile_picture=user_data.get("picture"),
                 background_tasks=background_tasks
             )
 
-            jwt_token = create_access_token({"sub": user.full_name})
+            jwt_token = create_access_token({"sub": user.username})
             redirect_url = f"{frontend_url}?token={jwt_token}"
             return RedirectResponse(redirect_url)
 
@@ -136,18 +136,18 @@ async def oauth_callback(
         raise HTTPException(500, detail="Authentication process failed")
 
 async def handle_user_creation(
-    full_name: str,
+    username: str,
     email: str,
     profile_picture: str,
     background_tasks: BackgroundTasks
 ) -> UserInDB:
     try:
-        existing_user = await user_repo.get_user(full_name)
+        existing_user = await user_repo.get_user(username)
         
         if existing_user:
             if existing_user.profile_picture != profile_picture:
                 await user_repo.update_user(
-                    full_name,
+                    username,
                     {"profile_picture": profile_picture}
                 )
                 existing_user.profile_picture = profile_picture
@@ -162,7 +162,7 @@ async def handle_user_creation(
                 )
 
         user_data = {
-            "full_name": full_name,
+            "username": username,
             "email": email,
             "provider": "github",
             "profile_picture": profile_picture,
@@ -175,8 +175,8 @@ async def handle_user_creation(
         return new_user
 
     except DuplicateKeyError as e:
-        logger.warning(f"Duplicate user creation attempt: {full_name}")
-        existing_user = await user_repo.get_user(full_name)
+        logger.warning(f"Duplicate user creation attempt: {username}")
+        existing_user = await user_repo.get_user(username)
         return existing_user
 
     except Exception as e:

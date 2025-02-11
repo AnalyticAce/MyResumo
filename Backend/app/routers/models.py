@@ -8,10 +8,10 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    full_name: Optional[str | None] = None
+    username: Optional[str | None] = None
 
 class User(BaseModel):
-    full_name: str = Field(..., example="johndoe")
+    username: str = Field(..., example="johndoe")
     email: Optional[EmailStr] = Field(None, example="johndoe@gmail.com")
     disabled: Optional[bool] = False
     provider: Optional[str] = "github"
@@ -22,6 +22,6 @@ class UserInDB(User):
     hashed_password: Optional[str] = None
 
 class UserCreate(BaseModel):
-    full_name: str
+    username: str
     email: str
     password: str

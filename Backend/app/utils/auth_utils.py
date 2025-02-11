@@ -36,8 +36,8 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return password_context.hash(password)
 
-async def authenticate_user(full_name: str, password: str):
-    user = await mongodb.get_user(full_name)
+async def authenticate_user(username: str, password: str):
+    user = await mongodb.get_user(username)
     if not user or not user.hashed_password:
         return False
     if not verify_password(password, user.hashed_password):
@@ -64,10 +64,10 @@ def decode_access_token(token: str):
 async def get_current_user(token: str = Depends(has_access)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        full_name: str = payload.get("sub")
-        if full_name is None:
+        username: str = payload.get("sub")
+        if username is None:
             raise HTTPException(status_code=401, detail="Token missing 'sub'")
-        return await mongodb.get_user(full_name=full_name)
+        return await mongodb.get_user(username=username)
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 

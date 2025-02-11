@@ -7,8 +7,8 @@ class UserRepository(BaseRepository):
     def __init__(self, db_name: str):
         super().__init__(db_name, "users")
 
-    async def get_user(self, full_name: str) -> Optional[UserInDB]:
-        user = await self.find_one({"full_name": full_name})
+    async def get_user(self, username: str) -> Optional[UserInDB]:
+        user = await self.find_one({"username": username})
         if user:
             return UserInDB(**self._map_user_data(user))
         return None
@@ -18,11 +18,11 @@ class UserRepository(BaseRepository):
         created_user = await self.find_one({"_id": ObjectId(user_id)})
         return UserInDB(**self._map_user_data(created_user))
 
-    async def update_user(self, full_name: str, update_data: Dict) -> bool:
-        return await self.update_one({"full_name": full_name}, update_data)
+    async def update_user(self, username: str, update_data: Dict) -> bool:
+        return await self.update_one({"username": username}, update_data)
 
-    async def delete_user(self, full_name: str) -> bool:
-        return await self.delete_one({"full_name": full_name})
+    async def delete_user(self, username: str) -> bool:
+        return await self.delete_one({"username": username})
 
     async def get_user_by_email(self, email: str) -> Optional[UserInDB]:
         user = await self.find_one({"email": email})
@@ -32,7 +32,7 @@ class UserRepository(BaseRepository):
 
     def _map_user_data(self, user_data: Dict) -> Dict:
         return {
-            "full_name": user_data.get("full_name"),
+            "username": user_data.get("username"),
             "email": user_data.get("email"),
             "hashed_password": user_data.get("hashed_password", ""),
             "provider": user_data.get("provider", "createk"),
