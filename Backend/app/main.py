@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.connector import MongoConnectionManager
 from app.routers.auth.oauth2 import oauth2_router
-from app.routers.api.api import user_router
+from app.routers.user.user import user_router
 from app.credentials.config import REDIS_HOST, REDIS_PORT
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache

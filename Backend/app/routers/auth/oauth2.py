@@ -5,13 +5,11 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Request
 import httpx
 from fastapi.responses import RedirectResponse
 from app.routers.models import UserInDB
-from app.utils.mail import send_email
 from app.utils.auth_utils import create_access_token
 from app.db.user_repo import UserRepository
 from fastapi import BackgroundTasks
 from app.credentials.config import (
-    GMAIL_EMAIL_PASSWORD, CLIENT_IDS, 
-    CLIENT_SECRETS, REDIRECT_URIS,
+    CLIENT_IDS, CLIENT_SECRETS, REDIRECT_URIS,
     OAUTH_CONFIG,
     FRONTEND_HOST, FRONTEND_PORT
 )
@@ -19,7 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 frontend_url = f"http://{FRONTEND_HOST}:{FRONTEND_PORT}/success"
-user_repo = UserRepository("createk")
+user_repo = UserRepository("myresumo")
 
 oauth2_router = APIRouter(
     prefix="/api/oauth2",
@@ -34,7 +32,7 @@ oauth2_router = APIRouter(
     }
 )
 
-async def exchange_code(provider: str, code: str, client: httpx.AsyncClient) -> dict:
+async def exchange_code(code: str, client: httpx.AsyncClient, provider: str = "github") -> dict:
     config = OAUTH_CONFIG[provider]
     data = {
         "client_id": CLIENT_IDS[provider],
@@ -68,14 +66,14 @@ async def get_user_info(provider: str, token: str, client: httpx.AsyncClient) ->
     print(user_data)
 
     email = None
-    if provider == "github":
-        email_response = await client.get(config["emails_url"], headers=headers)
-        if email_response.status_code == 200:
-            for email_data in email_response.json():
-                if email_data.get("primary") and email_data.get("verified"):
-                    email = email_data.get("email")
-                    break
-    
+
+    email_response = await client.get(config["emails_url"], headers=headers)
+    if email_response.status_code == 200:
+        for email_data in email_response.json():
+            if email_data.get("primary") and email_data.get("verified"):
+                email = email_data.get("email")
+                break
+
     return user_data, email
 
 @oauth2_router.get(
@@ -83,7 +81,7 @@ async def get_user_info(provider: str, token: str, client: httpx.AsyncClient) ->
     summary="OAuth2 login endpoint",
     description="OAuth2 login endpoint"
 )
-async def oauth_login(request: Request, provider: str) -> RedirectResponse:
+async def oauth_login(request: Request, provider: str = "github") -> RedirectResponse:
     if provider not in OAUTH_CONFIG:
         raise HTTPException(404, detail="Provider not supported")
     
@@ -115,20 +113,16 @@ async def oauth_callback(
             token_data = await exchange_code(provider, code, client)
             user_data, email = await get_user_info(provider, token_data["access_token"], client)
             
-            full_name = (
-                user_data.get("name") 
-                if (provider == "github" and user_data.get("name"))
-                else user_data.get("login") if provider == "github"
-                else user_data.get("name")
-            )
+            full_name = user_data.get("name")
 
             user = await handle_user_creation(
                 full_name=full_name,
                 email=email or user_data.get("email"),
                 provider=provider,
-                profile_picture=user_data.get("avatar_url") if provider == "github" else user_data.get("picture"),
+                profile_picture=user_data.get("picture"),
                 background_tasks=background_tasks
             )
+
             jwt_token = create_access_token({"sub": user.full_name})
             redirect_url = f"{frontend_url}?token={jwt_token}"
             return RedirectResponse(redirect_url)
@@ -144,7 +138,6 @@ async def oauth_callback(
 async def handle_user_creation(
     full_name: str,
     email: str,
-    provider: str,
     profile_picture: str,
     background_tasks: BackgroundTasks
 ) -> UserInDB:
@@ -162,7 +155,7 @@ async def handle_user_creation(
 
         if email:
             email_user = await user_repo.get_user_by_email(email)
-            if email_user and email_user.provider != provider:
+            if email_user and email_user.provider != 'github':
                 raise HTTPException(
                     status_code=409,
                     detail=f"Email already registered with {email_user.provider}"
@@ -171,24 +164,13 @@ async def handle_user_creation(
         user_data = {
             "full_name": full_name,
             "email": email,
-            "provider": provider,
+            "provider": "github",
             "profile_picture": profile_picture,
             "disabled": False,
             "created_at": datetime.utcnow()
         }
         
         new_user = await user_repo.create_user(user_data)
-
-        if email:
-            background_tasks.add_task(
-                send_email,
-                "Welcome to Createk",
-                "dossehdosseh14@gmail.com",
-                email,
-                GMAIL_EMAIL_PASSWORD,
-                "app/template/welcome.html",
-                {"full_name": full_name}
-            )
 
         return new_user
 

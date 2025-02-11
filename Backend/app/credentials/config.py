@@ -51,15 +51,9 @@ APP_PORT = os.environ.get('APP_PORT')
 if APP_PORT is None:
     raise ValueError('No APP_PORT set for FastAPI application')
 
-GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
-GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
-
 EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 if EMAIL_PASSWORD is None:
     raise ValueError('No EMAIL_PASSWORD set for FastAPI application')
-
-EMAIL_ADDRESS = "dossehdosseh14@gmail.com"
 
 FRONTEND_HOST = os.environ.get('FRONTEND_HOST')
 if FRONTEND_HOST is None:
@@ -85,12 +79,6 @@ OAUTH2 = "oauth2"
 GOOGLE_REDIRECT_URI = f"http://{SERVER_HOST}:{int(APP_PORT)}/api/{OAUTH2}/google/callback"
 
 OAUTH_CONFIG = {
-    "google": {
-        "auth_url": "https://accounts.google.com/o/oauth2/v2/auth",
-        "token_url": "https://oauth2.googleapis.com/token",
-        "userinfo_url": "https://openidconnect.googleapis.com/v1/userinfo",
-        "scopes": "openid email profile"
-    },
     "github": {
         "auth_url": "https://github.com/login/oauth/authorize",
         "token_url": "https://github.com/login/oauth/access_token",
@@ -101,16 +89,13 @@ OAUTH_CONFIG = {
 }
 
 CLIENT_IDS = {
-    "google": GOOGLE_CLIENT_ID,
     "github": GITHUB_CLIENT_ID
 }
 
 CLIENT_SECRETS = {
-    "google": GOOGLE_CLIENT_SECRET,
     "github": GITHUB_CLIENT_SECRET
 }
 
 REDIRECT_URIS = {
-    "google": f"http://{SERVER_HOST}:{int(APP_PORT)}/api/{OAUTH2}/google/callback",
     "github": f"http://{SERVER_HOST}:{int(APP_PORT)}/api/{OAUTH2}/github/callback"
 }

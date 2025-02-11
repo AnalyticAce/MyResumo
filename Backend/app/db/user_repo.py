@@ -38,7 +38,4 @@ class UserRepository(BaseRepository):
             "provider": user_data.get("provider", "createk"),
             "disabled": user_data.get("disabled", False),
             "profile_picture": user_data.get("profile_picture", None),
-            "following": user_data.get("following", []),
-            "followers": user_data.get("followers", []),
-            "social_links": user_data.get("social_links", {})
         }

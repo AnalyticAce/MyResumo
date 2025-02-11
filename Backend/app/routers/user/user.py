@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from app.db.user_repo import UserRepository
 from app.routers.models import User, UserInDB
-from app.utils.auth_utils import get_current_active_user, get_password_hash
+from app.utils.auth_utils import get_current_active_user
 
 user_router = APIRouter(
     prefix="/api/users",

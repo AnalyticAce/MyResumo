@@ -164,3 +164,4 @@ cython_debug/
 .vscode/
 Backend/app/credentials/.env
 Backend/app/credentials/client_secret.json
+node_modules

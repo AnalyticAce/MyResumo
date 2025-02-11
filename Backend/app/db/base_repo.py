@@ -23,19 +23,6 @@ class BaseRepository:
                 doc["_id"] = str(doc["_id"])
             return documents
 
-    # async def find(
-    #     self,
-    #     query: dict,
-    #     sort_by: Optional[List[tuple]] = None,
-    #     limit: Optional[int] = None
-    # ) -> List[Post]:
-    #     cursor = self.collection.find(query)
-    #     if sort_by:
-    #         cursor = cursor.sort(sort_by)
-    #     if limit:
-    #         cursor = cursor.limit(limit)
-    #     return [self.model(**doc) async for doc in cursor]
-    
     async def insert_one(self, document: Dict) -> str:
         async with self.connection_manager.get_collection(self.db_name, self.collection_name) as collection:
             result = await collection.insert_one(document)
