@@ -21,7 +21,7 @@ frontend_url = f"http://{FRONTEND_HOST}:{FRONTEND_PORT}/success"
 user_repo = UserRepository("myresumo")
 
 oauth2_router = APIRouter(
-    prefix="/api/oauth2",
+    prefix="/api/v1/oauth2",
     tags=["OAuth2"],
     responses={
         404: {"description": "Endpoint not found"},
@@ -80,7 +80,22 @@ async def get_user_info(provider: str, token: str, client: httpx.AsyncClient) ->
 @oauth2_router.get(
     '/{provider}/login',
     summary="OAuth2 login endpoint",
-    description="OAuth2 login endpoint"
+    description="""
+Initiates the OAuth2 authentication process.
+
+### Description:
+- Constructs the authorization URL for the specified OAuth provider.
+- Adds the necessary query parameters such as `client_id`, `redirect_uri`, `scope`, and `response_type`.
+- For providers like Google, additional parameters (`access_type` and `prompt`) are included.
+- If an unsupported provider is provided, returns a 404 error.
+
+### Parameters:
+- **provider (path parameter)**: The OAuth provider's identifier "github".
+
+### Responses:
+- **302 Redirect**: Redirects the user to the OAuth provider's authentication URL.
+- **404 Not Found**: If the provider is not supported.
+    """
 )
 async def oauth_login(request: Request, provider: str = "github") -> RedirectResponse:
     if provider not in OAUTH_CONFIG:
@@ -101,7 +116,32 @@ async def oauth_login(request: Request, provider: str = "github") -> RedirectRes
 @oauth2_router.get(
     '/{provider}/callback',
     summary="OAuth2 callback endpoint",
-    description="OAuth2 callback endpoint"
+    description="""
+Handles the callback from the OAuth provider after user authentication.
+
+### Description:
+1. **Exchange Authorization Code:**  
+   Exchanges the provided `code` for an access token.
+2. **Retrieve User Information:**  
+   Fetches user profile data using the access token.
+   - For GitHub: Uses the `login` field as a fallback if `name` is absent.
+3. **User Processing:**  
+   Either creates a new user or updates an existing user, and if a new user is created, a welcome email is sent via background tasks.
+4. **Token Generation and Redirection:**  
+   Generates a JWT token for the user and redirects to the frontend with the token as a query parameter.
+5. **Error Handling:**  
+   - Returns a 502 error for OAuth provider communication issues.
+   - Returns a 500 error for other unexpected errors.
+
+### Parameters:
+- **provider (path parameter)**: The OAuth provider's identifier (e.g., "github").
+- **code (query parameter)**: The authorization code returned by the OAuth provider.
+
+### Responses:
+- **302 Redirect**: Redirects the user to the frontend URL with a JWT token in the query parameter.
+- **502 Bad Gateway**: If there is an error communicating with the OAuth provider.
+- **500 Internal Server Error**: For any other error during the authentication process.
+    """
 )
 async def oauth_callback(
     request: Request,
@@ -139,8 +179,7 @@ async def oauth_callback(
 async def handle_user_creation(
     username: str,
     email: str,
-    profile_picture: str,
-    background_tasks: BackgroundTasks
+    profile_picture: str
 ) -> UserInDB:
     try:
         existing_user = await user_repo.get_user(username)

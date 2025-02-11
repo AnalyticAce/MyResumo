@@ -4,7 +4,7 @@ from app.routers.models import User, UserInDB
 from app.utils.auth_utils import get_current_active_user
 
 user_router = APIRouter(
-    prefix="/api/users",
+    prefix="/api/v1/users",
     tags=["User Management"]
 )
 

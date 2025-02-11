@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app import (
     MongoConnectionManager, oauth2_router, user_router, 
-    REDIS_HOST, REDIS_PORT
+    REDIS_HOST, REDIS_PORT, resume_router
 )
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
@@ -47,6 +47,7 @@ app.add_middleware(
 
 app.include_router(oauth2_router)
 app.include_router(user_router)
+app.include_router(resume_router)
 
 app.mount("/templates", StaticFiles(directory="app/templates"), name="templates")
 

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 class Token(BaseModel):
     access_token: str
@@ -24,6 +24,16 @@ class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+    
+class FormData(BaseModel):
+    job_description: Optional[str] = None
+    resume_text: Optional[str] = None
+    resume_tone: Optional[str] = None
+    resume_language: Optional[str] = None
+    section_arrange: Optional[List[str]] = None
 
-class Resume:
-    pass
+class Resume(BaseModel):
+    template_id: Optional[str] = None
+    job_description: Optional[str] = None
+    resume_data: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(datetime.timezone.utc))
