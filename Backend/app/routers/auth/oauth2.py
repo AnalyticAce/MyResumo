@@ -17,6 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 frontend_url = f"http://{FRONTEND_HOST}:{FRONTEND_PORT}/success"
+
 user_repo = UserRepository("myresumo")
 
 oauth2_router = APIRouter(

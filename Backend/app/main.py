@@ -1,10 +1,10 @@
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.db.connector import MongoConnectionManager
-from app.routers.auth.oauth2 import oauth2_router
-from app.routers.user.user import user_router
-from app.credentials.config import REDIS_HOST, REDIS_PORT
+from app import (
+    MongoConnectionManager, oauth2_router, user_router, 
+    REDIS_HOST, REDIS_PORT
+)
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend

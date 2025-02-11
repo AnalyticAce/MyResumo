@@ -8,7 +8,7 @@ user_router = APIRouter(
     tags=["User Management"]
 )
 
-user_repo = UserRepository("createk")
+user_repo = UserRepository("myresumo")
 
 @user_router.get("/me", response_model=User)
 async def read_users_me(current_user: UserInDB = Depends(get_current_active_user)):

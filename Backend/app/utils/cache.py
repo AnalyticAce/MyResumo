@@ -1,10 +1,7 @@
 import json
 import redis
-from app.credentials.config import REDIS_HOST, REDIS_PORT
-import json
-import redis
-import os
-from typing import Dict, List, Optional
+from typing import Dict, Optional
+from app import REDIS_HOST, REDIS_PORT
 
 class CacheManager:
     def __init__(self):

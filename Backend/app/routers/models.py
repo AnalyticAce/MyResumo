@@ -1,4 +1,3 @@
-from enum import Enum
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
@@ -16,7 +15,7 @@ class User(BaseModel):
     disabled: Optional[bool] = False
     provider: Optional[str] = "github"
     profile_picture: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(datetime.timezone.utc))
 
 class UserInDB(User):
     hashed_password: Optional[str] = None
@@ -25,3 +24,6 @@ class UserCreate(BaseModel):
     username: str
     email: str
     password: str
+
+class Resume:
+    pass
