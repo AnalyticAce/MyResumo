@@ -93,6 +93,7 @@ class FormData(BaseModel):
         return value
 
 class Resume(BaseModel):
+    user_id: Optional[str] = None
     template_id: Optional[str] = None
     job_description: Optional[str] = None
     resume_data: Optional[str] = None

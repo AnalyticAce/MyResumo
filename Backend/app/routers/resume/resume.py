@@ -18,7 +18,7 @@ resume_router = APIRouter(
 
 resume_repo = ResumeRepository("myresumo")
 
-@resume_router.post("/create", response_model=User)
+@resume_router.post("/create", response_model=Resume)
 async def create_resume(
         data: Resume,
         current_user: UserInDB = Depends(get_current_active_user)
