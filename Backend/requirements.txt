@@ -24,7 +24,6 @@ fastapi-cache2[redis]
 jinja2
 pyjwt
 nltk==3.8.1
-octoai==1.0.2
 opencv_contrib_python==4.8.0.74
 pdf2image==1.16.3
 Pillow==10.3.0
@@ -44,3 +43,4 @@ tinycss==0.4
 cssselect==1.2.0
 pyphen==0.15.0
 fonttools==4.51.0
+openai==1.62.0

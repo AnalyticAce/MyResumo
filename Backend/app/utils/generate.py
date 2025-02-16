@@ -1,12 +1,15 @@
-from octoai.text_gen import ChatMessage
-from octoai.client import OctoAI
+from openai import ChatCompletion, OpenAI
 import json, nltk
 from rake_nltk import Rake
 
 class ResumeGenerator:
-    def __init__(self, API_KEY: str, job_description: str, model_name: str = "mixtral-8x7b-instruct",
-        presence_penalty=0, temperature=0.1, top_p=0.9) -> None:
-        self.client = OctoAI(api_key=API_KEY,)
+    def __init__(self, 
+            API_KEY: str, job_description: str, 
+            model_name: str = "gpt-3.5-turbo",
+            presence_penalty=0, temperature=0.1, 
+            top_p=0.9
+        ) -> None:
+        self.client = OpenAI(api_key=API_KEY)
         self.job_description = job_description
         self.model_name = model_name
         self.presence_penalty = presence_penalty
@@ -44,15 +47,11 @@ class ResumeGenerator:
     def generate_resume(self, prompt: str, resume_content: str,
                 tone: str, language: str, key_words: str = "", 
                 additional_info: str = None) -> dict:
-        completion = self.client.text_gen.create_chat_completion(
-            max_tokens=100000,
+        completion = self.client.ChatCompletion.create(
+            model=self.model_name,
             messages=[
-                ChatMessage(
-                    content=f"{prompt}",
-                    role="system"
-                ),
-                ChatMessage(
-                    content=f"""
+                {"role": "system", "content": f"{prompt}"},
+                {"role": "user", "content": f"""
                     User's Resume:
                     {resume_content}
                     Job Description:
@@ -64,36 +63,27 @@ class ResumeGenerator:
                     Language of the new resume:
                     {language}
                     User's Additional Information:
-                    {additional_info}""",
-                    role="user"
-                )
+                    {additional_info}"""}
             ],
-            model=self.model_name,
+            max_tokens=100000,
             presence_penalty=self.presence_penalty,
             temperature=self.temperature,
             top_p=self.top_p
         )
 
-        return self.extract_json(completion.choices[0].message.content)
+        return self.extract_json(completion.choices[0].message['content'])
     
     def extract_keywords_ai(self, prompt: str) -> str:
-        completion = self.client.text_gen.create_chat_completion(
-            max_tokens=4000,
-            messages=[
-                ChatMessage(
-                    content=f"""{prompt}
-                    """,
-                    role="system"
-                ),
-                ChatMessage(
-                    content=f"{self.job_description}",
-                    role="user"
-                )
-            ],
+        completion = self.client.ChatCompletion.create(
             model=self.model_name,
+            messages=[
+                {"role": "system", "content": f"{prompt}"},
+                {"role": "user", "content": f"{self.job_description}"}
+            ],
+            max_tokens=4000,
             presence_penalty=self.presence_penalty,
             temperature=self.temperature,
             top_p=self.top_p
         )
 
-        return completion.choices[0].message.content
+        return completion.choices[0].message['content']
