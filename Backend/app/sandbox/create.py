@@ -1,7 +1,43 @@
-from openai import ChatCompletion, OpenAI
+from openai import OpenAI
 import json, nltk
 from rake_nltk import Rake
+from pdf2image import convert_from_path
+import cv2, os, pytesseract
+from typing import List
+from PIL import Image
 
+class Vision:
+    def __init__(self, pdf_file : str) -> None:
+        self.pdf_file = pdf_file
+        pass
+
+    def pdf_to_image(self) -> List[Image.Image]:
+        images = convert_from_path(self.pdf_file)
+        return images
+
+    @staticmethod
+    def save_images(images: List[Image.Image], filename: str) -> List[Image.Image]:
+        save_images_name = []
+        for i, img in enumerate(images):
+            main = filename.replace('.pdf', "").replace(" ", "_")
+            img.save(f'{main}_page{i}.jpg', 'JPEG')
+            save_images_name.append(f'{main}_page{i}.jpg')
+        return save_images_name
+
+    @staticmethod
+    def delete_image(images: List[Image.Image]) -> None:
+        for i in images:
+            os.remove(i)
+        return None
+
+    @staticmethod
+    def ocr_image(images: List[Image.Image]) -> List[str]:
+        texts = []
+        for image in images:
+            text = pytesseract.image_to_string(cv2.imread(image))
+            texts.append(text)
+        return texts
+    
 class ResumeGenerator:
     def __init__(self, API_KEY: str, job_description: str, model_name: str = "gpt-3.5-turbo",
         presence_penalty=0, temperature=0.1, top_p=0.9) -> None:
@@ -81,3 +117,35 @@ class ResumeGenerator:
         )
 
         return completion.choices[0].message['content']
+
+if __name__ == "__main__":
+    with open('description.txt', 'r') as f:
+        job_description = f.read()
+
+    # generator = ResumeGenerator(
+    #     API_KEY="sk-************************", 
+    #     job_description=job_description,
+    #     model_name="gpt-3.5-turbo",
+    #     presence_penalty=0,
+    #     temperature=0.1,
+    #     top_p=0.9
+    # )
+
+    with open("../utils/prompts/prompt.txt", "r") as f:
+        prompt = f.read()
+
+    vision = Vision("resume.pdf")
+    images = vision.pdf_to_image()
+    save_images_name = vision.save_images(images, "resume.pdf")
+    texts = vision.ocr_image(save_images_name)
+    vision.delete_image(save_images_name)
+    resume_content = " ".join(texts)
+
+    # resume = generator.generate_resume(
+    #     prompt=prompt,
+    #     resume_content=resume_content,
+    #     tone="professional",
+    #     language="English",
+    #     key_words=generator.extract_keywords(),
+    #     additional_info="I am a hardworking individual"
+    # )
