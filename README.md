@@ -32,37 +32,49 @@ To run **MyResumo**, you'll need to set up your environment and install the nece
 - Docker (if running with Docker Compose)
 
 ### Installation
-#### Running Without Docker
+#### Running Locally
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/AnalyticAce/MyResumo.git
-   ```
+```bash
+git clone https://github.com/AnalyticAce/MyResumo.git
+```
 2. Navigate to the project directory:
-   ```bash
-   cd MyResumo
-   ```
+```bash
+cd MyResumo
+```
 3. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On macOS/Linux
-   venv\Scripts\activate  # On Windows
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+venv\Scripts\activate  # On Windows
+```
 4. Install the required dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 5. Start the FastAPI backend:
-   ```bash
-   uvicorn app.main:app --host 0.0.0.0 --port 8080
-   ```
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8080
+```
 
 #### Running With Docker Compose
 1. Ensure Docker is installed on your system.
 2. Navigate to the project directory and build the Docker containers:
-   ```bash
-   docker-compose up --build
-   ```
+```bash
+docker-compose up --build
+```
 3. The application will be available at `http://localhost:8080` for the backend and `http://localhost:8501` for the frontend.
+
+#### Running With Docker
+1. Ensure Docker is installed on your system.
+2. Navigate to the project directory and pull the Docker image:
+```bash
+    docker pull ghcr.io/analyticace/myresumo:latest
+```
+3. Build the docker images:
+```bash
+    docker run ghcr.io/analyticace/myresumo:latest -p 8080:8080
+```
+4. The application will be available at `http://localhost:8080` for the backend and `http://localhost:8501` for the frontend.
 
 ## Contribution Guidelines
 
