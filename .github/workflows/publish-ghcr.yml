@@ -1,0 +1,26 @@
+name: Docker Image CI/CD for GHCR
+
+on:
+  push:
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        run: |
+          echo "${{ secrets._GITHUB_TOKEN }}" | docker login ghcr.io -u analyticace --password-stdin
+
+      - name: Set up Docker Buildx (for caching)
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push with caching
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/analyticace/myresumo:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
