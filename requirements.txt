@@ -13,12 +13,10 @@ fastapi[standard]
 websockets
 slowapi
 redis==4.5.5
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
 fastapi-sso
 asgiref
 pymongo
 fastapi-cache2[redis]
+pendulum
 jinja2
 pyjwt
