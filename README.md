@@ -64,18 +64,6 @@ docker-compose up --build
 ```
 3. The application will be available at `http://localhost:8080` for the backend and `http://localhost:8501` for the frontend.
 
-#### Running With Docker
-1. Ensure Docker is installed on your system.
-2. Navigate to the project directory and pull the Docker image:
-```bash
-docker pull ghcr.io/analyticace/myresumo:latest
-```
-3. Build the docker images:
-```bash
-docker run ghcr.io/analyticace/myresumo:latest -p 8080:8080
-```
-4. The application will be available at `http://localhost:8080` for the backend and `http://localhost:8501` for the frontend.
-
 ## Contribution Guidelines
 
 We welcome contributions to **MyResumo**! If you'd like to contribute, please follow these guidelines:

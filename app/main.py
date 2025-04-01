@@ -6,7 +6,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connector import MongoConnectionManager
-from app.api.routers.chat import chat_router
 from app.core.config import REDIS_HOST, REDIS_PORT
 
 
@@ -53,7 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(chat_router)
 app.mount("/templates", StaticFiles(directory="app/templates"), name="templates")
 
 
@@ -64,7 +62,7 @@ async def custom_swagger_ui_html():
             template = f.read()
 
         return HTMLResponse(
-            template.replace("{{ title }}", "My API Documentation").replace(
+            template.replace("{{ title }}", "MyResumo API Documentation").replace(
                 "{{ openapi_url }}", "/openapi.json"
             )
         )
