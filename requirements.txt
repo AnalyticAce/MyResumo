@@ -13,10 +13,14 @@ fastapi[standard]
 websockets
 slowapi
 redis==4.5.5
+pandas
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
 fastapi-sso
 asgiref
 pymongo
-fastapi-cache2[redis]
-pendulum
+fastapi-cache2[redis]==0.2.2  # Requires pendulum>=3
+pendulum==3.0.0               # Requires Rust (cargo) for install
 jinja2
 pyjwt
