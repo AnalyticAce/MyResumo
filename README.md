@@ -2,6 +2,13 @@
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-python.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/check-it-out.svg)](https://forthebadge.com)
+
+> [!WARNING]  
+> A new implementation is currently in progress on the develop branch. Please switch to this branch to access the latest version of the code.
+Once the new version is complete, the main branch will be updated to reflect this new implementation.
+Due to the recent acquisition of OctoAI by Nvidia 😔, the new version is now being built using the OpenAI API.
+> An issue has been opened to track progress and discussions related to this transition.
+
 ## Overview
 **MyResumo** is an AI-backed resume generator designed to tailor your resume and skills based on a given job description. This innovative tool leverages the latest advancements in AI technology to provide you with a customized resume that stands out.
 
