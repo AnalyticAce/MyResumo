@@ -1,18 +1,18 @@
-setuptools
-uvicorn[standard]
-python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
+fastapi[standard]
+uvicorn[standard]
+motor==3.6.0
+redis==4.5.5
+charset-normalizer==3.3.2
+setuptools
+python-multipart
 authlib
 itsdangerous
-motor==3.6.0
-pydantic[email]
 asyncio
 httpx
-fastapi[standard]
 websockets
 slowapi
-redis==4.5.5
 pandas
 google-api-python-client
 google-auth-httplib2
@@ -20,7 +20,15 @@ google-auth-oauthlib
 fastapi-sso
 asgiref
 pymongo
-fastapi-cache2[redis]==0.2.2  # Requires pendulum>=3
-pendulum==3.0.0               # Requires Rust (cargo) for install
 jinja2
 pyjwt
+markdown
+pytesseract
+pdf2image
+opencv-python
+psutil
+pypdf
+openai
+langchain-community
+langchain
+langchain-openai

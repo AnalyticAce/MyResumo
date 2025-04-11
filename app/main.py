@@ -75,19 +75,19 @@ async def custom_swagger_ui_html():
             content=f"Error loading documentation: {str(e)}", status_code=500
         )
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get("/upload/{filename}")
+async def upload_file(filename: str):
+    return {"filename": filename}
 
-@app.get("/chat")
-async def chat():
-    return {"message": "Hello World"}
+# @app.get("/chat")
+# async def chat():
+#     return {"message": "Hello World"}
 
-@app.get("/chat/{chat_id}")
-async def chat(chat_id: str):
-    return {"message": f"Hello {chat_id}"}
+# @app.get("/chat/{chat_id}")
+# async def chat(chat_id: str):
+#     return {"message": f"Hello {chat_id}"}
 
-@app.get("/settings")
-async def settings():
-    return {"message": "Hello World"}
+# @app.get("/settings")
+# async def settings():
+#     return {"message": "Hello World"}
 
