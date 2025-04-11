@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
@@ -13,16 +11,9 @@ async def startup_logic(app: FastAPI) -> None:
     try:
         connection_manager = MongoConnectionManager()
         app.state.mongo = connection_manager
-
-        redis = aioredis.from_url(
-            f"redis://{REDIS_HOST}:{REDIS_PORT}", decode_responses=True
-        )
-        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-        print("Successfully initialized database and cache connections")
     except Exception as e:
         print(f"Error during startup: {e}")
         raise
-
 
 async def shutdown_logic(app: FastAPI) -> None:
     try:
