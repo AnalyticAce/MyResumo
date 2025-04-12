@@ -7,6 +7,47 @@ import json
 import re
 
 class AtsResumeOptimizer:
+    """
+    ATS Resume Optimizer
+
+    A class that uses AI language models to optimize resumes for Applicant Tracking Systems (ATS)
+    based on specific job descriptions.
+
+    This class leverages OpenAI's language models to analyze a job description and a provided resume,
+    then generates an ATS-optimized version of the resume in JSON format. The optimization focuses on
+    incorporating relevant keywords, formatting for ATS readability, and highlighting the most relevant
+    experience for the target position.
+
+    Attributes
+    model_name : str
+        The name of the OpenAI model to use for processing
+    resume : str
+        The resume text to be optimized
+    api_key : str
+        OpenAI API key for authentication
+    api_base : str
+        Base URL for the OpenAI API
+    language : str
+        Language for processing the resume
+    llm : ChatOpenAI
+        The initialized language model instance
+    output_parser : JsonOutputParser
+        Parser for converting LLM output to JSON format
+
+    Methods
+    _get_openai_model()
+        Initialize the OpenAI model with appropriate settings
+    _get_prompt_template()
+        Create the PromptTemplate for ATS resume optimization
+    _setup_chain()
+        Set up the LLMChain for processing job descriptions and resumes
+    generate_ats_optimized_resume_json(job_description)
+        Generate an ATS-optimized resume in JSON format based on the provided job description
+
+    Example
+    >>> optimizer = AtsResumeOptimizer(api_key="your_api_key", resume="your resume text")
+    >>> optimized_resume = optimizer.generate_ats_optimized_resume_json("job description text")
+    """
     def __init__(self, model_name: str = "gpt-3.5-turbo", resume: str = "", api_key: str = "", api_base = "https://api.openai.com/v1/chat/completions", language: str = "en") -> None:
         """
         Initialize the AI model for resume processing.
@@ -37,7 +78,7 @@ class AtsResumeOptimizer:
         self.output_parser = JsonOutputParser()
         self._setup_chain()
 
-    def _get_openai_model(self):
+    def _get_openai_model(self) -> ChatOpenAI:
         """Initialize the OpenAI model with appropriate settings"""
         if self.model_name:
             return ChatOpenAI(
@@ -49,7 +90,7 @@ class AtsResumeOptimizer:
         else:
             return ChatOpenAI(temperature=0)
 
-    def _get_prompt_template(self):
+    def _get_prompt_template(self) -> PromptTemplate:
         """Create the PromptTemplate for ATS resume optimization"""
         template = """
         # ROLE: Expert ATS Resume Optimization Specialist
@@ -173,7 +214,7 @@ class AtsResumeOptimizer:
         """
         return PromptTemplate.from_template(template=template)
 
-    def _setup_chain(self):
+    def _setup_chain(self) -> None:
         """Set up the LLMChain for processing job descriptions and resumes"""
         prompt_template = self._get_prompt_template()
         # self.chain = prompt_template | self.llm
@@ -223,7 +264,6 @@ class AtsResumeOptimizer:
             return {"error": f"Error processing request: {str(e)}"}
 
 if __name__ == "__main__":
-
     with open("../../../data/sample_resumes/resume.txt" "r") as f:
         resume = f.read()
     
