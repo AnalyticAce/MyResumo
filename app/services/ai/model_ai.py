@@ -8,6 +8,26 @@ import re
 
 class AtsResumeOptimizer:
     def __init__(self, model_name: str = "gpt-3.5-turbo", resume: str = "", api_key: str = "", api_base = "https://api.openai.com/v1/chat/completions", language: str = "en") -> None:
+        """
+        Initialize the AI model for resume processing.
+
+        Parameters
+        ----------
+        model_name : str, optional
+            The name of the OpenAI model to use, by default "gpt-3.5-turbo"
+        resume : str, optional
+            The resume text to analyze, by default ""
+        api_key : str, optional
+            The API key for OpenAI, by default ""
+        api_base : str, optional
+            The base URL for the OpenAI API, by default "https://api.openai.com/v1/chat/completions"
+        language : str, optional
+            The language for processing the resume, by default "en"
+
+        Returns
+        -------
+        None
+        """
         self.model_name = model_name
         self.resume = resume
         self.api_key = api_key
