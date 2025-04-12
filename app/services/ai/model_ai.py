@@ -45,8 +45,11 @@ class AtsResumeOptimizer:
         Generate an ATS-optimized resume in JSON format based on the provided job description
 
     Example
+    >>> # Note: Ensure to replace "your_api_key" and "your resume text" with actual values.
     >>> optimizer = AtsResumeOptimizer(api_key="your_api_key", resume="your resume text")
     >>> optimized_resume = optimizer.generate_ats_optimized_resume_json("job description text")
+    >>> print(optimized_resume)
+    >>> # Output: JSON object with optimized resume
     """
     def __init__(self, model_name: str = "gpt-3.5-turbo", resume: str = "", api_key: str = "", api_base = "https://api.openai.com/v1/chat/completions", language: str = "en") -> None:
         """

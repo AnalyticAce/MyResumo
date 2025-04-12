@@ -167,5 +167,4 @@ node_modules
 
 *.aux
 *.out
-*.tex
 .env
