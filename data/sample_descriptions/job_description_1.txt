@@ -1,0 +1,55 @@
+Schedule: Full-Time, Monday - Friday, Eastern Time
+
+Benefits: Fully remote position, 40 hours Weekly, Paid Time Off, 2 Days Off
+
+Salary / Rate: $5,000 Annually
+
+About The Company
+
+At Nao Medical, we're revolutionizing healthcare by blending cutting-edge technology with heartfelt, personalized care. Over the past 13 years, we've proudly served more than a million New Yorkers at our various locations. Our mission is simple: through our multi-specialty practice, we provide accessible, quality care tailored to each patient's needs. We're breaking down barriers, championing health equity, and delivering value-based care to create healthier communities.
+
+Job Summary
+
+As a Junior Engineer - generative AI, you will play a crucial role in supporting our development efforts. You will work closely with cross-functional teams and participate in building applications that utilize generative AI technologies. This is an excellent opportunity for junior developers looking to expand their skills in a fast-paced environment.
+
+Primary Responsibilities
+
+Collaborate with global teams to design and develop AI - Driven applications. 
+Write clean and efficient code in Python to implement generative AI solutions. 
+Communicate ideas and projects updates clearly to team members and stake holders. 
+
+Job Requirements
+
+Qualifications
+
+Solid foundation in Python Programming. 
+Excellent English communication skills (both written and verbal) 
+Strong confidence and the ability to articulate ideas clearly. 
+Genuine Interest in generative AI technologies and automation 
+
+Technical Requirements
+
+Candidates must provide their equipment and technology meeting these minimum specification 
+Up-to-date desktop or laptop computer with at least 8GB of RAM and a modern processor (Intel i5 or equivalent)
+Windows 10 or macOS 10.15 or later
+High-speed internet connection with a minimum speed of 100 Mbps
+Functional headset with microphone, webcam, and reliable keyboard and mouse
+Quiet workspace devoid of distractions
+A second monitor is preferred but not required
+Emergency backup or contingency plan for technology or connectivity issues.
+
+What We Offer 
+
+A Collaborative and innovative work environment. 
+Opportunities for professional growth and development. 
+The chance to work on cutting - edge technologies in the AI Space 
+
+Equal Employment Opportunity Statement
+
+Nao Medical is n Equal Opportunity Employer. We are committed to fostering, cultivating, and preserving a culture of diversity, equity, and inclusion. We do not discriminate based on race, color, religion, creed, national origin, ancestry, sex, age, disability, marital status, sexual orientation, gender identity, genetic information, military or veteran status, or any other characteristic protected by applicable federal, state, or local laws. This policy applies to all employment terms and conditions, including recruiting, hiring, placement, promotion, termination, layoff, recall, transfer, leaves of absences, compensation, and training.
+
+Nao Medical is dedicated to providing a work environment free from discrimination and harassment and treating all individuals with respect and dignity. Combining individuals from diverse backgrounds and experiences creates a more innovative, creative and productive workforce.
+
+Nao Medical is an equal opportunity employer, celebrates diversity, and is committed to building an inclusive environment for all employees and patients.
+
+Experience the Nao Medical difference. Join us in transforming healthcare, Nao!

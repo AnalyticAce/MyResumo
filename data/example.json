@@ -1,0 +1,153 @@
+{
+    "user_information": {
+      "name": "Shalom DOSSEH",
+      "main_job_title": "Junior Engineer - Generative AI",
+      "profile_description": "Data Professional with a strong foundation in Python programming and a genuine interest in generative AI technologies. Experienced in developing AI-driven applications and collaborating with cross-functional teams to deliver innovative solutions.",
+      "email": "dosseh.contact@gmail.com",
+      "linkedin": "DOSSEH Shalom",
+      "github": "AnalyticAce",
+      "experiences": [
+        {
+          "job_title": "Data Science & Analytics - Internship",
+          "company": "Gozem - Africa's Super App",
+          "start_date": "07/2024",
+          "end_date": "04/2025",
+          "four_tasks": [
+            "Partnered with Gozem Money leadership to understand data requirements for the pre-launch phase of a new fintech vertical, including data extraction and analysis across large-scale financial datasets for financial forecasting and transaction analytics.",
+            "Utilized Python (Pandas, Scikit-learn), SQL, and Looker Studio to generate actionable insights and align business needs with technical solutions.",
+            "Leveraged SQL and Astro Airflow to design and implement real-time transaction monitoring for 8,000,000+ monthly transactions to detect and prevent fraud, money laundering, and terrorist financing activities.",
+            "Collaborated with the data engineering team to gather, structure, and integrate data from multiple sources into a centralized analytics repository, enabling a unified view of key product insights."
+          ]
+        },
+        {
+          "job_title": "Data Analyst (Ride-hailing) - Internship",
+          "company": "Gozem - Africa's Super App",
+          "start_date": "09/2023",
+          "end_date": "01/2024",
+          "four_tasks": [
+            "Executed 65%+ of the squad\u2019s quarterly tasks, completing 92% of high-priority deliverables efficiently.",
+            "Investigated transaction data, detecting and dismantling fraudulent schemes, leading to millions in recovered revenue.",
+            "Performed data integrity checks, identifying and resolving anomalies to maintain accurate reporting.",
+            "Automated routine reporting and analytics tasks, improving efficiency and precision in data insights."
+          ]
+        }
+      ],
+      "education": [
+        {
+          "institution": "EPITECH - European Institute of Technology",
+          "degree": "Bachelor's degree, Innovation and Information Technology",
+          "description": "Cultivated robust skills across various domains of computer science, completing nearly 130 projects and mini-projects. Relevant Courses: Computer Numerical Analysis, Artificial Intelligence, Advanced DevOps, Advanced C++.",
+          "start_date": "10/2022",
+          "end_date": "Present"
+        }
+      ],
+      "skills": {
+        "hard_skills": [
+          "Python",
+          "SQL",
+          "Pandas",
+          "NumPy",
+          "Scikit-Learn",
+          "Looker Studio",
+          "Excel",
+          "GCP",
+          "Azure",
+          "MongoDB",
+          "Docker",
+          "Jenkins",
+          "Ansible",
+          "Apache Airflow",
+          "Git Source Control",
+          "Github action",
+          "Linux"
+        ],
+        "soft_skills": [
+          "Adaptability",
+          "Coachable",
+          "Problem-Solving",
+          "Decision-Making",
+          "Effective communication",
+          "Active listening"
+        ]
+      },
+      "hobbies": []
+    },
+    "projects": [
+      {
+        "project_name": "MyResumo",
+        "two_goals_of_the_project": [
+          "Built an AI-backed resume generator designed to tailor your resume and skills based on a given job description.",
+          "Leveraged the latest advancements in AI to provide an ATS-friendly resume."
+        ],
+        "project_end_result": "Innovative tool that helps users create optimized resumes for job applications."
+      },
+      {
+        "project_name": "MyTorch",
+        "two_goals_of_the_project": [
+          "Developed a neural network-based chessboard analyzer from scratch without deep learning libraries.",
+          "Trained models on FEN notation to classify six game states."
+        ],
+        "project_end_result": "Achieved 90% accuracy in binary classification and 60-70% in multi-class tasks."
+      },
+      {
+        "project_name": "Gomoku AI",
+        "two_goals_of_the_project": [
+          "Developed a high-performance Gomoku AI bot using Min-Max with Alpha-Beta pruning and heuristic scoring.",
+          "Designed to compete with GomokuCup AI bots, ensuring efficiency under computational constraints."
+        ],
+        "project_end_result": "Optimized decision-making for the Gomoku game."
+      },
+      {
+        "project_name": "PyDepViz",
+        "two_goals_of_the_project": [
+          "A Python-native dependency graph visualizer designed to simplify dependency management in Python projects.",
+          "Helps developers visualize and resolve dependency deadlocks efficiently."
+        ],
+        "project_end_result": "Tool that aids in managing Python project dependencies."
+      }
+    ],
+    "certificate": [
+      {
+        "name": "Career Essentials in GitHub Professional Certificate",
+        "institution": "Github",
+        "description": "Professional certification in GitHub essentials.",
+        "date": "02/2025"
+      },
+      {
+        "name": "Data Scientist Certification",
+        "institution": "Datacamp",
+        "description": "Certification in data science.",
+        "date": "07/2025"
+      },
+      {
+        "name": "AI Engineer for Data Scientists Associate Certification",
+        "institution": "Datacamp",
+        "description": "Certification in AI engineering for data scientists.",
+        "date": "09/2025"
+      },
+      {
+        "name": "Certified Associate in Project Management (CAPM)",
+        "institution": "PMI",
+        "description": "Certification in project management.",
+        "date": "09/2025"
+      }
+    ],
+    "extra_curricular_activities": [
+      {
+        "name": "Technical Workshop Facilitator, Innovation Hub at Epitech",
+        "description": "Hosted Python, DevOps, and AI workshops, mentoring students in technical fields. Partnered with industry professionals to deliver hands-on training sessions."
+      },
+      {
+        "name": "Lead Project Manager, Epitech\u2019s Student Bureau",
+        "description": "Led a team of 3 project managers, overseeing 30+ initiatives within time and budget constraints. Developed planning & tracking tools to optimize project execution."
+      },
+      {
+        "name": "Event Manager & Core Member, Google Developer Students Club",
+        "description": "Organized tech events, hackathons, and networking sessions to engage student developers. Drove community initiatives to enhance learning in AI & Google Cloud Technologies."
+      },
+      {
+        "name": "Social Data Analyst, AFRIK EDUTECH - EPITECH X IMPACT",
+        "description": "Conducted impact analysis & forecasting, guiding leadership decisions on program effectiveness. Collected & cleaned large-scale datasets for resource optimization."
+      }
+    ]
+}
