@@ -6,14 +6,74 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 
 class LaTeXGenerator:
+    """
+    A class to generate LaTeX files from given templates and data.
+    The LaTeXGenerator handles the creation of LaTeX documents using Jinja2 templates
+    and input data in JSON format. It provides methods for loading and parsing JSON data,
+    processing the data to be compatible with LaTeX, and generating output documents
+    by rendering templates with the processed data.
+    Attributes:
+        template_dir (str): Directory path containing LaTeX templates.
+        json_data (dict): Parsed JSON data to be used in template rendering.
+        env (jinja2.Environment): Configured Jinja2 environment for template processing.
+    Methods:
+        setup_jinja_environment: Configures the Jinja2 environment with LaTeX-friendly delimiters.
+        load_json: Loads JSON data from a file.
+        parse_json_from_string: Parses JSON data from a string.
+        format_date: Converts date strings from MM/YYYY to Month YYYY format.
+        bold_numbers: Makes numbers and percentages bold in LaTeX.
+        latex_escape: Escapes LaTeX special characters and decodes HTML entities.
+        preprocess_json_data: Recursively processes all string values to decode HTML entities.
+        generate_from_template: Generates a LaTeX document from a template and the loaded JSON data.
+        create_simple_template: Creates a simple LaTeX resume template with Jinja2 placeholders.
+    """
     def __init__(self, template_dir=None):
+        """
+        Initialize the LaTeX generator.
+
+        This constructor sets up the LaTeX generator with a template directory and initializes
+        the Jinja2 environment for template rendering.
+
+        Parameters
+        ----------
+        template_dir : str, optional
+            The directory path where LaTeX templates are stored. If None, a default directory
+            will be used.
+
+        Attributes
+        ----------
+        template_dir : str
+            Directory containing LaTeX templates
+        json_data : dict
+            Resume data in JSON format, initially None until loaded
+        env : jinja2.Environment
+            The Jinja2 environment for template rendering
+        """
         self.template_dir = template_dir
         self.json_data = None
         self.env = None
         self.setup_jinja_environment()
 
-    def setup_jinja_environment(self):
-        """Set up the Jinja2 environment with the template directory."""
+    def setup_jinja_environment(self) -> None:
+        """
+        Set up the Jinja2 environment with the template directory and custom delimiters.
+
+        This method initializes the Jinja2 Environment object with:
+        - A FileSystemLoader using the template_dir attribute to locate templates
+        - Custom delimiters to avoid conflicts with LaTeX syntax:
+            - Block delimiters: <% %>
+            - Variable delimiters: << >>
+            - Comment delimiters: <# #>
+        - Autoescaping disabled (False) since we're generating LaTeX content
+
+        Additionally, registers custom filters for LaTeX content processing:
+        - format_date: Formats date strings according to specified format
+        - bold_numbers: Adds LaTeX bold formatting to numeric values
+        - latex_escape: Escapes special LaTeX characters to prevent rendering issues
+
+        Returns:
+                None
+        """
         self.env = Environment(
             loader=FileSystemLoader(self.template_dir),
             autoescape=False,
@@ -30,7 +90,19 @@ class LaTeXGenerator:
         self.env.filters['latex_escape'] = self.latex_escape
 
     def load_json(self, json_path):
-        """Load and parse the JSON data from a file."""
+        """
+        Load and parse the JSON data from a file.
+        
+        Args:
+            json_path (str): Path to the JSON file to be loaded.
+            
+        Returns:
+            bool: True if JSON was successfully loaded, False otherwise.
+            
+        Side effects:
+            Sets self.json_data with the parsed JSON content when successful.
+            Prints error message to console when loading fails.
+        """
         try:
             with open(json_path, 'r', encoding='utf-8') as file:
                 self.json_data = json.load(file)
@@ -39,8 +111,20 @@ class LaTeXGenerator:
             print(f"Error loading JSON: {e}")
             return False
 
-    def parse_json_from_string(self, json_string):
-        """Parse JSON data from a string."""
+    def parse_json_from_string(self, json_string) -> bool:
+        """
+        Parse a JSON string into a Python object.
+        
+        Args:
+            json_string (str): A string containing valid JSON data.
+            
+        Returns:
+            bool: True if parsing was successful, False otherwise.
+            
+        Side effects:
+            If successful, sets self.json_data to the parsed JSON object.
+            If unsuccessful, prints an error message.
+        """
         try:
             self.json_data = json.loads(json_string)
             return True
@@ -49,8 +133,20 @@ class LaTeXGenerator:
             return False
 
     @staticmethod
-    def format_date(date_str):
-        """Format date strings from MM/YYYY to Month YYYY format."""
+    def format_date(date_str) -> str:
+        """
+        Convert a date string to a formatted date.
+
+        Takes a date string in format 'mm/yyyy' and converts it to 'Mon. YYYY' format.
+
+        Args:
+            date_str (str): The date string to format, typically in 'mm/yyyy' format.
+                        Can also be 'present' (case insensitive) or empty.
+
+        Returns:
+            str: The formatted date string. Returns 'Present' if input is empty or 
+                'present' (case insensitive). Returns the original string if parsing fails.
+        """
         if not date_str or date_str.lower() == 'present':
             return "Present"
 
@@ -61,16 +157,44 @@ class LaTeXGenerator:
             return date_str
 
     @staticmethod
-    def bold_numbers(text):
-        """Make numbers and percentages bold in LaTeX."""
+    def bold_numbers(text) -> str:
+        """
+        Makes all numbers in text bold by wrapping them with LaTeX \textbf command.
+        
+        Args:
+            text (str): The input text containing numbers to be made bold.
+        
+        Returns:
+            str: The text with all numbers wrapped in \textbf{} LaTeX command.
+            
+        Example:
+            >>> bold_numbers("I have 42 apples and a 99.5% success rate")
+            "I have \\textbf{42} apples and a \\textbf{99.5\\%} success rate"
+        
+        Notes:
+            - Matches integers, decimals, numbers with commas, and numbers with % or + suffix
+            - Doesn't affect numbers that are already part of a LaTeX command
+        """
         return re.sub(
             r'(\d+[\d,.]*(?:\+|\%?))', 
             r'\\textbf{\1}', 
             text
         )
+
     @staticmethod
-    def latex_escape(text):
-        """Escape LaTeX special characters and decode HTML entities."""
+    def latex_escape(text) -> str:
+        """
+        Escape special LaTeX characters in a string to make it safe for LaTeX documents.
+        This function replaces special LaTeX characters with their escaped equivalents.
+        It first unescapes any HTML entities using html.unescape, then performs LaTeX-specific escaping.
+        Args:
+            text: The text to escape. If not a string, it will be returned unchanged.
+        Returns:
+            str: The input text with LaTeX special characters properly escaped.
+        Example:
+            >>> latex_escape("100% of $10 is $10")
+            "100\\% of \\$10 is \\$10"
+        """
         if not isinstance(text, str):
             return text
 
@@ -95,8 +219,17 @@ class LaTeXGenerator:
         
         return text
 
-    def preprocess_json_data(self):
-        """Recursively process all string values to decode HTML entities."""
+    def preprocess_json_data(self) -> None:
+        """
+        Preprocesses the JSON data stored in the instance by recursively unescaping HTML entities.
+        
+        This method traverses through the entire JSON data structure (dictionaries, lists, and strings)
+        and converts any HTML escaped characters (like &amp;, &lt;, etc.) back to their original form.
+        The processed data replaces the original json_data attribute.
+        
+        Returns:
+            None: The method modifies the self.json_data attribute in place.
+        """
         def process_value(value):
             if isinstance(value, str):
                 return html.unescape(value)
@@ -110,8 +243,26 @@ class LaTeXGenerator:
         if self.json_data:
             self.json_data = process_value(self.json_data)
 
-    def generate_from_template(self, template_name):
-        """Generate a LaTeX document from a template and JSON data."""
+    def generate_from_template(self, template_name) -> str | bool:
+        """
+        Generates LaTeX content from a template using the loaded JSON data.
+
+        This method renders the specified Jinja2 template with the preprocessed JSON data,
+        producing LaTeX code that can be compiled into a PDF document.
+
+        Args:
+            template_name (str): The filename of the template to use (must be available
+                                in the Jinja2 environment).
+
+        Returns:
+            str or bool: The rendered LaTeX content as a string if successful, False if an error occurs.
+
+        Raises:
+            ValueError: If JSON data has not been loaded before calling this method.
+
+        Example:
+            latex_content = generator.generate_from_template("modern_template.tex")
+        """
         if not self.json_data:
             raise ValueError("JSON data not loaded")
 
