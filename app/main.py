@@ -4,8 +4,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connector import MongoConnectionManager
-from app.core.config import REDIS_HOST, REDIS_PORT
-
+from app.api.routers.resume import resume_router
+from app.web.core import core_web_router
+from app.web.dashboard import web_router
+from app.web.chat import chat_router
 
 async def startup_logic(app: FastAPI) -> None:
     try:
@@ -66,19 +68,8 @@ async def custom_swagger_ui_html():
             content=f"Error loading documentation: {str(e)}", status_code=500
         )
 
-@app.get("/upload/{filename}")
-async def upload_file(filename: str):
-    return {"filename": filename}
 
-# @app.get("/chat")
-# async def chat():
-#     return {"message": "Hello World"}
-
-# @app.get("/chat/{chat_id}")
-# async def chat(chat_id: str):
-#     return {"message": f"Hello {chat_id}"}
-
-# @app.get("/settings")
-# async def settings():
-#     return {"message": "Hello World"}
-
+app.include_router(resume_router)
+app.include_router(core_web_router)
+app.include_router(web_router)
+app.include_router(chat_router)
