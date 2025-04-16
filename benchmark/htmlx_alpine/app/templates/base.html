@@ -1,0 +1,64 @@
+{# base.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyResumo - ATS Resume Optimizer{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.8.4/dist/htmx.min.js"></script>
+    <style>
+        .meter {
+            height: 20px;
+            position: relative;
+            background: #f3f3f3;
+            border-radius: 25px;
+            padding: 4px;
+            box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+        }
+        .meter > span {
+            display: block;
+            height: 100%;
+            border-radius: 10px;
+            background-color: rgb(43, 194, 83);
+            background-image: linear-gradient(
+                center bottom,
+                rgb(43, 194, 83) 37%,
+                rgb(84, 240, 84) 69%
+            );
+            position: relative;
+            overflow: hidden;
+            transition: width 1s ease-in-out;
+        }
+        .step-connector {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #cbd5e0;
+            margin-top: 25px;
+        }
+        .step-connector.active {
+            background-color: #4299e1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold text-gray-900">MyResumo</h1>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                &copy; 2025 MyResumo. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>

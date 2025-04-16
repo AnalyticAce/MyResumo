@@ -10,8 +10,6 @@ if [ ! -d "venv" ]; then
     python3 -m venv venv
 fi
 
-source venv/bin/activate
-
 echo "Installing dependencies..."
 pip install --upgrade pip --break-system-packages
 pip install -r requirements.txt --break-system-packages
@@ -23,4 +21,8 @@ if [ -f ".pre-commit-config.yaml" ]; then
 fi
 
 echo "Development environment setup complete!"
-echo "You can now run the application with: python main.py"
+echo "---------------------------------------"
+echo "To activate the virtual environment, run:"
+echo "    source venv/bin/activate"
+echo ""
+echo "After activation, you can run the application with: python main.py"

@@ -1,0 +1,427 @@
+{# index.html #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg p-6" x-data="resumeApp()">
+    <!-- Progress Stepper -->
+    <div class="flex items-center justify-between mb-12">
+        <div class="flex items-center">
+            <div class="rounded-full h-12 w-12 flex items-center justify-center bg-blue-500 text-white" 
+                :class="{'bg-blue-500': currentStep >= 1, 'bg-gray-300': currentStep < 1}">
+                1
+            </div>
+            <div class="text-sm font-medium ml-2">Upload</div>
+        </div>
+        <div class="step-connector" :class="{'active': currentStep >= 2}"></div>
+        <div class="flex items-center">
+            <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                :class="{'bg-blue-500 text-white': currentStep >= 2, 'bg-gray-300 text-gray-600': currentStep < 2}">
+                2
+            </div>
+            <div class="text-sm font-medium ml-2">Analysis</div>
+        </div>
+        <div class="step-connector" :class="{'active': currentStep >= 3}"></div>
+        <div class="flex items-center">
+            <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                :class="{'bg-blue-500 text-white': currentStep >= 3, 'bg-gray-300 text-gray-600': currentStep < 3}">
+                3
+            </div>
+            <div class="text-sm font-medium ml-2">Optimize</div>
+        </div>
+        <div class="step-connector" :class="{'active': currentStep >= 4}"></div>
+        <div class="flex items-center">
+            <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                :class="{'bg-blue-500 text-white': currentStep >= 4, 'bg-gray-300 text-gray-600': currentStep < 4}">
+                4
+            </div>
+            <div class="text-sm font-medium ml-2">Download</div>
+        </div>
+    </div>
+
+    <!-- Step 1: Upload -->
+    <div x-show="currentStep === 1" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Resume Upload -->
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center" 
+                 x-bind:class="{'border-blue-500': isDraggingResume}"
+                 x-on:dragover.prevent="isDraggingResume = true"
+                 x-on:dragleave.prevent="isDraggingResume = false"
+                 x-on:drop.prevent="handleResumeDrop($event)">
+                <svg class="h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="mt-4 flex flex-col items-center">
+                    <h3 class="text-lg font-medium text-gray-900">Upload your resume</h3>
+                    <p class="text-sm text-gray-500">PDF or DOCX (max 5MB)</p>
+                    <div class="mt-4">
+                        <label class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                            Browse files
+                            <input type="file" class="hidden" accept=".pdf,.docx" x-on:change="handleResumeSelect"/>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm" x-show="resumeFile">
+                    <span class="font-medium" x-text="resumeFile?.name"></span>
+                    <button class="ml-2 text-red-500" x-on:click.prevent="resumeFile = null">Remove</button>
+                </div>
+            </div>
+
+            <!-- Job Description Upload -->
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Job Description</h3>
+                <textarea 
+                    class="w-full h-48 p-4 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+                    placeholder="Paste the job description here..."
+                    x-model="jobDescription"
+                ></textarea>
+                <p class="mt-2 text-sm text-gray-500">Or upload a job posting file</p>
+                <div class="mt-2">
+                    <label class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 cursor-pointer">
+                        Upload file
+                        <input type="file" class="hidden" accept=".pdf,.docx,.txt" x-on:change="handleJobDescriptionSelect"/>
+                    </label>
+                </div>
+                <div class="mt-2 text-sm" x-show="jobDescriptionFile">
+                    <span class="font-medium" x-text="jobDescriptionFile?.name"></span>
+                    <button class="ml-2 text-red-500" x-on:click.prevent="jobDescriptionFile = null">Remove</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <button 
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                x-on:click="analyzeResume()"
+                :disabled="!canProceedToAnalysis()"
+                :class="{'opacity-50 cursor-not-allowed': !canProceedToAnalysis(), 'cursor-pointer': canProceedToAnalysis()}"
+            >
+                Analyze Resume
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Analysis -->
+    <div x-show="currentStep === 2" class="space-y-8">
+        <div x-show="isAnalyzing" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <p class="mt-4 text-lg font-medium text-gray-900">Analyzing your resume...</p>
+            <p class="text-sm text-gray-500">This may take a few moments</p>
+        </div>
+
+        <div x-show="!isAnalyzing" class="space-y-8">
+            <!-- Analysis Results -->
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Resume Analysis Results</h3>
+                
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">ATS Match Score</span>
+                        <span class="text-sm font-medium text-gray-700" x-text="matchScore + '%'"></span>
+                    </div>
+                    <div class="meter">
+                        <span x-bind:style="'width: ' + matchScore + '%'"></span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 mb-2">Key Requirements Found</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="skill in matchedSkills" :key="skill">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
+                                        <circle cx="4" cy="4" r="3" />
+                                    </svg>
+                                    <span x-text="skill"></span>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900 mb-2">Missing Requirements</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="skill in missingSkills" :key="skill">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <svg class="-ml-0.5 mr-1.5 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
+                                        <circle cx="4" cy="4" r="3" />
+                                    </svg>
+                                    <span x-text="skill"></span>
+                                </span>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between">
+                <button 
+                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    x-on:click="currentStep = 1"
+                >
+                    Back
+                </button>
+                <button 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    x-on:click="currentStep = 3"
+                >
+                    Optimize Resume
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Optimize -->
+    <div x-show="currentStep === 3" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Original Resume -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Original Resume</h3>
+                <div class="border border-gray-300 rounded-lg p-4 bg-gray-50 h-96 overflow-y-auto">
+                    <div x-html="resumeContent"></div>
+                </div>
+            </div>
+            
+            <!-- Optimized Resume -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Optimized Resume</h3>
+                <div 
+                    class="border border-gray-300 rounded-lg p-4 bg-white h-96 overflow-y-auto"
+                    hx-get="/api/optimize-resume"
+                    hx-trigger="load"
+                    hx-vals='{"resume": resumeContent, "jobDescription": jobDescription}'
+                    hx-target="this"
+                    hx-swap="innerHTML"
+                >
+                    <div class="flex justify-center items-center h-full">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-lg font-medium text-gray-900">Improvement Suggestions</h3>
+            
+            <div class="space-y-4">
+                <template x-for="(suggestion, index) in suggestions" :key="index">
+                    <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <h4 class="text-sm font-medium text-yellow-800" x-text="suggestion.title"></h4>
+                                <p class="mt-1 text-sm text-yellow-700" x-text="suggestion.description"></p>
+                                <div class="mt-2 flex">
+                                    <button 
+                                        class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none"
+                                        x-on:click="acceptSuggestion(index)"
+                                    >
+                                        Apply suggestion
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="flex justify-between">
+            <button 
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                x-on:click="currentStep = 2"
+            >
+                Back
+            </button>
+            <button 
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                x-on:click="currentStep = 4"
+            >
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 4: Download -->
+    <div x-show="currentStep === 4" class="space-y-8">
+        <div class="max-w-2xl mx-auto">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Download Your Optimized Resume</h3>
+            
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Final ATS Match Score</span>
+                    <span class="text-sm font-medium text-gray-700" x-text="finalMatchScore + '%'"></span>
+                </div>
+                <div class="meter">
+                    <span x-bind:style="'width: ' + finalMatchScore + '%'"></span>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                <h4 class="text-md font-medium text-gray-900 mb-4">Choose Format</h4>
+                <div class="flex space-x-4">
+                    <button 
+                        class="px-4 py-2 border rounded-md transition-colors"
+                        :class="{'border-blue-500 bg-blue-50 text-blue-700': selectedFormat === 'pdf', 'border-gray-300 text-gray-700': selectedFormat !== 'pdf'}"
+                        x-on:click="selectedFormat = 'pdf'"
+                    >
+                        PDF
+                    </button>
+                    <button 
+                        class="px-4 py-2 border rounded-md transition-colors"
+                        :class="{'border-blue-500 bg-blue-50 text-blue-700': selectedFormat === 'docx', 'border-gray-300 text-gray-700': selectedFormat !== 'docx'}"
+                        x-on:click="selectedFormat = 'docx'"
+                    >
+                        DOCX
+                    </button>
+                    <button 
+                        class="px-4 py-2 border rounded-md transition-colors"
+                        :class="{'border-blue-500 bg-blue-50 text-blue-700': selectedFormat === 'txt', 'border-gray-300 text-gray-700': selectedFormat !== 'txt'}"
+                        x-on:click="selectedFormat = 'txt'"
+                    >
+                        TXT
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <button 
+                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                    hx-post="/api/download-resume"
+                    hx-vals='{"format": selectedFormat}'
+                >
+                    <svg class="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download Resume
+                </button>
+            </div>
+        </div>
+
+        <div class="flex justify-between">
+            <button 
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                x-on:click="currentStep = 3"
+            >
+                Back
+            </button>
+            <button 
+                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                x-on:click="startOver()"
+            >
+                Start Over
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function resumeApp() {
+    return {
+        currentStep: 1,
+        resumeFile: null,
+        jobDescriptionFile: null,
+        jobDescription: '',
+        resumeContent: '',
+        isDraggingResume: false,
+        isAnalyzing: false,
+        matchScore: 0,
+        finalMatchScore: 0,
+        matchedSkills: [],
+        missingSkills: [],
+        suggestions: [],
+        selectedFormat: 'pdf',
+        
+        handleResumeDrop(event) {
+            this.isDraggingResume = false;
+            if (event.dataTransfer.files.length > 0) {
+                this.resumeFile = event.dataTransfer.files[0];
+                this.readResumeFile();
+            }
+        },
+        
+        handleResumeSelect(event) {
+            if (event.target.files.length > 0) {
+                this.resumeFile = event.target.files[0];
+                this.readResumeFile();
+            }
+        },
+        
+        readResumeFile() {
+            // In real implementation, this would parse the file
+            // For demo purposes, we'll just set mock content
+            this.resumeContent = "<p><strong>John Doe</strong><br>Software Engineer<br>john.doe@email.com</p><p><strong>Experience</strong><br>Senior Developer, ABC Tech (2020-Present)<br>- Developed web applications using React and Node.js<br>- Implemented CI/CD pipelines</p><p><strong>Skills</strong><br>JavaScript, React, Node.js, Git, Agile</p><p><strong>Education</strong><br>BS Computer Science, University of Technology (2016-2020)</p>";
+        },
+        
+        handleJobDescriptionSelect(event) {
+            if (event.target.files.length > 0) {
+                this.jobDescriptionFile = event.target.files[0];
+                // In real implementation, this would parse the file
+                this.jobDescription = "We are looking for a skilled Software Engineer with experience in React, Node.js, and Python. The ideal candidate should have knowledge of AWS, CI/CD, and Docker. Experience with TypeScript and GraphQL is preferred.";
+            }
+        },
+        
+        canProceedToAnalysis() {
+            return (this.resumeFile && this.resumeContent) && 
+                   (this.jobDescription || this.jobDescriptionFile);
+        },
+        
+        analyzeResume() {
+            if (!this.canProceedToAnalysis()) return;
+            
+            this.currentStep = 2;
+            this.isAnalyzing = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                this.isAnalyzing = false;
+                this.matchScore = 65;
+                this.matchedSkills = ["JavaScript", "React", "Node.js"];
+                this.missingSkills = ["Python", "AWS", "Docker", "TypeScript", "GraphQL"];
+                
+                this.suggestions = [
+                    {
+                        title: "Add Python experience",
+                        description: "The job requires Python but it's not mentioned in your resume. If you have experience with Python, add it to your skills section."
+                    },
+                    {
+                        title: "Highlight AWS experience",
+                        description: "AWS knowledge is required. Include any AWS experience you have or mention relevant cloud experience."
+                    },
+                    {
+                        title: "Add Docker to your skills",
+                        description: "Docker experience is required. If you have containerization experience, add it to your skills section."
+                    }
+                ];
+            }, 2000);
+        },
+        
+        acceptSuggestion(index) {
+            // In real implementation, this would update the optimized resume
+            // For demo purposes, we'll just remove the suggestion
+            this.suggestions.splice(index, 1);
+            this.matchScore += 5;
+            this.finalMatchScore = this.matchScore + 15;
+        },
+        
+        startOver() {
+            this.currentStep = 1;
+            this.resumeFile = null;
+            this.jobDescriptionFile = null;
+            this.jobDescription = '';
+            this.resumeContent = '';
+            this.matchScore = 0;
+            this.finalMatchScore = 0;
+            this.matchedSkills = [];
+            this.missingSkills = [];
+            this.suggestions = [];
+            this.selectedFormat = 'pdf';
+        }
+    }
+}
+</script>
+{% endblock %}
