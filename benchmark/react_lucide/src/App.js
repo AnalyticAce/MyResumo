@@ -93,6 +93,7 @@ const App = () => {
       setMatchedSkills(["JavaScript", "React", "Node.js"]);
       setMissingSkills(["Python", "AWS", "Docker", "TypeScript", "GraphQL"]);
       
+      // Reset suggestions each time we analyze
       setSuggestions([
         {
           id: 1,
@@ -113,7 +114,6 @@ const App = () => {
     }, 2000);
   };
 
-  // Function to optimize resume
   useEffect(() => {
     if (currentStep === 3) {
       // In real implementation, this would be an API call
@@ -129,18 +129,40 @@ const App = () => {
           JavaScript, React, Node.js, Git, Agile, Python, AWS, Docker</p>
           <p><strong>Education</strong><br>BS Computer Science, University of Technology (2016-2020)</p>
         `);
+        console.log('Current suggestions:', suggestions);
+        // Make sure we have suggestions in case they were cleared
+        if (suggestions.length === 0) {
+          setSuggestions([
+            {
+              id: 1,
+              title: "Add Python experience",
+              description: "The job requires Python but it's not mentioned in your resume. If you have experience with Python, add it to your skills section."
+            },
+            {
+              id: 2,
+              title: "Highlight AWS experience",
+              description: "AWS knowledge is required. Include any AWS experience you have or mention relevant cloud experience."
+            },
+            {
+              id: 3,
+              title: "Add Docker to your skills",
+              description: "Docker experience is required. If you have containerization experience, add it to your skills section."
+            }
+          ]);
+        }
       }, 1000);
     }
-  }, [currentStep]);
+  }, [currentStep, suggestions.length]);
 
   // Function to accept a suggestion
   const acceptSuggestion = (id) => {
     // Remove the suggestion from the list
     setSuggestions(suggestions.filter(suggestion => suggestion.id !== id));
     // Update match score
-    setMatchScore(prev => prev + 5);
-    // Update final match score
-    setFinalMatchScore(matchScore + 15);
+    const newScore = matchScore + 5;
+    setMatchScore(newScore);
+    // Update final match score - must be based on the new score
+    setFinalMatchScore(newScore + 15);
   };
 
   // Function to download resume
@@ -244,14 +266,13 @@ const App = () => {
                           <h3 className="text-lg font-medium text-slate-900">Upload your resume</h3>
                           <p className="text-sm text-slate-500 mt-1">PDF or DOCX (max 5MB)</p>
                           <div className="mt-4">
-                            <label htmlFor="resume-upload">
-                              <Button 
-                                variant="outline" 
-                                className="cursor-pointer"
-                                as="span"
-                              >
+                            <label 
+                              htmlFor="resume-upload" 
+                              className="inline-block"
+                            >
+                              <div className="inline-flex h-10 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 cursor-pointer">
                                 Browse files
-                              </Button>
+                              </div>
                               <input 
                                 id="resume-upload" 
                                 type="file" 
@@ -295,15 +316,10 @@ const App = () => {
                       />
                       <div className="flex items-center">
                         <span className="text-sm text-slate-500">Or upload a job posting file</span>
-                        <label htmlFor="job-desc-upload" className="ml-4">
-                          <Button 
-                            variant="outline"
-                            size="sm" 
-                            className="cursor-pointer" 
-                            as="span"
-                          >
+                        <label htmlFor="job-desc-upload" className="ml-4 inline-block">
+                          <div className="inline-flex h-9 items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 cursor-pointer">
                             Upload file
-                          </Button>
+                          </div>
                           <input 
                             id="job-desc-upload" 
                             type="file" 
@@ -462,39 +478,39 @@ const App = () => {
                   </TabsContent>
                   
                   <TabsContent value="suggestions" className="mt-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Improvement Suggestions</CardTitle>
-                        <CardDescription>Apply these changes to improve your resume</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          {suggestions.map((suggestion) => (
-                            <Alert key={suggestion.id} variant="default" className="bg-amber-50 border-amber-200">
-                              <AlertCircle className="h-4 w-4 text-amber-500" />
-                              <AlertTitle>{suggestion.title}</AlertTitle>
-                              <AlertDescription className="mt-1">{suggestion.description}</AlertDescription>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="mt-2 bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200 hover:text-amber-900"
-                                onClick={() => acceptSuggestion(suggestion.id)}
-                              >
-                                Apply suggestion
-                              </Button>
-                            </Alert>
-                          ))}
-                          
-                          {suggestions.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-8 text-center">
-                              <CheckCircle className="h-12 w-12 text-green-500 mb-2" />
-                              <p className="text-slate-600">All suggestions have been applied!</p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Improvement Suggestions</CardTitle>
+                          <CardDescription>Apply these changes to improve your resume</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {suggestions && suggestions.length > 0 ? (
+                              suggestions.map((suggestion) => (
+                                <Alert key={suggestion.id} variant="default" className="bg-amber-50 border-amber-200">
+                                  <AlertCircle className="h-4 w-4 text-amber-500" />
+                                  <AlertTitle>{suggestion.title}</AlertTitle>
+                                  <AlertDescription className="mt-1">{suggestion.description}</AlertDescription>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="mt-2 bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200 hover:text-amber-900"
+                                    onClick={() => acceptSuggestion(suggestion.id)}
+                                  >
+                                    Apply suggestion
+                                  </Button>
+                                </Alert>
+                              ))
+                            ) : (
+                              <div className="flex flex-col items-center justify-center py-8 text-center">
+                                <CheckCircle className="h-12 w-12 text-green-500 mb-2" />
+                                <p className="text-slate-600">All suggestions have been applied!</p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
                 </Tabs>
 
                 <div className="flex justify-between">

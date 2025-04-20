@@ -78,8 +78,8 @@
 \begin{center}
     \textbf{\Huge \scshape <<data.user_information.name|latex_escape>>} \\ \vspace{1pt}
     \href{mailto:<<data.user_information.email|latex_escape>>}{\underline{<<data.user_information.email|latex_escape>>}} $|$
-    \href{https://github.com/<<data.user_information.github|latex_escape>>}{\underline{Github: <<data.user_information.github|latex_escape>>}} $|$
-    \href{https://www.linkedin.com/in/<<data.user_information.linkedin|latex_escape|lower|replace(" ", "-")>>}{\underline{LinkedIn: <<data.user_information.linkedin|latex_escape>>}}
+    \href{<<data.user_information.github|latex_escape>>}{\underline{Github: <<data.user_information.github|latex_escape>>}} $|$
+    \href{<<data.user_information.linkedin|latex_escape|lower|replace(" ", "-")>>}{\underline{LinkedIn: <<data.user_information.linkedin|latex_escape>>}}
 \end{center}
 
 <% if data.user_information.get('profile_description') %>
@@ -115,7 +115,7 @@
     \resumeSubHeadingListStart
       <% for project in data.projects %>
       \resumeProjectHeading
-          {\textbf{<<project.project_name|latex_escape>>} $|$ \emph{<% if project.tech_stack is defined %><<project.tech_stack|latex_escape>><% else %>Python<% endif %>}}{}
+          {\textbf{<<project.project_name|latex_escape>>} $|$ \emph{<% if project.tech_stack is defined %><% if project.tech_stack is iterable and project.tech_stack is not string %><<", ".join(project.tech_stack)|latex_escape>><% else %><<project.tech_stack|latex_escape>><% endif %><% else %>Python<% endif %>}}{}
           \resumeItemListStart
             <% for goal in project.two_goals_of_the_project %>
             \resumeItem{<<goal|latex_escape|bold_numbers>>}

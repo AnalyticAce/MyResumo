@@ -1,7 +1,7 @@
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
-from langchain.chains import LLMChain
+from langchain_core.runnables import RunnablePassthrough
 from typing import Dict, Any
 import json
 import re
@@ -40,7 +40,7 @@ class AtsResumeOptimizer:
     _get_prompt_template()
         Create the PromptTemplate for ATS resume optimization
     _setup_chain()
-        Set up the LLMChain for processing job descriptions and resumes
+        Set up the processing pipeline for job descriptions and resumes
     generate_ats_optimized_resume_json(job_description)
         Generate an ATS-optimized resume in JSON format based on the provided job description
 
@@ -218,14 +218,13 @@ class AtsResumeOptimizer:
         return PromptTemplate.from_template(template=template)
 
     def _setup_chain(self) -> None:
-        """Set up the LLMChain for processing job descriptions and resumes"""
+        """
+        Set up the processing pipeline for job descriptions and resumes using the modern
+        functional composition approach with the pipe operator.
+        """
         prompt_template = self._get_prompt_template()
-        # self.chain = prompt_template | self.llm
-        self.chain = LLMChain(
-            llm=self.llm,
-            prompt=prompt_template,
-            output_key="ats_resume"
-        )
+        # Using the recommended pipe-based approach instead of deprecated LLMChain
+        self.chain = prompt_template | self.llm
 
     def generate_ats_optimized_resume_json(self, job_description: str) -> Dict[str, Any]:
         """
@@ -241,33 +240,37 @@ class AtsResumeOptimizer:
             return {"error": "Resume not provided"}
 
         try:
+            # Updated invocation for the pipe-based chain
             result = self.chain.invoke({
                 "job_description": job_description,
                 "resume": self.resume
             })
+            
             try:
-                json_result = json.loads(result["ats_resume"])
+                # With the pipe-based approach, result is the direct string output
+                # rather than a dictionary with an 'ats_resume' key
+                json_result = json.loads(result)
                 return json_result
             except json.JSONDecodeError:
                 try:
-                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', result["ats_resume"])
+                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', result)
                     if json_match:
                         json_str = json_match.group(1)
                         return json.loads(json_str)
 
-                    json_str = re.search(r'(\{[\s\S]*\})', result["ats_resume"])
+                    json_str = re.search(r'(\{[\s\S]*\})', result)
                     if json_str:
                         return json.loads(json_str.group(1))
 
                     return {"error": "Could not extract valid JSON from response"}
                 except Exception as e:
-                    return {"error": f"JSON parsing error: {str(e)}", "raw_response": result["ats_resume"]}
+                    return {"error": f"JSON parsing error: {str(e)}", "raw_response": result}
 
         except Exception as e:
             return {"error": f"Error processing request: {str(e)}"}
 
 if __name__ == "__main__":
-    with open("../../../data/sample_resumes/resume.txt" "r") as f:
+    with open("../../../data/sample_resumes/resume.txt", "r") as f:
         resume = f.read()
     
     with open("../../../data/sample_descriptions/job_description_1.txt", "r") as f:

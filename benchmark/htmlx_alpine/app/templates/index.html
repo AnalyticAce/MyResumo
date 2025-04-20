@@ -39,11 +39,11 @@
     </div>
 
     <!-- Step 1: Upload -->
-    <div x-show="currentStep === 1" class="space-y-8">
+    <div x-show="currentStep === 1" class="space-y-8" x-transition:enter="transition ease-out duration-300">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Resume Upload -->
             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center" 
-                 x-bind:class="{'border-blue-500': isDraggingResume}"
+                 x-bind:class="{'border-blue-500 bg-blue-50': isDraggingResume}"
                  x-on:dragover.prevent="isDraggingResume = true"
                  x-on:dragleave.prevent="isDraggingResume = false"
                  x-on:drop.prevent="handleResumeDrop($event)">
@@ -52,7 +52,8 @@
                 </svg>
                 <div class="mt-4 flex flex-col items-center">
                     <h3 class="text-lg font-medium text-gray-900">Upload your resume</h3>
-                    <p class="text-sm text-gray-500">PDF or DOCX (max 5MB)</p>
+                    <p class="text-sm text-gray-500" x-show="resumeFile && resumeFile.size > 5 * 1024 * 1024" class="text-red-600">File size exceeds 5MB.</p>
+
                     <div class="mt-4">
                         <label class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer">
                             Browse files
@@ -254,7 +255,13 @@
             <div class="mb-6">
                 <div class="flex justify-between mb-2">
                     <span class="text-sm font-medium text-gray-700">Final ATS Match Score</span>
-                    <span class="text-sm font-medium text-gray-700" x-text="finalMatchScore + '%'"></span>
+                    <span 
+                        :class="{
+                            'good': matchScore >= 60 && matchScore < 80, 
+                            'excellent': matchScore >= 80
+                        }"
+                        x-bind:style="'width: ' + matchScore + '%'">
+                    </span>
                 </div>
                 <div class="meter">
                     <span x-bind:style="'width: ' + finalMatchScore + '%'"></span>
@@ -403,9 +410,9 @@ function resumeApp() {
         acceptSuggestion(index) {
             // In real implementation, this would update the optimized resume
             // For demo purposes, we'll just remove the suggestion
-            this.suggestions.splice(index, 1);
+            const removed = this.suggestions.splice(index, 1);
             this.matchScore += 5;
-            this.finalMatchScore = this.matchScore + 15;
+            this.finalMatchScore = Math.min(100, this.matchScore + 15);
         },
         
         startOver() {

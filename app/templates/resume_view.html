@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Details - MyResumo{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" x-data="resumeView('{{ resume_id }}')">
+    <div class="md:flex md:items-center md:justify-between mb-8">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-3xl font-bold text-gray-900" x-text="resume.title || 'Resume Details'"></h1>
+            <p class="text-gray-500 mt-2">Last updated <span x-text="formatDate(resume.updated_at)"></span></p>
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+            <button @click="downloadResume()" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Download PDF
+            </button>
+            <a href="/dashboard" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading state -->
+    <div x-show="isLoading" class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-500"></div>
+    </div>
+
+    <!-- Error state -->
+    <div x-show="hasError" class="bg-red-50 border border-red-200 rounded-md p-4 mb-8">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">Error loading resume</h3>
+                <p class="text-sm text-red-700 mt-2" x-text="errorMessage"></p>
+                <div class="mt-4">
+                    <button @click="loadResume()" class="text-sm font-medium text-red-600 hover:text-red-500">Retry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content - only shown when resume is loaded -->
+    <div x-show="!isLoading && !hasError && resume" class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <!-- ATS Score -->
+        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">ATS Compatibility Score</h3>
+            <div class="mt-4 flex items-center">
+                <div class="flex-1 max-w-sm">
+                    <div class="relative pt-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full" 
+                                      :class="{
+                                          'text-green-600 bg-green-200': resume.ats_score >= 80,
+                                          'text-yellow-600 bg-yellow-200': resume.ats_score >= 60 && resume.ats_score < 80,
+                                          'text-red-600 bg-red-200': resume.ats_score < 60
+                                      }">
+                                    <span x-text="resume.ats_score"></span>%
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-semibold inline-block text-gray-600">
+                                    <template x-if="resume.ats_score >= 80">Excellent</template>
+                                    <template x-if="resume.ats_score >= 60 && resume.ats_score < 80">Good</template>
+                                    <template x-if="resume.ats_score < 60">Needs Improvement</template>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 mt-2">
+                            <div :style="`width: ${resume.ats_score}%`" 
+                                 :class="{
+                                     'bg-green-500': resume.ats_score >= 80,
+                                     'bg-yellow-500': resume.ats_score >= 60 && resume.ats_score < 80,
+                                     'bg-red-500': resume.ats_score < 60
+                                 }"
+                                 class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-8">
+                    <p class="text-sm text-gray-600 max-w-xs">
+                        <template x-if="resume.ats_score >= 80">
+                            Your resume is highly compatible with standard ATS systems and is likely to pass screening filters.
+                        </template>
+                        <template x-if="resume.ats_score >= 60 && resume.ats_score < 80">
+                            Your resume has good ATS compatibility but could be improved with some keyword optimization.
+                        </template>
+                        <template x-if="resume.ats_score < 60">
+                            Your resume may struggle to pass ATS screenings. Consider updating keywords and formatting.
+                        </template>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resume Details -->
+        <div x-show="resume.optimized_data" class="px-0">
+            <!-- Basic Information -->
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
+                <div class="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                        <dt class="text-sm font-medium text-gray-500">Full name</dt>
+                        <dd class="mt-1 text-sm text-gray-900" x-text="resume.optimized_data?.user_information?.name || 'Not provided'"></dd>
+                    </div>
+                    <div class="sm:col-span-3">
+                        <dt class="text-sm font-medium text-gray-500">Job title</dt>
+                        <dd class="mt-1 text-sm text-gray-900" x-text="resume.optimized_data?.user_information?.main_job_title || 'Not provided'"></dd>
+                    </div>
+                    <div class="sm:col-span-3">
+                        <dt class="text-sm font-medium text-gray-500">Email address</dt>
+                        <dd class="mt-1 text-sm text-gray-900" x-text="resume.optimized_data?.user_information?.email || 'Not provided'"></dd>
+                    </div>
+                    <div class="sm:col-span-3">
+                        <dt class="text-sm font-medium text-gray-500">LinkedIn</dt>
+                        <dd class="mt-1 text-sm text-gray-900" x-text="resume.optimized_data?.user_information?.linkedin || 'Not provided'"></dd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Description -->
+            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Profile Description</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p x-text="resume.optimized_data?.user_information?.profile_description || 'No profile description provided.'"></p>
+                </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Skills</h3>
+                
+                <div class="mt-4">
+                    <h4 class="text-md font-medium text-gray-700">Hard Skills</h4>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <template x-for="skill in resume.optimized_data?.user_information?.skills?.hard_skills || []" :key="skill">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <span x-text="skill"></span>
+                            </span>
+                        </template>
+                        <template x-if="!resume.optimized_data?.user_information?.skills?.hard_skills?.length">
+                            <span class="text-sm text-gray-500">No hard skills listed</span>
+                        </template>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4 class="text-md font-medium text-gray-700">Soft Skills</h4>
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <template x-for="skill in resume.optimized_data?.user_information?.skills?.soft_skills || []" :key="skill">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <span x-text="skill"></span>
+                            </span>
+                        </template>
+                        <template x-if="!resume.optimized_data?.user_information?.skills?.soft_skills?.length">
+                            <span class="text-sm text-gray-500">No soft skills listed</span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience -->
+            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Work Experience</h3>
+                
+                <div class="mt-4 divide-y divide-gray-200">
+                    <template x-for="(experience, index) in resume.optimized_data?.user_information?.experiences || []" :key="index">
+                        <div class="py-4">
+                            <div class="flex justify-between">
+                                <h4 class="text-md font-medium text-gray-900" x-text="experience.job_title"></h4>
+                                <span class="text-sm text-gray-500">
+                                    <span x-text="experience.start_date"></span> - <span x-text="experience.end_date"></span>
+                                </span>
+                            </div>
+                            <p class="text-sm font-medium text-gray-500" x-text="experience.company"></p>
+                            <ul class="mt-2 pl-4 list-disc list-outside text-sm text-gray-600">
+                                <template x-for="(task, taskIndex) in experience.four_tasks" :key="taskIndex">
+                                    <li x-text="task"></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    <template x-if="!resume.optimized_data?.user_information?.experiences?.length">
+                        <p class="text-sm text-gray-500 py-4">No work experience listed</p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Education</h3>
+                
+                <div class="mt-4 divide-y divide-gray-200">
+                    <template x-for="(education, index) in resume.optimized_data?.user_information?.education || []" :key="index">
+                        <div class="py-4">
+                            <div class="flex justify-between">
+                                <h4 class="text-md font-medium text-gray-900" x-text="education.institution"></h4>
+                                <span class="text-sm text-gray-500">
+                                    <span x-text="education.start_date"></span> - <span x-text="education.end_date"></span>
+                                </span>
+                            </div>
+                            <p class="text-sm font-medium text-gray-500" x-text="education.degree"></p>
+                            <p class="mt-2 text-sm text-gray-600" x-text="education.description || ''"></p>
+                        </div>
+                    </template>
+                    <template x-if="!resume.optimized_data?.user_information?.education?.length">
+                        <p class="text-sm text-gray-500 py-4">No education listed</p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div x-show="resume.optimized_data?.projects?.length > 0" class="border-t border-gray-200 px-4 py-5 sm:px-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Projects</h3>
+                
+                <div class="mt-4 divide-y divide-gray-200">
+                    <template x-for="(project, index) in resume.optimized_data?.projects || []" :key="index">
+                        <div class="py-4">
+                            <h4 class="text-md font-medium text-gray-900" x-text="project.project_name"></h4>
+                            <ul class="mt-2 pl-4 list-disc list-outside text-sm text-gray-600">
+                                <template x-for="(goal, goalIndex) in project.two_goals_of_the_project" :key="goalIndex">
+                                    <li x-text="goal"></li>
+                                </template>
+                            </ul>
+                            <p class="mt-2 text-sm text-gray-600" x-text="project.project_end_result"></p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Not optimized yet message -->
+            <template x-if="!resume.optimized_data">
+                <div class="border-t border-gray-200 px-4 py-8 sm:px-6 text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                        <svg class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <h3 class="mt-3 text-lg font-medium text-gray-900">Resume Not Optimized Yet</h3>
+                    <p class="mt-2 text-sm text-gray-500">This resume hasn't been optimized with our AI yet. Return to dashboard to optimize it.</p>
+                    <div class="mt-6">
+                        <a href="/dashboard" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function resumeView(resumeId) {
+        return {
+            resumeId: resumeId,
+            resume: {},
+            isLoading: true,
+            hasError: false,
+            errorMessage: '',
+            
+            // Initialize
+            async init() {
+                await this.loadResume();
+            },
+            
+            // Load resume data from API
+            async loadResume() {
+                this.isLoading = true;
+                this.hasError = false;
+                
+                try {
+                    const response = await fetch(`/api/resume/${this.resumeId}`);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load resume: ${response.statusText}`);
+                    }
+                    
+                    this.resume = await response.json();
+                } catch (error) {
+                    this.hasError = true;
+                    this.errorMessage = error.message || 'An error occurred while loading the resume';
+                    console.error('Error loading resume:', error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+            
+            // Download resume as PDF
+            downloadResume() {
+                window.open(`/api/resume/${this.resumeId}/download?use_optimized=true`, '_blank');
+            },
+            
+            // Format date
+            formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+    }
+</script>
+{% endblock %}

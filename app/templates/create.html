@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}Create Resume - MyResumo{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Create an Optimized Resume</h1>
+    
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6" 
+         x-data="resumeCreator()" 
+         x-init="init()">
+        <!-- Progress Stepper -->
+        <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center">
+                <div class="rounded-full h-12 w-12 flex items-center justify-center bg-blue-500 text-white">
+                    1
+                </div>
+                <div class="text-sm font-medium ml-2">Upload</div>
+            </div>
+            <div class="step-connector" :class="{'active': currentStep >= 2}"></div>
+            <div class="flex items-center">
+                <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                     :class="{'bg-blue-500 text-white': currentStep >= 2, 'bg-gray-300 text-gray-600': currentStep < 2}">
+                    2
+                </div>
+                <div class="text-sm font-medium ml-2" :class="{'text-gray-900': currentStep >= 2, 'text-gray-500': currentStep < 2}">Analyze</div>
+            </div>
+            <div class="step-connector" :class="{'active': currentStep >= 3}"></div>
+            <div class="flex items-center">
+                <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                     :class="{'bg-blue-500 text-white': currentStep >= 3, 'bg-gray-300 text-gray-600': currentStep < 3}">
+                    3
+                </div>
+                <div class="text-sm font-medium ml-2" :class="{'text-gray-900': currentStep >= 3, 'text-gray-500': currentStep < 3}">Results</div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Upload Resume and Job Description -->
+        <div x-show="currentStep === 1" class="fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Resume Upload -->
+                <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">Upload Your Resume</h3>
+                    <div 
+                        class="border-2 border-dashed border-gray-300 rounded-md px-6 pt-5 pb-6 cursor-pointer"
+                        :class="{'border-blue-500 bg-blue-50': isDraggingResume}"
+                        @dragover.prevent="isDraggingResume = true"
+                        @dragleave.prevent="isDraggingResume = false"
+                        @drop.prevent="handleResumeDrop($event)">
+                        
+                        <div class="space-y-1 text-center">
+                            <template x-if="!resumeFile">
+                                <div>
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <p class="mt-1 text-sm text-gray-600">
+                                        Drag and drop your resume file here, or
+                                        <label for="resume-file" class="text-blue-600 hover:underline cursor-pointer">browse</label>
+                                        to upload
+                                    </p>
+                                    <p class="text-xs text-gray-500">PDF only (max 5MB)</p>
+                                </div>
+                            </template>
+                            <template x-if="resumeFile">
+                                <div class="text-center">
+                                    <svg class="mx-auto h-10 w-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="mt-2 text-sm font-medium" x-text="resumeFile.name"></p>
+                                    <button type="button" @click.prevent="resumeFile = null" class="mt-1 text-xs text-red-600 hover:underline">
+                                        Remove file
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        <input id="resume-file" type="file" accept=".pdf" class="hidden" @change="handleResumeFileChange">
+                    </div>
+                    
+                    <div class="mt-4" x-show="resumeContent !== ''">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">Extracted Content</h4>
+                        <div class="text-xs bg-white border border-gray-300 rounded p-3 h-40 overflow-y-auto">
+                            <p x-text="resumeContent"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Job Description -->
+                <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">Add Job Description</h3>
+                    <div>
+                        <label for="job-description" class="block text-sm font-medium text-gray-700 mb-1">
+                            Paste the job description here:
+                        </label>
+                        <textarea 
+                            id="job-description" 
+                            rows="12"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            placeholder="Copy and paste the full job description here. The more detailed the job description, the better the optimization results."
+                            x-model="jobDescription"
+                        ></textarea>
+                    </div>
+                    <div class="mt-2">
+                        <label for="job-title" class="block text-sm font-medium text-gray-700">
+                            Job Title (optional)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="job-title" 
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            placeholder="e.g. Senior Software Developer"
+                            x-model="jobTitle"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-end">
+                <button 
+                    type="button"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center"
+                    :class="{'opacity-50 cursor-not-allowed': !canProceedToAnalysis()}"
+                    :disabled="!canProceedToAnalysis()"
+                    @click="startAnalysis()">
+                    Analyze Resume
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Analysis In Progress -->
+        <div x-show="currentStep === 2" class="text-center py-12 fade-in">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-opacity-50 mx-auto mb-6"></div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Analyzing Your Resume</h3>
+            <p class="text-gray-600 max-w-md mx-auto">
+                Our AI is optimizing your resume for the job description. This typically takes about 30-60 seconds.
+            </p>
+            
+            <div class="mt-8 max-w-md mx-auto">
+                <div class="h-2 bg-gray-200 rounded-full">
+                    <div class="h-2 bg-blue-500 rounded-full" :style="`width: ${analysisProgress}%`"></div>
+                </div>
+                <p class="mt-2 text-sm text-gray-600" x-text="analysisProgressMessage"></p>
+            </div>
+        </div>
+        
+        <!-- Step 3: Results -->
+        <div x-show="currentStep === 3" class="fade-in">
+            <div class="text-center mb-8">
+                <svg class="checkmark mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+                <h3 class="text-2xl font-bold text-gray-900 mt-6 mb-2">Resume Analysis Complete!</h3>
+                <p class="text-gray-600">Your resume has been optimized for the job description.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                <!-- ATS Score -->
+                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
+                        <h4 class="font-medium text-white">ATS Compatibility Score</h4>
+                    </div>
+                    <div class="p-4 text-center">
+                        <div class="relative inline-flex items-center justify-center">
+                            <!-- Score Circle -->
+                            <svg class="w-32 h-32">
+                                <circle
+                                    class="text-gray-200"
+                                    stroke-width="8"
+                                    stroke="currentColor"
+                                    fill="transparent"
+                                    r="56"
+                                    cx="64"
+                                    cy="64"
+                                />
+                                <circle
+                                    class="text-blue-500"
+                                    stroke-width="8"
+                                    :stroke-dasharray="calculateCircumference(56)"
+                                    :stroke-dashoffset="calculateCircumference(56) - (calculateCircumference(56) * matchScore) / 100"
+                                    stroke-linecap="round"
+                                    stroke="currentColor"
+                                    fill="transparent"
+                                    r="56"
+                                    cx="64"
+                                    cy="64"
+                                />
+                            </svg>
+                            <span class="absolute text-3xl font-bold" x-text="`${matchScore}%`"></span>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-600">
+                            <template x-if="matchScore >= 80">
+                                <span>Excellent! Your resume is highly compatible with this position.</span>
+                            </template>
+                            <template x-if="matchScore >= 60 && matchScore < 80">
+                                <span>Good match! Your resume aligns well with the job requirements.</span>
+                            </template>
+                            <template x-if="matchScore < 60">
+                                <span>Your resume could use some improvements to better match this job.</span>
+                            </template>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Matched Skills -->
+                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3">
+                        <h4 class="font-medium text-white">Matched Skills</h4>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="skill in matchedSkills" :key="skill">
+                                <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-800" x-text="skill"></span>
+                            </template>
+                        </div>
+                        <template x-if="matchedSkills.length === 0">
+                            <p class="text-sm text-gray-500">No skills directly matched.</p>
+                        </template>
+                    </div>
+                </div>
+                
+                <!-- Missing Skills -->
+                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-3">
+                        <h4 class="font-medium text-white">Recommended Skills to Add</h4>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="skill in missingSkills" :key="skill">
+                                <span class="px-2 py-1 rounded-full text-sm bg-orange-100 text-orange-800" x-text="skill"></span>
+                            </template>
+                        </div>
+                        <template x-if="missingSkills.length === 0">
+                            <p class="text-sm text-gray-500">No additional skills recommended.</p>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
+                <button
+                    type="button"
+                    class="inline-flex items-center justify-center px-6 py-3 border border-transparent font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    @click="downloadOptimizedResume()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Download Optimized Resume
+                </button>
+                <button
+                    type="button"
+                    class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    @click="resetAndStartOver()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    Start Over
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function resumeCreator() {
+        return {
+            currentStep: 1,
+            resumeFile: null,
+            resumeContent: '',
+            resumeId: null,
+            jobTitle: '',
+            jobDescription: '',
+            isDraggingResume: false,
+            isUploading: false,
+            isAnalyzing: false,
+            analysisProgress: 0,
+            analysisProgressMessage: 'Initializing...',
+            matchScore: 0,
+            matchedSkills: [],
+            missingSkills: [],
+            
+            init() {
+                // Initialize the component
+                this.resetProgressInterval = null;
+            },
+            
+            // Handle resume file drag & drop and file input
+            handleResumeDrop(event) {
+                this.isDraggingResume = false;
+                const file = event.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf' && file.size <= 5 * 1024 * 1024) {
+                    this.resumeFile = file;
+                    this.uploadResumeFile();
+                }
+            },
+            
+            handleResumeFileChange(event) {
+                const file = event.target.files[0];
+                if (file && file.type === 'application/pdf' && file.size <= 5 * 1024 * 1024) {
+                    this.resumeFile = file;
+                    this.uploadResumeFile();
+                }
+            },
+            
+            // Upload the resume file to the backend
+            async uploadResumeFile() {
+                if (!this.resumeFile) return;
+                
+                this.isUploading = true;
+                
+                // Create a FormData object to send the file
+                const formData = new FormData();
+                formData.append('file', this.resumeFile);
+                formData.append('title', this.resumeFile.name.replace('.pdf', ''));
+                formData.append('job_description', ''); // Will be updated later when we analyze
+                formData.append('user_id', 'temp-user-id'); // In a real app, you'd use the logged-in user's ID
+                
+                try {
+                    const response = await fetch('/api/resume/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to upload resume');
+                    }
+                    
+                    const data = await response.json();
+                    this.resumeId = data.id;
+                    
+                    // Fetch the resume to get the extracted content
+                    const resumeResponse = await fetch(`/api/resume/${this.resumeId}`);
+                    if (resumeResponse.ok) {
+                        const resumeData = await resumeResponse.json();
+                        this.resumeContent = resumeData.original_content;
+                    }
+                    
+                } catch (error) {
+                    console.error('Error uploading resume:', error);
+                    alert('Failed to upload resume. Please try again.');
+                } finally {
+                    this.isUploading = false;
+                }
+            },
+            
+            // Check if we can proceed to analysis
+            canProceedToAnalysis() {
+                return (this.resumeFile && this.resumeContent && this.resumeId) && 
+                     this.jobDescription.trim().length > 0 && !this.isUploading;
+            },
+            
+            // Start the analysis process
+            async startAnalysis() {
+                if (!this.canProceedToAnalysis()) return;
+                
+                this.currentStep = 2;
+                this.isAnalyzing = true;
+                
+                // Start progress animation
+                this.startProgressSimulation();
+                
+                // Send the job description for optimization
+                try {
+                    const response = await fetch(`/api/resume/${this.resumeId}/optimize`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            job_description: this.jobDescription
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to optimize resume');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Update match score and skill data
+                    this.matchScore = data.ats_score || 65;
+                    
+                    // Extract skills from the optimized data
+                    if (data.optimized_data && data.optimized_data.user_information && data.optimized_data.user_information.skills) {
+                        const skills = data.optimized_data.user_information.skills;
+                        
+                        // Split the skills into matched and missing based on some logic
+                        // For this demo, we'll just use the hard_skills as matched and assign some missing
+                        this.matchedSkills = skills.hard_skills || [];
+                        
+                        // In a real app, you'd determine missing skills from the job description
+                        // Here we'll just use placeholder data
+                        this.missingSkills = ['Docker', 'TypeScript', 'GraphQL', 'AWS'].filter(
+                            skill => !this.matchedSkills.includes(skill)
+                        ).slice(0, 5);
+                    }
+                    
+                    // Complete the progress simulation
+                    clearInterval(this.resetProgressInterval);
+                    this.analysisProgress = 100;
+                    this.analysisProgressMessage = 'Analysis complete!';
+                    
+                    // Move to results step after a short delay
+                    setTimeout(() => {
+                        this.currentStep = 3;
+                        this.isAnalyzing = false;
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Error optimizing resume:', error);
+                    alert('Failed to optimize resume. Please try again.');
+                    this.currentStep = 1;
+                    this.isAnalyzing = false;
+                    clearInterval(this.resetProgressInterval);
+                }
+            },
+            
+            // Simulate progress animation during analysis
+            startProgressSimulation() {
+                this.analysisProgress = 0;
+                this.analysisProgressMessage = 'Processing resume text...';
+                
+                this.resetProgressInterval = setInterval(() => {
+                    if (this.analysisProgress < 95) {
+                        this.analysisProgress += Math.floor(Math.random() * 15);
+                        if (this.analysisProgress > 95) this.analysisProgress = 95;
+                        
+                        // Update progress message based on progress
+                        if (this.analysisProgress < 30) {
+                            this.analysisProgressMessage = 'Extracting key information...';
+                        } else if (this.analysisProgress < 60) {
+                            this.analysisProgressMessage = 'Analyzing job requirements...';
+                        } else if (this.analysisProgress < 80) {
+                            this.analysisProgressMessage = 'Optimizing content...';
+                        } else {
+                            this.analysisProgressMessage = 'Finalizing your resume...';
+                        }
+                    }
+                }, 1000);
+            },
+            
+            // Download the optimized resume as PDF
+            async downloadOptimizedResume() {
+                if (!this.resumeId) return;
+                
+                try {
+                    // Open the download URL in a new tab
+                    window.open(`/api/resume/${this.resumeId}/download?use_optimized=true`, '_blank');
+                } catch (error) {
+                    console.error('Error downloading resume:', error);
+                    alert('Failed to download resume. Please try again.');
+                }
+            },
+            
+            // Reset the form and start over
+            resetAndStartOver() {
+                this.currentStep = 1;
+                this.resumeFile = null;
+                this.resumeContent = '';
+                this.jobTitle = '';
+                this.jobDescription = '';
+                this.isDraggingResume = false;
+                this.isAnalyzing = false;
+                this.matchScore = 0;
+                this.matchedSkills = [];
+                this.missingSkills = [];
+            },
+            
+            // Calculate circumference for SVG circle animation
+            calculateCircumference(radius) {
+                return 2 * Math.PI * radius;
+            }
+        }
+    }
+</script>
+{% endblock %}

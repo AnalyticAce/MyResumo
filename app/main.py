@@ -46,6 +46,7 @@ app.add_middleware(
 )
 
 app.mount("/templates", StaticFiles(directory="app/templates"), name="templates")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 @app.get("/docs", include_in_schema=False)
