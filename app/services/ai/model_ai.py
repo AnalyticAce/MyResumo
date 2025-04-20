@@ -247,24 +247,31 @@ class AtsResumeOptimizer:
             })
             
             try:
-                # With the pipe-based approach, result is the direct string output
-                # rather than a dictionary with an 'ats_resume' key
-                json_result = json.loads(result)
-                return json_result
-            except json.JSONDecodeError:
+                # Extract the content from AIMessage object if needed
+                if hasattr(result, 'content'):
+                    # For AIMessage objects
+                    content = result.content
+                else:
+                    # For string responses
+                    content = result
+                
+                # Try to parse content as JSON directly
                 try:
-                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', result)
+                    json_result = json.loads(content)
+                    return json_result
+                except json.JSONDecodeError:
+                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
                     if json_match:
                         json_str = json_match.group(1)
                         return json.loads(json_str)
 
-                    json_str = re.search(r'(\{[\s\S]*\})', result)
+                    json_str = re.search(r'(\{[\s\S]*\})', content)
                     if json_str:
                         return json.loads(json_str.group(1))
 
-                    return {"error": "Could not extract valid JSON from response"}
-                except Exception as e:
-                    return {"error": f"JSON parsing error: {str(e)}", "raw_response": result}
+                    return {"error": f"Could not extract valid JSON from response: {content[:100]}..."}
+            except Exception as e:
+                return {"error": f"JSON parsing error: {str(e)}", "raw_response": str(result)[:500]}
 
         except Exception as e:
             return {"error": f"Error processing request: {str(e)}"}

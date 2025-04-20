@@ -12,6 +12,15 @@ import tempfile
 from pathlib import Path
 import secrets
 from datetime import datetime
+import logging
+import traceback
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 # Request and response models
@@ -205,64 +214,157 @@ async def optimize_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    logger.info(f"Starting resume optimization for resume_id: {resume_id}")
+    
+    # 1. Retrieve resume
+    logger.info(f"Retrieving resume with ID: {resume_id}")
     resume = await repo.get_resume_by_id(resume_id)
     if not resume:
+        logger.warning(f"Resume not found with ID: {resume_id}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Resume with ID {resume_id} not found"
         )
+    logger.info(f"Successfully retrieved resume: {resume.get('title', 'Untitled')}")
+    
+    # 2. Get API configuration
+    logger.info("Retrieving API configuration")
     api_key = os.getenv("OPENAI_API_KEY")
     api_base_url = os.getenv("OPENAI_API_BASE_URL")
     model_name = os.getenv("OPENAI_MODEL_NAME")
+    
+    # Log API configuration (safely)
+    logger.info(f"API configuration - model_name: {model_name or 'Not set'}")
+    logger.info(f"API configuration - api_base_url: {api_base_url or 'Not set'}")
+    logger.info(f"API Key present: {bool(api_key)}")
+    
     if not api_key:
+        logger.warning("API key not found in environment variables, attempting to get from app state")
         try:
             api_key = request.app.state.config.AI_API_KEY
-        except:
+            logger.info("Successfully retrieved API key from app state")
+        except Exception as config_error:
+            logger.error(f"Failed to retrieve API key from app state: {str(config_error)}")
+            logger.error(f"Config error details: {traceback.format_exc()}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="AI API key not configured"
             )
+    
+    # 3. Initialize optimizer
+    logger.info("Initializing AtsResumeOptimizer")
     optimizer = AtsResumeOptimizer(
         model_name=model_name,
         resume=resume["original_content"],
         api_key=api_key,
         api_base=api_base_url,
     )
+    
+    # 4. Get job description
     job_description = optimization_request.job_description or resume.get("job_description", "")
+    logger.info(f"Job description length: {len(job_description)} characters")
+    
     if not job_description:
+        logger.warning("Job description is empty")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Job description is required for optimization"
         )
+    
     try:
+        # 5. Generate optimized resume
+        logger.info("Calling AI service to generate optimized resume")
         result = optimizer.generate_ats_optimized_resume_json(job_description)
+        
+        # 6. Check for errors in result
         if "error" in result:
+            logger.error(f"AI service returned an error: {result.get('error')}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"AI optimization error: {result['error']}"
             )
+        
+        # 7. Log the structure of the result (without exposing sensitive data)
+        logger.info("AI service returned result successfully")
+        logger.info(f"Result keys: {list(result.keys() if isinstance(result, dict) else [])}")
+        
+        # 8. Calculate score
+        logger.info("Calculating ATS score from result")
         score_bases = {
             "skills_match": len(result.get("user_information", {}).get("skills", {}).get("hard_skills", [])),
             "experiences": len(result.get("user_information", {}).get("experiences", [])),
             "education": len(result.get("user_information", {}).get("education", [])),
             "projects": len(result.get("projects", [])),
         }
+        logger.info(f"Score bases: {score_bases}")
+        
         base_score = 50
         max_additional = 45
         completeness_score = sum(min(value, 5) for value in score_bases.values()) / (5 * len(score_bases))
         ats_score = int(base_score + (completeness_score * max_additional))
-        optimized_data = ResumeData.parse_obj(result)
-        await repo.update_optimized_data(resume_id, optimized_data, ats_score)
+        logger.info(f"Calculated ATS score: {ats_score}")
+        
+        # 9. Parse and validate result
+        logger.info("Parsing result into ResumeData model")
+        try:
+            optimized_data = ResumeData.parse_obj(result)
+            logger.info("Successfully validated result through Pydantic model")
+        except Exception as validation_error:
+            logger.error(f"Failed to parse result into ResumeData model: {str(validation_error)}")
+            logger.error(f"Validation error details: {traceback.format_exc()}")
+            logger.debug(f"Problematic data: {result}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error parsing AI response: {str(validation_error)}"
+            )
+        
+        # 10. Update database
+        logger.info(f"Updating resume {resume_id} with optimized data")
+        try:
+            await repo.update_optimized_data(resume_id, optimized_data, ats_score)
+            logger.info("Successfully updated resume with optimized data")
+        except Exception as db_error:
+            logger.error(f"Database error during update: {str(db_error)}")
+            logger.error(f"Database error details: {traceback.format_exc()}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Database error during update: {str(db_error)}"
+            )
+        
+        # 11. Return success response
+        logger.info(f"Resume optimization completed successfully for resume_id: {resume_id}")
         return {
             "resume_id": resume_id,
             "ats_score": ats_score,
             "optimized_data": result
         }
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions as they're already properly formatted
+        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error during resume optimization: {str(e)}"
-        )
+        # Log the full stack trace for any other exception
+        logger.error(f"Unexpected error during resume optimization: {str(e)}")
+        logger.error(f"Error details: {traceback.format_exc()}")
+        
+        # Check for specific error types to provide better error messages
+        if "API key" in str(e).lower() or "authentication" in str(e).lower():
+            logger.error("AI service authentication error")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error authenticating with AI service. Please check API configuration."
+            )
+        elif "timeout" in str(e).lower() or "time" in str(e).lower():
+            logger.error("AI service timeout error")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="AI service request timed out. Please try again later."
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error during resume optimization: {str(e)}"
+            )
 
 
 @resume_router.get(

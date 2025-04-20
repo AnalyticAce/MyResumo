@@ -19,7 +19,10 @@
         </div>
     </div>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg" x-data="dashboardApp()">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg" 
+         x-data="dashboardApp()" 
+         x-init="init()"
+         x-cloak>
         <!-- Stats Overview -->
         <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
             <h3 class="text-lg font-medium text-gray-900">Overview</h3>
@@ -231,9 +234,41 @@
             lastUpdated: null,
             showDeleteModal: false,
             resumeToDelete: null,
+            pageLeaving: false,
             
             // Initialize the component and fetch data
             async init() {
+                // Set initial state to prevent operations during initialization
+                this.pageLeaving = false;
+                this.showDeleteModal = false;
+                this.resumeToDelete = null;
+                
+                // Add multiple event listeners for different browser behaviors
+                window.addEventListener('beforeunload', () => {
+                    this.pageLeaving = true;
+                    this.showDeleteModal = false;
+                    this.resumeToDelete = null;
+                });
+                
+                // For Chromium-based browsers (Edge, Brave, Chrome)
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') {
+                        this.pageLeaving = true;
+                        this.showDeleteModal = false;
+                        this.resumeToDelete = null;
+                    }
+                });
+                
+                // Cache navigation actions to prevent race conditions
+                const originalPushState = history.pushState;
+                history.pushState = function() {
+                    // Set the global variable that Alpine.js can access
+                    window.alpinePageTransition = true;
+                    
+                    // Call the original function
+                    return originalPushState.apply(this, arguments);
+                };
+                
                 await this.loadResumes();
                 this.calculateStats();
             },
@@ -294,32 +329,54 @@
             
             // View resume details
             viewResume(resumeId) {
+                // Set flag to prevent unintended actions during navigation
+                this.pageLeaving = true;
                 window.location.href = `/resume/${resumeId}`;
             },
             
             // Download resume PDF
             downloadResume(resumeId) {
-                window.open(`/api/resume/${resumeId}/download?use_optimized=true`, '_blank');
+                // Use a safer approach for downloads that won't trigger navigation issues
+                const downloadUrl = `/api/resume/${resumeId}/download?use_optimized=true`;
+                
+                // Create a temporary link element for download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrl;
+                downloadLink.setAttribute('download', '');
+                downloadLink.setAttribute('target', '_blank');
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
             },
             
             // Delete resume (show confirmation modal)
             deleteResume(resumeId) {
+                // Only proceed if we're not in the middle of a page transition
+                if (this.pageLeaving) return;
+                
                 this.resumeToDelete = resumeId;
                 this.showDeleteModal = true;
             },
             
             // Confirm delete action
             async confirmDelete() {
-                if (!this.resumeToDelete) return;
+                // Add safeguard to prevent unintended deletions
+                if (!this.resumeToDelete || this.pageLeaving) {
+                    this.showDeleteModal = false;
+                    this.resumeToDelete = null;
+                    return;
+                }
                 
                 try {
-                    const response = await fetch(`/api/resume/${this.resumeToDelete}`, {
+                    const resumeId = this.resumeToDelete; // Store ID locally
+                    
+                    const response = await fetch(`/api/resume/${resumeId}`, {
                         method: 'DELETE'
                     });
                     
                     if (response.ok) {
                         // Remove from local state
-                        this.resumes = this.resumes.filter(r => r.id !== this.resumeToDelete);
+                        this.resumes = this.resumes.filter(r => r.id !== resumeId);
                         this.calculateStats();
                     } else {
                         console.error('Failed to delete resume');
@@ -329,6 +386,7 @@
                     console.error('Error deleting resume:', error);
                     alert('Error deleting resume. Please try again.');
                 } finally {
+                    // Reset state variables
                     this.showDeleteModal = false;
                     this.resumeToDelete = null;
                 }
