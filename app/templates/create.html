@@ -268,120 +268,130 @@
             </div>
         </div>
         
-        <!-- Step 3: Results -->
+        <!-- Step 3: Results - Simplified with aligned cards -->
         <div x-show="currentStep === 3" class="fade-in">
-            <div class="text-center mb-8">
-                <svg class="checkmark mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-                <h3 class="text-2xl font-bold text-gray-900 mt-6 mb-2">Resume Analysis Complete!</h3>
-                <p class="text-gray-600">Your resume has been optimized for the job description.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                <!-- ATS Score -->
-                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
-                        <h4 class="font-medium text-white">ATS Compatibility Score</h4>
+            <!-- Compact success indicator -->
+            <div class="bg-gradient-to-br from-green-50 to-teal-50 p-6 rounded-lg mb-6">
+                <div class="text-center mb-5">
+                    <!-- Reduced vertical spacing -->
+                    <svg class="checkmark mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="height: 40px; width: 40px;">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-900 mt-3 mb-1">Resume Analysis Complete!</h3>
+                    <p class="text-gray-600 text-sm">Your resume has been optimized for the job description.</p>
+                </div>
+
+                <!-- Results Cards - Grid Layout -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <!-- ATS Score -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
+                            <h4 class="font-medium text-white">ATS Compatibility Score</h4>
+                        </div>
+                        <div class="p-4 text-center">
+                            <div class="relative inline-flex items-center justify-center">
+                                <!-- Score Circle -->
+                                <svg class="w-28 h-28">
+                                    <circle
+                                        class="text-gray-200"
+                                        stroke-width="8"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="50"
+                                        cx="56"
+                                        cy="56"
+                                    />
+                                    <circle
+                                        class="text-blue-500"
+                                        stroke-width="8"
+                                        :stroke-dasharray="calculateCircumference(50)"
+                                        :stroke-dashoffset="calculateCircumference(50) - (calculateCircumference(50) * matchScore) / 100"
+                                        stroke-linecap="round"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="50"
+                                        cx="56"
+                                        cy="56"
+                                    />
+                                </svg>
+                                <span class="absolute text-2xl font-bold" x-text="`${matchScore}%`"></span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600">
+                                <template x-if="matchScore >= 80">
+                                    <span>Excellent! Your resume is highly compatible with this position.</span>
+                                </template>
+                                <template x-if="matchScore >= 60 && matchScore < 80">
+                                    <span>Good match! Your resume aligns well with the job requirements.</span>
+                                </template>
+                                <template x-if="matchScore < 60">
+                                    <span>Your resume could use some improvements to better match this job.</span>
+                                </template>
+                            </p>
+                        </div>
                     </div>
-                    <div class="p-4 text-center">
-                        <div class="relative inline-flex items-center justify-center">
-                            <!-- Score Circle -->
-                            <svg class="w-32 h-32">
-                                <circle
-                                    class="text-gray-200"
-                                    stroke-width="8"
-                                    stroke="currentColor"
-                                    fill="transparent"
-                                    r="56"
-                                    cx="64"
-                                    cy="64"
-                                />
-                                <circle
-                                    class="text-blue-500"
-                                    stroke-width="8"
-                                    :stroke-dasharray="calculateCircumference(56)"
-                                    :stroke-dashoffset="calculateCircumference(56) - (calculateCircumference(56) * matchScore) / 100"
-                                    stroke-linecap="round"
-                                    stroke="currentColor"
-                                    fill="transparent"
-                                    r="56"
-                                    cx="64"
-                                    cy="64"
-                                />
+                    
+                    <!-- Matched Skills -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3">
+                            <h4 class="font-medium text-white">Matched Skills</h4>
+                        </div>
+                        <div class="p-4 h-full">
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="skill in matchedSkills" :key="skill">
+                                    <span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800" x-text="skill"></span>
+                                </template>
+                            </div>
+                            <template x-if="matchedSkills.length === 0">
+                                <p class="text-sm text-gray-500">No skills directly matched.</p>
+                            </template>
+                        </div>
+                    </div>
+                    
+                    <!-- Missing Skills -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                        <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-3">
+                            <h4 class="font-medium text-white">Recommended Skills to Add</h4>
+                        </div>
+                        <div class="p-4 h-full">
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="skill in missingSkills" :key="skill">
+                                    <span class="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800" x-text="skill"></span>
+                                </template>
+                            </div>
+                            <template x-if="missingSkills.length === 0">
+                                <p class="text-sm text-gray-500">No additional skills recommended.</p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Card - Full Width -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                    <div class="bg-gradient-to-r from-gray-100 to-gray-200 px-4 py-3">
+                        <h4 class="font-medium text-gray-700">Actions</h4>
+                    </div>
+                    <div class="p-4 flex flex-col sm:flex-row justify-center gap-4">
+                        <button
+                            type="button"
+                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                            @click="downloadOptimizedResume()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
-                            <span class="absolute text-3xl font-bold" x-text="`${matchScore}%`"></span>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-600">
-                            <template x-if="matchScore >= 80">
-                                <span>Excellent! Your resume is highly compatible with this position.</span>
-                            </template>
-                            <template x-if="matchScore >= 60 && matchScore < 80">
-                                <span>Good match! Your resume aligns well with the job requirements.</span>
-                            </template>
-                            <template x-if="matchScore < 60">
-                                <span>Your resume could use some improvements to better match this job.</span>
-                            </template>
-                        </p>
+                            Download Optimized Resume
+                        </button>
+                        <button
+                            type="button"
+                            class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                            @click="resetAndStartOver()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                            </svg>
+                            Start Over
+                        </button>
                     </div>
                 </div>
-                
-                <!-- Matched Skills -->
-                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3">
-                        <h4 class="font-medium text-white">Matched Skills</h4>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="skill in matchedSkills" :key="skill">
-                                <span class="px-2 py-1 rounded-full text-sm bg-green-100 text-green-800" x-text="skill"></span>
-                            </template>
-                        </div>
-                        <template x-if="matchedSkills.length === 0">
-                            <p class="text-sm text-gray-500">No skills directly matched.</p>
-                        </template>
-                    </div>
-                </div>
-                
-                <!-- Missing Skills -->
-                <div class="bg-gray-50 border border-gray-200 rounded-md overflow-hidden">
-                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-3">
-                        <h4 class="font-medium text-white">Recommended Skills to Add</h4>
-                    </div>
-                    <div class="p-4">
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="skill in missingSkills" :key="skill">
-                                <span class="px-2 py-1 rounded-full text-sm bg-orange-100 text-orange-800" x-text="skill"></span>
-                            </template>
-                        </div>
-                        <template x-if="missingSkills.length === 0">
-                            <p class="text-sm text-gray-500">No additional skills recommended.</p>
-                        </template>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
-                <button
-                    type="button"
-                    class="inline-flex items-center justify-center px-6 py-3 border border-transparent font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    @click="downloadOptimizedResume()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Download Optimized Resume
-                </button>
-                <button
-                    type="button"
-                    class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    @click="resetAndStartOver()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                    </svg>
-                    Start Over
-                </button>
             </div>
         </div>
     </div>
@@ -406,10 +416,22 @@
             matchScore: 0,
             matchedSkills: [],
             missingSkills: [],
+            // PDF preview properties
+            resumePreviewLoaded: false,
+            resumePreviewType: 'pdf', // Can be 'pdf' or 'structured'
+            resumePreviewUrl: '',
+            previewData: null,
             
             init() {
                 // Initialize the component
                 this.resetProgressInterval = null;
+                
+                // Listen for escape key to exit full screen PDF view if implemented
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isFullScreenPreview) {
+                        this.isFullScreenPreview = false;
+                    }
+                });
             },
             
             // Handle resume file drag & drop and file input
@@ -495,7 +517,8 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            job_description: this.jobDescription
+                            job_description: this.jobDescription,
+                            job_title: this.jobTitle || undefined
                         })
                     });
                     
@@ -523,6 +546,9 @@
                         ).slice(0, 5);
                     }
                     
+                    // Set up the PDF preview
+                    this.setupResumePreview(data);
+                    
                     // Complete the progress simulation
                     clearInterval(this.resetProgressInterval);
                     this.analysisProgress = 100;
@@ -540,6 +566,55 @@
                     this.currentStep = 1;
                     this.isAnalyzing = false;
                     clearInterval(this.resetProgressInterval);
+                }
+            },
+            
+            // Set up the resume preview based on available data
+            setupResumePreview(data) {
+                this.resumePreviewLoaded = false;
+                
+                // Check if PDF is available
+                if (data.optimized_pdf_url) {
+                    this.resumePreviewType = 'pdf';
+                    this.resumePreviewUrl = data.optimized_pdf_url;
+                    
+                    // In development environment, we might not have real PDF URLs,
+                    // so we fallback to the structured view if needed
+                    if (!this.resumePreviewUrl || this.resumePreviewUrl === '#') {
+                        // For demo purposes, you could use a sample PDF if available
+                        this.resumePreviewUrl = `/api/resume/${this.resumeId}/download?use_optimized=true`;
+                        
+                        // Set a timeout to simulate PDF loading
+                        setTimeout(() => {
+                            this.resumePreviewLoaded = true;
+                        }, 1500);
+                    } else {
+                        // Setup onload handler for real PDF URL
+                        // This will happen naturally through the @load directive in the template
+                    }
+                } else if (data.optimized_data) {
+                    // If no PDF but structured data is available
+                    this.resumePreviewType = 'structured';
+                    this.previewData = data.optimized_data;
+                    
+                    // Set a timeout to simulate loading
+                    setTimeout(() => {
+                        this.resumePreviewLoaded = true;
+                    }, 1000);
+                } else {
+                    // Neither available - show error state
+                    this.resumePreviewType = 'structured';
+                    this.previewData = {
+                        user_information: {
+                            name: 'Preview Not Available',
+                            main_job_title: 'Please download the resume to view',
+                            profile_description: 'The resume preview could not be generated. Please use the download button to view your optimized resume.'
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        this.resumePreviewLoaded = true;
+                    }, 1000);
                 }
             },
             
@@ -592,6 +667,9 @@
                 this.matchScore = 0;
                 this.matchedSkills = [];
                 this.missingSkills = [];
+                this.resumePreviewLoaded = false;
+                this.resumePreviewUrl = '';
+                this.previewData = null;
             },
             
             // Calculate circumference for SVG circle animation

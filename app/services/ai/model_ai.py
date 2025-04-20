@@ -140,7 +140,8 @@ class AtsResumeOptimizer:
             - Include keywords in context rather than keyword stuffing
             - Use both spelled-out terms and acronyms where applicable (e.g., "Search Engine Optimization (SEO)")
             - Ensure job titles, company names, dates, and locations are clearly formatted
-            - Keep formatting consistent throughout the document
+            - Keep formatting consistent throughout the document.
+            - If candidate has projects, only list the most related to the job not all of them, list 3-4 projects.
 
         5. **ETHICAL GUIDELINES**
             - Only include truthful information from the original resume
@@ -167,6 +168,7 @@ class AtsResumeOptimizer:
                         "company": "",
                         "start_date": "",
                         "end_date": "",
+                        "location": "",
                         "four_tasks": []
                     }}
                 ],
@@ -174,6 +176,7 @@ class AtsResumeOptimizer:
                     {{
                         "institution": "",
                         "degree": "",
+                        "location": "",
                         "description": "",
                         "start_date": "",
                         "end_date": ""
@@ -188,13 +191,16 @@ class AtsResumeOptimizer:
             "projects": [
                 {{
                     "project_name": "",
+                    "project_link": "",
                     "two_goals_of_the_project": [],
-                    "project_end_result": ""
+                    "project_end_result": "",
+                    "tech_stack": []
                 }}
             ],
             "certificate": [
                 {{
                     "name": "",
+                    "link" : "",
                     "institution": "",
                     "description": "",
                     "date": ""
@@ -203,7 +209,9 @@ class AtsResumeOptimizer:
             "extra_curricular_activities": [
                 {{
                     "name": "",
-                    "description": ""
+                    "description": "",
+                    "start_date": "",
+                    "end_date": ""
                 }}
             ]
         }}

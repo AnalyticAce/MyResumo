@@ -11,12 +11,14 @@ class Experience(BaseSchema):
     Attributes:
         job_title (str): The job title/position held
         company (str): The company or organization name
+        location (Optional[str]): The location/city of the job
         start_date (str): When the job started (stored as string for flexibility)
         end_date (str): When the job ended (or "Present" for current positions)
         four_tasks (List[str]): List of four key responsibilities or achievements
     """
     job_title: str
     company: str
+    location: Optional[str] = None
     start_date: str
     end_date: str
     four_tasks: List[str] = Field(..., min_items=4, max_items=4)
@@ -88,10 +90,12 @@ class Project(BaseSchema):
         project_name (str): Name of the project
         two_goals_of_the_project (List[str]): Two main goals or objectives
         project_end_result (str): The outcome or result of the project
+        tech_stack (Optional[List[str]]): Technologies used in the project
     """
     project_name: str
     two_goals_of_the_project: List[str] = Field(..., min_items=2, max_items=2)
     project_end_result: str
+    tech_stack: Optional[List[str]] = None
 
 
 class Certificate(BaseSchema):
@@ -117,9 +121,13 @@ class ExtraCurricularActivity(BaseSchema):
     Attributes:
         name (str): Name of the activity
         description (str): Details about the activity
+        start_date (Optional[str]): When the activity began
+        end_date (Optional[str]): When the activity ended (or "Present")
     """
     name: str
     description: str
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
 
 
 class ResumeData(BaseSchema):
