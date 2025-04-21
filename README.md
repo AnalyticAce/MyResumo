@@ -35,7 +35,8 @@
 - **Database**: MongoDB
 - **Frontend**: Jinja2 templates, Alpine.js, HTML/CSS
 - **AI Integration**: Deepseek API
-- **Deployment**: Docker, Docker Compose
+- **Deployment**: Docker
+- **Package Management**: uv
 
 > [!CAUTION]
 > This application utilizes LLM models which may generate unpredictable responses. Always review and verify AI-generated content before submitting to potential employers. The application is currently in beta, with ongoing improvements to the prompt engineering and output quality.
@@ -45,9 +46,46 @@
 ### Prerequisites
 
 - Python 3.8+
-- Docker and Docker Compose (for containerized deployment)
+- Docker (for containerized deployment)
 - MongoDB instance (local or remote)
 - Deepseek API key
+
+### Setting Up Dependencies
+
+#### Install uv (Fast Python Package Manager)
+
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver:
+
+```bash
+# Install uv using pip
+pip install uv
+
+# Or using the recommended installer script
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Setup MongoDB
+
+Options for MongoDB setup:
+
+1. **Using Docker** (recommended for development):
+```bash
+docker run -d --name mongodb -p 27017:27017 mongo:latest
+```
+
+2. **Local Installation**:
+   - [MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)
+
+3. **MongoDB Atlas** (Cloud Hosted):
+   - [Sign up for MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
+   - Create a free tier cluster
+   - Get your connection string from the dashboard
+
+#### Get Deepseek API Key
+
+1. Sign up at [Deepseek Platform](https://platform.deepseek.com/)
+2. Navigate to API section and generate a new key
+3. Save your API key securely for the next step
 
 ### Environment Variables
 
@@ -57,7 +95,6 @@ Create a `.env` file in the project root with the following variables:
 DEEPSEEK_API_KEY=your_api_key_here
 MONGODB_URI=mongodb://username:password@host:port/
 DB_NAME=myresumo
-REDIS_URL=redis://localhost:6379
 ```
 
 ### Using Official Docker Image (Recommended)
@@ -91,14 +128,14 @@ cd MyResumo
 
 2. Create and activate a virtual environment:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On macOS/Linux
-venv\Scripts\activate     # On Windows
+uv venv
+source .venv/bin/activate  # On macOS/Linux
+.venv\Scripts\activate     # On Windows
 ```
 
 3. Install dependencies:
 ```bash
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 4. Run development server:
@@ -107,15 +144,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ```
 
 5. Access the application at `http://localhost:8080`
-
-### Docker Deployment
-
-1. Build and run the containers:
-```bash
-docker-compose up -d
-```
-
-2. Access the application at `http://localhost:8080`
 
 ## 📚 API Documentation
 
