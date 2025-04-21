@@ -17,7 +17,7 @@
 **MyResumo** is an AI-powered resume customization platform that tailors your professional profile to match specific job descriptions. By leveraging advanced natural language processing, it analyzes job requirements and adapts your resume to highlight relevant skills and experiences, significantly improving your chances of passing through Applicant Tracking Systems (ATS) and catching recruiters' attention.
 
 <div align="center">
-  <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="600"/>
+  <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="800"/>
 </div>
 
 ## ✨ Key Features
@@ -36,7 +36,6 @@
 - **Frontend**: Jinja2 templates, Alpine.js, HTML/CSS
 - **AI Integration**: Deepseek API
 - **Deployment**: Docker, Docker Compose
-- **Caching**: Redis
 
 > [!CAUTION]
 > This application utilizes LLM models which may generate unpredictable responses. Always review and verify AI-generated content before submitting to potential employers. The application is currently in beta, with ongoing improvements to the prompt engineering and output quality.
