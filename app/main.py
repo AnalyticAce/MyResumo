@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from redis import asyncio as aioredis
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connector import MongoConnectionManager
 from app.api.routers.resume import resume_router
@@ -68,6 +68,23 @@ async def custom_swagger_ui_html():
         return HTMLResponse(
             content=f"Error loading documentation: {str(e)}", status_code=500
         )
+
+
+@app.get("/health", tags=["Health"], summary="Health Check")
+async def health_check():
+    """
+    Health check endpoint for monitoring and container orchestration.
+    
+    Returns:
+        JSONResponse: Status information about the application.
+    """
+    return JSONResponse(
+        content={
+            "status": "healthy",
+            "version": app.version,
+            "service": "myresumo"
+        }
+    )
 
 
 app.include_router(resume_router)
