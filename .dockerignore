@@ -1,0 +1,41 @@
+# Version control
+.git
+.github
+.gitignore
+
+# Environment and configuration files
+.env*
+venv
+env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache
+.coverage
+htmlcov/
+
+# Development artifacts
+*.log
+logs/
+*.swp
+*.swo
+.DS_Store
+.idea/
+.vscode/
+
+# Project specific
+data/sample_resumes/
+data/sample_descriptions/
+data/sample_responses/
+tests/
+README.md
+CONTRIBUTING.md
+LICENSE
+benchmark/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
