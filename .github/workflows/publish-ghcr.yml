@@ -4,9 +4,19 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - '.github/workflows/publish-ghcr.yml'
   pull_request:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - '.github/workflows/publish-ghcr.yml'
 
 jobs:
   build_and_publish:

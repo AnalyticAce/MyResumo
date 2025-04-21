@@ -60,6 +60,27 @@ DB_NAME=myresumo
 REDIS_URL=redis://localhost:6379
 ```
 
+### Using Official Docker Image (Recommended)
+
+The fastest way to get started is to use our official Docker image:
+
+```bash
+docker pull ghcr.io/analyticace/myresumo:latest
+```
+
+Run the container with your environment variables:
+
+```bash
+docker run -d --name myresumo \
+  -p 8080:8080 \
+  -e DEEPSEEK_API_KEY=your_api_key_here \
+  -e MONGODB_URI=mongodb://username:password@host:port/ \
+  -e DB_NAME=myresumo \
+  ghcr.io/analyticace/myresumo:latest
+```
+
+Access the application at `http://localhost:8080`
+
 ### Local Development
 
 1. Clone the repository:
