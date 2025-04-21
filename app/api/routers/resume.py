@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, Request, status, UploadFile, File, Form, Body
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.resume_repository import ResumeRepository
 from app.services.ai.model_ai import AtsResumeOptimizer
@@ -47,6 +47,24 @@ class OptimizationResponse(BaseModel):
     resume_id: str
     ats_score: int
     optimized_data: Dict[str, Any]
+
+
+class ContactFormRequest(BaseModel):
+    """
+    Schema for contact form submission.
+    """
+    name: str = Field(..., description="Full name of the person reaching out")
+    email: EmailStr = Field(..., description="Email address for return communication")
+    subject: str = Field(..., description="Subject of the contact message")
+    message: str = Field(..., description="Detailed message content")
+
+
+class ContactFormResponse(BaseModel):
+    """
+    Schema for contact form response.
+    """
+    success: bool = Field(..., description="Whether the message was sent successfully")
+    message: str = Field(..., description="Status message")
 
 
 # Initialize the API router
@@ -448,3 +466,49 @@ async def preview_resume(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
         detail="Resume preview not implemented. Use the download endpoint to generate a PDF."
     )
+
+
+@resume_router.post(
+    "/contact",
+    response_model=ContactFormResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Submit contact form",
+    response_description="Contact form submission status",
+)
+async def submit_contact_form(
+    request: ContactFormRequest = Body(...),
+) -> ContactFormResponse:
+    """
+    Submit a contact form.
+    
+    This endpoint processes contact form submissions from users wanting to reach out
+    to the project maintainers, report issues, or ask questions.
+    
+    Args:
+        request: The contact form data including name, email, subject, and message
+        
+    Returns:
+        ContactFormResponse: Success status and confirmation message
+        
+    Raises:
+        HTTPException: If there's an issue processing the form
+    """
+    try:
+        # In a production environment, this would typically:
+        # 1. Store the message in a database
+        # 2. Send an email notification to administrators
+        # 3. Potentially send an auto-response to the user
+        
+        # For now, we'll just return a success response
+        # TODO: Implement actual email sending functionality
+        
+        return ContactFormResponse(
+            success=True,
+            message="Thank you for your message! We'll get back to you soon."
+        )
+    except Exception as e:
+        # Log the error in a production environment
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process your message: {str(e)}"
+        )

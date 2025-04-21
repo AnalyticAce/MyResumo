@@ -2,9 +2,13 @@ from fastapi import APIRouter, HTTPException, Request, status
 from app.web.base_router import WebRouter
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from pathlib import Path
+
+# Setup templates
+templates_path = Path(__file__).parent.parent / "templates"
+templates = Jinja2Templates(directory=str(templates_path))
 
 core_web_router = WebRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 @core_web_router.get(
     "/",
@@ -59,27 +63,24 @@ async def about(
     )
 
 @core_web_router.get(
-    "/contact",
-    summary="Contact Us",
-    response_description="Get in touch with MyResumo Maintainer and Contributors",
+    "/contribution",
+    summary="Contribution",
+    response_description="Get involved with MyResumo development",
     response_class=HTMLResponse,
 )
-async def contact(
+async def contribution(
     request: Request,
 ):
     """
-    Render the contact page.
-    
-    This endpoint renders a form and information for contacting the 
-    MyResumo team.
+    Render the contribution page.
     
     Args:
-        request: The incoming HTTP request
+        request: The FastAPI request object
         
     Returns:
-        HTMLResponse: The rendered contact page
+        HTMLResponse: Rendered HTML template for contribution page
     """
     return templates.TemplateResponse(
-        "contact.html",
+        "contribution.html",
         {"request": request}
     )
