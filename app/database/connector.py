@@ -1,8 +1,12 @@
 import motor.motor_asyncio
 from typing import Optional, Dict
 from contextlib import asynccontextmanager
-from app.core.config import MONGO_CONNECTION_STRING
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+
+MONGO_CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING", "mongodb://localhost:27017")
 
 class MongoConnectionManager:
     _instance: Optional["MongoConnectionManager"] = None
