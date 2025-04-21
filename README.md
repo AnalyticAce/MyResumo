@@ -1,4 +1,4 @@
-# MyResumo <img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version 2.0.0"/>
+# MyResumo `<img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version 2.0.0"/>`
 
 <div align="center">
 
@@ -69,14 +69,16 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Options for MongoDB setup:
 
 1. **Using Docker** (recommended for development):
+
 ```bash
 docker run -d --name mongodb -p 27017:27017 mongo:latest
 ```
 
 2. **Local Installation**:
-   - [MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)
 
+   - [MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)
 3. **MongoDB Atlas** (Cloud Hosted):
+
    - [Sign up for MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
    - Create a free tier cluster
    - Get your connection string from the dashboard
@@ -121,12 +123,14 @@ Access the application at `http://localhost:8080`
 ### Local Development
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/AnalyticAce/MyResumo.git
 cd MyResumo
 ```
 
 2. Create and activate a virtual environment:
+
 ```bash
 uv venv
 source .venv/bin/activate  # On macOS/Linux
@@ -134,11 +138,13 @@ source .venv/bin/activate  # On macOS/Linux
 ```
 
 3. Install dependencies:
+
 ```bash
 uv pip install -r requirements.txt
 ```
 
 4. Run development server:
+
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ```
@@ -148,6 +154,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
 ## 📚 API Documentation
 
 Once the application is running, access the API documentation at:
+
 - Interactive API docs: `http://localhost:8080/docs`
 - OpenAPI specification: `http://localhost:8080/openapi.json`
 
@@ -195,4 +202,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **DOSSEH Shalom** - [LinkedIn](https://www.linkedin.com/in/shalom-dosseh-4a484a262) - [GitHub](https://github.com/AnalyticAce)
 
 Project Link: [https://github.com/AnalyticAce/MyResumo](https://github.com/AnalyticAce/MyResumo)
-
