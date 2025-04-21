@@ -1,5 +1,7 @@
 # Copilot Instructions - Best Development Practices
 
+*My Github Username is:* **AnalyticAce**
+
 This guide establishes development standards and best practices for our tech stack: Python, FastAPI, HTML/CSS, Jinja2, Alpine.js, and AI integrations. Following these practices ensures maintainable, sustainable, and high-quality systems.
 
 ## General Instructions
