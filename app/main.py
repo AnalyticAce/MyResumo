@@ -12,10 +12,23 @@ from app.web.dashboard import web_router
 from app.web.chat import chat_router
 import os
 
+
 # Initialize templates
 templates = Jinja2Templates(directory="app/templates")
 
+
 async def startup_logic(app: FastAPI) -> None:
+    """
+    Execute startup logic for the FastAPI application.
+    
+    Initialize database connections and other resources needed by the application.
+    
+    Args:
+        app: The FastAPI application instance
+        
+    Raises:
+        Exception: If any startup operation fails
+    """
     try:
         connection_manager = MongoConnectionManager()
         app.state.mongo = connection_manager
@@ -23,7 +36,16 @@ async def startup_logic(app: FastAPI) -> None:
         print(f"Error during startup: {e}")
         raise
 
+
 async def shutdown_logic(app: FastAPI) -> None:
+    """
+    Execute shutdown logic for the FastAPI application.
+    
+    Properly close database connections and clean up resources.
+    
+    Args:
+        app: The FastAPI application instance
+    """
     try:
         await app.state.mongo.close_all()
         print("Successfully closed all database connections")
@@ -31,6 +53,7 @@ async def shutdown_logic(app: FastAPI) -> None:
         print(f"Error during shutdown: {e}")
     finally:
         print("Shutting down background tasks.")
+
 
 app = FastAPI(
     title="MyResumo API",
@@ -43,6 +66,7 @@ app = FastAPI(
     docs_url=None,
 )
 
+
 # Exception handlers
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -50,6 +74,13 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     Custom exception handler for HTTP exceptions.
     Renders the 404.html template for 404 errors.
     For other HTTP errors, renders a basic error page or returns JSON for API routes.
+    
+    Args:
+        request: The incoming request
+        exc: The HTTP exception that was raised
+        
+    Returns:
+        An appropriate response based on the request type and error
     """
     if exc.status_code == 404:
         # Check if this is an API request or a web page request
@@ -79,10 +110,18 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         status_code=exc.status_code
     )
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """
     Custom exception handler for request validation errors.
+    
+    Args:
+        request: The incoming request
+        exc: The validation error that was raised
+        
+    Returns:
+        JSON response for API routes or template response for web routes
     """
     # For API routes, return JSON error
     if request.url.path.startswith("/api"):
@@ -102,10 +141,18 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422
     )
 
+
 @app.middleware("http")
 async def add_response_headers(request: Request, call_next):
     """
     Middleware to add response headers and handle flashed messages.
+    
+    Args:
+        request: The incoming request
+        call_next: The next middleware or route handler
+        
+    Returns:
+        The response with added security headers
     """
     response = await call_next(request)
     
@@ -116,6 +163,8 @@ async def add_response_headers(request: Request, call_next):
     
     return response
 
+
+# Add middleware and static file mounts
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -130,6 +179,15 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
+    """
+    Serve custom Swagger UI HTML for API documentation.
+    
+    Returns:
+        HTMLResponse: Custom Swagger UI HTML
+    
+    Raises:
+        FileNotFoundError: If the custom Swagger template is not found
+    """
     try:
         with open("app/templates/custom_swagger.html") as f:
             template = f.read()
@@ -165,11 +223,13 @@ async def health_check():
         }
     )
 
+
 # Include routers - These must come BEFORE the catch-all route
 app.include_router(resume_router)
 app.include_router(core_web_router)
 app.include_router(web_router)
 app.include_router(chat_router)
+
 
 # Catch-all for not found pages - IMPORTANT: This must come AFTER including all routers
 @app.get("/{path:path}", include_in_schema=False)
@@ -177,6 +237,13 @@ async def catch_all(request: Request, path: str):
     """
     Catch-all route handler for undefined paths.
     This must be defined AFTER all other routes to avoid intercepting valid routes.
+    
+    Args:
+        request: The incoming request
+        path: The path that was not matched by any other route
+        
+    Returns:
+        Template response with 404 page
     """
     # Skip handling for paths that should be handled by other middleware/routers
     if path.startswith(("api/", "static/", "templates/", "docs")):

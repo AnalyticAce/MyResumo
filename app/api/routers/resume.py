@@ -15,6 +15,7 @@ from datetime import datetime
 import logging
 import traceback
 
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -25,28 +26,40 @@ logger = logging.getLogger(__name__)
 
 # Request and response models
 class CreateResumeRequest(BaseModel):
-    user_id: str
-    title: str
-    original_content: str
-    job_description: str
+    """
+    Schema for creating a new resume.
+    """
+    user_id: str = Field(..., description="Unique identifier for the user")
+    title: str = Field(..., description="Title of the resume")
+    original_content: str = Field(..., description="Original content of the resume")
+    job_description: str = Field(..., description="Job description to tailor the resume for")
 
 
 class OptimizeResumeRequest(BaseModel):
-    job_description: str
+    """
+    Schema for optimizing an existing resume.
+    """
+    job_description: str = Field(..., description="Job description to tailor the resume for")
 
 
 class ResumeSummary(BaseModel):
-    id: str
-    title: str
-    ats_score: Optional[int] = None
-    created_at: datetime
-    updated_at: datetime
+    """
+    Schema for resume summary information.
+    """
+    id: str = Field(..., description="Unique identifier for the resume")
+    title: str = Field(..., description="Title of the resume")
+    ats_score: Optional[int] = Field(None, description="ATS score of the resume if optimized")
+    created_at: datetime = Field(..., description="When the resume was created")
+    updated_at: datetime = Field(..., description="When the resume was last updated")
 
 
 class OptimizationResponse(BaseModel):
-    resume_id: str
-    ats_score: int
-    optimized_data: Dict[str, Any]
+    """
+    Schema for resume optimization response.
+    """
+    resume_id: str = Field(..., description="Unique identifier for the optimized resume")
+    ats_score: int = Field(..., description="ATS score of the optimized resume")
+    optimized_data: Dict[str, Any] = Field(..., description="Optimized resume data")
 
 
 class ContactFormRequest(BaseModel):
@@ -76,6 +89,15 @@ resume_router = APIRouter(
 
 # Helper function to get repository instance
 async def get_resume_repository(request: Request) -> ResumeRepository:
+    """
+    Dependency for getting the resume repository instance.
+    
+    Args:
+        request: The incoming request
+        
+    Returns:
+        ResumeRepository: An instance of the resume repository
+    """
     return ResumeRepository()
 
 
@@ -93,6 +115,26 @@ async def create_resume(
     user_id: str = Form(...),
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Create a new resume from a PDF file.
+    
+    This endpoint accepts a PDF file upload, extracts the text content,
+    and creates a new resume entry in the database.
+    
+    Args:
+        request: The incoming request
+        file: Uploaded PDF resume file
+        title: Title for the resume
+        job_description: Job description to tailor the resume for
+        user_id: ID of the user creating the resume
+        repo: Resume repository instance
+        
+    Returns:
+        Dict containing the ID of the created resume
+        
+    Raises:
+        HTTPException: If the resume creation fails
+    """
     try:
         pdf_content = await file.read()
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
@@ -133,6 +175,20 @@ async def get_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Get a specific resume by ID.
+    
+    Args:
+        resume_id: ID of the resume to retrieve
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        Dict containing the resume data
+        
+    Raises:
+        HTTPException: If the resume is not found
+    """
     resume_data = await repo.get_resume_by_id(resume_id)
     if not resume_data:
         raise HTTPException(
@@ -154,6 +210,17 @@ async def get_user_resumes(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Get all resumes for a specific user.
+    
+    Args:
+        user_id: ID of the user whose resumes to retrieve
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        List of resume summaries for the specified user
+    """
     resumes = await repo.get_resumes_by_user_id(user_id)
     formatted_resumes = []
     for resume in resumes:
@@ -179,6 +246,21 @@ async def update_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Update a specific resume by ID.
+    
+    Args:
+        resume_id: ID of the resume to update
+        update_data: Data to update in the resume
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        Dict indicating success status
+        
+    Raises:
+        HTTPException: If the resume is not found or update fails
+    """
     resume = await repo.get_resume_by_id(resume_id)
     if not resume:
         raise HTTPException(
@@ -205,6 +287,20 @@ async def delete_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Delete a specific resume by ID.
+    
+    Args:
+        resume_id: ID of the resume to delete
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        Dict indicating success status
+        
+    Raises:
+        HTTPException: If the resume is not found or deletion fails
+    """
     resume = await repo.get_resume_by_id(resume_id)
     if not resume:
         raise HTTPException(
@@ -232,6 +328,24 @@ async def optimize_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Optimize a resume using AI based on a job description.
+    
+    This endpoint uses AI to analyze the original resume and job description,
+    then generates an optimized version that's tailored to the job requirements.
+    
+    Args:
+        resume_id: ID of the resume to optimize
+        optimization_request: Contains the job description for optimization
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        OptimizationResponse: Contains the optimized data and ATS score
+        
+    Raises:
+        HTTPException: If the resume is not found or optimization fails
+    """
     logger.info(f"Starting resume optimization for resume_id: {resume_id}")
     
     # 1. Retrieve resume
@@ -397,6 +511,25 @@ async def download_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Download a resume as a PDF file.
+    
+    This endpoint generates a PDF version of the resume using LaTeX templates.
+    By default, it uses the optimized version of the resume.
+    
+    Args:
+        resume_id: ID of the resume to download
+        use_optimized: Whether to use the optimized version of the resume
+        template: LaTeX template to use for generating the PDF
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Returns:
+        FileResponse: PDF file download
+        
+    Raises:
+        HTTPException: If the resume is not found or PDF generation fails
+    """
     resume = await repo.get_resume_by_id(resume_id)
     if not resume:
         raise HTTPException(
@@ -462,6 +595,19 @@ async def preview_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
+    """
+    Preview a resume (not implemented).
+    
+    This endpoint is intended for previewing a resume, but it's not yet implemented.
+    
+    Args:
+        resume_id: ID of the resume to preview
+        request: The incoming request
+        repo: Resume repository instance
+        
+    Raises:
+        HTTPException: Always raises a 501 Not Implemented error
+    """
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
         detail="Resume preview not implemented. Use the download endpoint to generate a PDF."
