@@ -1,13 +1,19 @@
-from fastapi import FastAPI
-from redis import asyncio as aioredis
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.database.connector import MongoConnectionManager
 from app.api.routers.resume import resume_router
 from app.web.core import core_web_router
 from app.web.dashboard import web_router
 from app.web.chat import chat_router
+import os
+
+# Initialize templates
+templates = Jinja2Templates(directory="app/templates")
 
 async def startup_logic(app: FastAPI) -> None:
     try:
@@ -36,6 +42,79 @@ app = FastAPI(
     version="2.0.0",
     docs_url=None,
 )
+
+# Exception handlers
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """
+    Custom exception handler for HTTP exceptions.
+    Renders the 404.html template for 404 errors.
+    For other HTTP errors, renders a basic error page or returns JSON for API routes.
+    """
+    if exc.status_code == 404:
+        # Check if this is an API request or a web page request
+        if request.url.path.startswith("/api"):
+            return JSONResponse(
+                status_code=404,
+                content={"detail": "Resource not found"}
+            )
+        # For web requests, render our custom 404 page
+        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+    
+    # For API routes, return JSON error
+    if request.url.path.startswith("/api"):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": str(exc.detail)}
+        )
+    
+    # For other errors on web routes, show a simple error page
+    return templates.TemplateResponse(
+        "404.html", 
+        {
+            "request": request, 
+            "status_code": exc.status_code,
+            "detail": str(exc.detail)
+        }, 
+        status_code=exc.status_code
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Custom exception handler for request validation errors.
+    """
+    # For API routes, return JSON error
+    if request.url.path.startswith("/api"):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": exc.errors()}
+        )
+    
+    # For web routes, show an error page with validation details
+    return templates.TemplateResponse(
+        "404.html", 
+        {
+            "request": request, 
+            "status_code": 422,
+            "detail": "Validation Error: Please check your input data."
+        }, 
+        status_code=422
+    )
+
+@app.middleware("http")
+async def add_response_headers(request: Request, call_next):
+    """
+    Middleware to add response headers and handle flashed messages.
+    """
+    response = await call_next(request)
+    
+    # Add security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    
+    return response
 
 app.add_middleware(
     CORSMiddleware,
@@ -86,8 +165,23 @@ async def health_check():
         }
     )
 
-
+# Include routers - These must come BEFORE the catch-all route
 app.include_router(resume_router)
 app.include_router(core_web_router)
 app.include_router(web_router)
 app.include_router(chat_router)
+
+# Catch-all for not found pages - IMPORTANT: This must come AFTER including all routers
+@app.get("/{path:path}", include_in_schema=False)
+async def catch_all(request: Request, path: str):
+    """
+    Catch-all route handler for undefined paths.
+    This must be defined AFTER all other routes to avoid intercepting valid routes.
+    """
+    # Skip handling for paths that should be handled by other middleware/routers
+    if path.startswith(("api/", "static/", "templates/", "docs")):
+        # Let the normal routing handle these paths
+        raise StarletteHTTPException(status_code=404)
+    
+    # For truly non-existent routes, render the 404 page
+    return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
