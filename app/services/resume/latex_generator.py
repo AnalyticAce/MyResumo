@@ -153,7 +153,8 @@ class LaTeXGenerator:
         try:
             date_obj = datetime.strptime(date_str, "%m/%Y")
             return date_obj.strftime("%b. %Y")
-        except:
+        except Exception as e:
+            print(f"Error formatting date: {e}")
             return date_str
 
     @staticmethod

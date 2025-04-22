@@ -4,8 +4,7 @@ Notifications utility module for MyResumo.
 This module provides helper functions for creating and managing notifications,
 including toast messages for the frontend.
 """
-from typing import Dict, Any, Optional, List, Literal
-from fastapi import Request, Response
+from typing import Dict, Any, Literal
 from starlette.responses import HTMLResponse, JSONResponse, Response as StarletteResponse
 
 

@@ -6,7 +6,7 @@ from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.resume_repository import ResumeRepository
 from app.services.ai.model_ai import AtsResumeOptimizer
 from app.services.resume.latex_generator import LaTeXGenerator
-from app.utils.file_handling import extract_text_from_pdf, save_pdf_file, create_temporary_pdf
+from app.utils.file_handling import extract_text_from_pdf, create_temporary_pdf
 import os
 import tempfile
 from pathlib import Path

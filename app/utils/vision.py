@@ -1,7 +1,7 @@
 import os
 import cv2
 import pytesseract
-from typing import List, Dict, Any
+from typing import List
 from pdf2image import convert_from_path, convert_from_bytes
 from PIL import Image
 

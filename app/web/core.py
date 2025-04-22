@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import Request
 from app.web.base_router import WebRouter
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse

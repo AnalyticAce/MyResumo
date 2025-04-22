@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
@@ -9,8 +9,6 @@ from app.database.connector import MongoConnectionManager
 from app.api.routers.resume import resume_router
 from app.web.core import core_web_router
 from app.web.dashboard import web_router
-from app.web.chat import chat_router
-import os
 
 
 # Initialize templates
@@ -228,7 +226,6 @@ async def health_check():
 app.include_router(resume_router)
 app.include_router(core_web_router)
 app.include_router(web_router)
-app.include_router(chat_router)
 
 
 # Catch-all for not found pages - IMPORTANT: This must come AFTER including all routers
