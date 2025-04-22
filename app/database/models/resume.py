@@ -98,7 +98,7 @@ class UserInformation(BaseSchema):
 
 class Project(BaseSchema):
     """Model representing a project in a resume.
-    
+
     Attributes:
     ----------
         project_name (str): Name of the project
@@ -115,7 +115,7 @@ class Project(BaseSchema):
 
 class Certificate(BaseSchema):
     """Model representing a professional certificate in a resume.
-    
+
     Attributes:
     ----------
         name (str): Name of the certification
@@ -132,7 +132,7 @@ class Certificate(BaseSchema):
 
 class ExtraCurricularActivity(BaseSchema):
     """Model representing an extracurricular activity in a resume.
-    
+
     Attributes:
     ----------
         name (str): Name of the activity
@@ -166,7 +166,7 @@ class ResumeData(BaseSchema):
 
 class Resume(BaseSchema):
     """Model representing a resume in the database.
-    
+
     Attributes:
     ----------
         user_id (str): ID of the user who owns this resume

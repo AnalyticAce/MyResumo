@@ -3,6 +3,7 @@
 This module provides helper functions for creating and managing notifications,
 including toast messages for the frontend.
 """
+
 from typing import Any, Dict, Literal
 
 from starlette.responses import HTMLResponse, JSONResponse
@@ -27,18 +28,14 @@ def create_toast_data(
     -------
         A dictionary with the toast notification data.
     """
-    return {
-        "message": message,
-        "type": type,
-        "duration": duration
-    }
+    return {"message": message, "type": type, "duration": duration}
 
 
 def inject_toast_script(
     response: StarletteResponse,
     message: str,
     type: NotificationType = "info",
-    duration: int = 5000
+    duration: int = 5000,
 ) -> StarletteResponse:
     """Inject a toast notification script into an HTML response.
 
@@ -57,10 +54,10 @@ def inject_toast_script(
     """
     if not isinstance(response, HTMLResponse):
         return response
-    
+
     # Extract the content as a string
     content = response.body.decode("utf-8")
-    
+
     # Create the script to show the toast
     script = f"""
     <script>
@@ -71,12 +68,12 @@ def inject_toast_script(
         }});
     </script>
     """
-    
+
     # Insert the script before the closing </body> tag
     if "</body>" in content:
         modified_content = content.replace("</body>", f"{script}</body>")
         response.body = modified_content.encode("utf-8")
-    
+
     return response
 
 
@@ -84,10 +81,10 @@ def add_toast_header(
     response: StarletteResponse,
     message: str,
     type: NotificationType = "info",
-    duration: int = 5000
+    duration: int = 5000,
 ) -> StarletteResponse:
     """Add a toast notification header to a response.
-    
+
     This allows the client-side JavaScript to read the header and display a toast.
     Useful for API responses that redirect to HTML pages.
 
@@ -113,7 +110,7 @@ def create_response_with_toast(
     message: str = None,
     toast_type: NotificationType = "success",
     duration: int = 5000,
-    headers: Dict[str, str] = None
+    headers: Dict[str, str] = None,
 ) -> JSONResponse:
     """Create a JSON response with toast notification headers.
 
@@ -130,16 +127,14 @@ def create_response_with_toast(
         A JSONResponse with toast notification headers if a message was provided.
     """
     headers = headers or {}
-    
+
     if message:
-        headers.update({
-            "X-Toast-Message": message,
-            "X-Toast-Type": toast_type,
-            "X-Toast-Duration": str(duration)
-        })
-    
-    return JSONResponse(
-        content=content,
-        status_code=status_code,
-        headers=headers
-    )
+        headers.update(
+            {
+                "X-Toast-Message": message,
+                "X-Toast-Type": toast_type,
+                "X-Toast-Duration": str(duration),
+            }
+        )
+
+    return JSONResponse(content=content, status_code=status_code, headers=headers)

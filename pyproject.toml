@@ -1,8 +1,4 @@
 [tool.ruff]
-# Enable flake8-docstrings (pydocstyle)
-select = ["E", "F", "D", "I", "N"]
-ignore = ["E501"]  # Ignore line length errors
-
 # Exclude a variety of commonly ignored directories.
 exclude = [
     ".git",
@@ -19,8 +15,13 @@ line-length = 88
 indent-width = 4
 
 [tool.ruff.lint]
-# Enable Pycodestyle's E203 warning, which is not enforced by default
+# Enable flake8-docstrings (pydocstyle)
+select = ["E", "F", "D", "I", "N"]
+ignore = ["E501"]  # Ignore line length errors
+# Enable Pycodestyle's E203 warning
 extend-select = ["E203"]
+# Enable preview mode for E203 to have an effect
+preview = true
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.
@@ -35,9 +36,9 @@ skip-magic-trailing-comma = false
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
 convention = "google"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-third-party = ["fastapi", "pydantic", "sqlalchemy"]

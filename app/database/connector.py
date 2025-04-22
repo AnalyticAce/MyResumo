@@ -15,22 +15,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGO_CONNECTION_STRING = os.getenv("MONGO_CONNECTION_STRING", "mongodb://localhost:27017")
+MONGO_CONNECTION_STRING = os.getenv(
+    "MONGO_CONNECTION_STRING", "mongodb://localhost:27017"
+)
 
 
 class MongoConnectionManager:
     """Singleton class for managing MongoDB connections.
-    
+
     This class implements the singleton pattern to ensure only one instance of the
     connection manager exists. It manages connection pooling to MongoDB and provides
     methods for retrieving and closing connections.
-    
+
     Attributes:
         _instance: Class-level singleton instance reference
         _clients: Dictionary of motor AsyncIOMotorClient instances
         url: MongoDB connection string
     """
-    
+
     _instance: Optional["MongoConnectionManager"] = None
     _clients: Dict[str, motor.motor_asyncio.AsyncIOMotorClient] = {}
 
@@ -45,7 +47,7 @@ class MongoConnectionManager:
 
     def __new__(cls):
         """Singleton implementation ensuring only one instance is created.
-        
+
         Returns:
             The singleton MongoConnectionManager instance
         """
@@ -55,14 +57,14 @@ class MongoConnectionManager:
 
     def __init__(self):
         """Initialize the MongoConnectionManager with the connection string.
-        
+
         The initialization only happens once due to the singleton pattern.
         """
         self.url = MONGO_CONNECTION_STRING
 
     async def get_client(self) -> motor.motor_asyncio.AsyncIOMotorClient:
         """Get the MongoDB client instance, creating it if it doesn't exist.
-        
+
         Returns:
             AsyncIOMotorClient: MongoDB motor client for asynchronous operations
         """
@@ -74,7 +76,7 @@ class MongoConnectionManager:
 
     async def close_all(self):
         """Close all active MongoDB connections.
-        
+
         This method should be called during application shutdown to properly
         release all database connections.
         """
@@ -85,14 +87,14 @@ class MongoConnectionManager:
     @asynccontextmanager
     async def get_collection(self, db_name: str, collection_name: str):
         """Get a MongoDB collection as an async context manager.
-        
+
         Args:
             db_name: Name of the database
             collection_name: Name of the collection
-            
+
         Yields:
             motor.motor_asyncio.AsyncIOMotorCollection: The requested collection
-            
+
         Examples:
             ```python
             async with connection_manager.get_collection("mydb", "users") as collection:

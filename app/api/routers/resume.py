@@ -37,8 +37,7 @@ from app.utils.file_handling import create_temporary_pdf, extract_text_from_pdf
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -50,13 +49,17 @@ class CreateResumeRequest(BaseModel):
     user_id: str = Field(..., description="Unique identifier for the user")
     title: str = Field(..., description="Title of the resume")
     original_content: str = Field(..., description="Original content of the resume")
-    job_description: str = Field(..., description="Job description to tailor the resume for")
+    job_description: str = Field(
+        ..., description="Job description to tailor the resume for"
+    )
 
 
 class OptimizeResumeRequest(BaseModel):
     """Schema for optimizing an existing resume."""
 
-    job_description: str = Field(..., description="Job description to tailor the resume for")
+    job_description: str = Field(
+        ..., description="Job description to tailor the resume for"
+    )
 
 
 class ResumeSummary(BaseModel):
@@ -64,7 +67,9 @@ class ResumeSummary(BaseModel):
 
     id: str = Field(..., description="Unique identifier for the resume")
     title: str = Field(..., description="Title of the resume")
-    ats_score: Optional[int] = Field(None, description="ATS score of the resume if optimized")
+    ats_score: Optional[int] = Field(
+        None, description="ATS score of the resume if optimized"
+    )
     created_at: datetime = Field(..., description="When the resume was created")
     updated_at: datetime = Field(..., description="When the resume was last updated")
 
@@ -72,7 +77,9 @@ class ResumeSummary(BaseModel):
 class OptimizationResponse(BaseModel):
     """Schema for resume optimization response."""
 
-    resume_id: str = Field(..., description="Unique identifier for the optimized resume")
+    resume_id: str = Field(
+        ..., description="Unique identifier for the optimized resume"
+    )
     ats_score: int = Field(..., description="ATS score of the optimized resume")
     optimized_data: Dict[str, Any] = Field(..., description="Optimized resume data")
 
@@ -94,19 +101,16 @@ class ContactFormResponse(BaseModel):
 
 
 # Initialize the API router
-resume_router = APIRouter(
-    prefix="/api/resume",
-    tags=["Resume"]
-)
+resume_router = APIRouter(prefix="/api/resume", tags=["Resume"])
 
 
 # Helper function to get repository instance
 async def get_resume_repository(request: Request) -> ResumeRepository:
     """Dependency for getting the resume repository instance.
-    
+
     Args:
         request: The incoming request
-        
+
     Returns:
     -------
         ResumeRepository: An instance of the resume repository
@@ -129,10 +133,10 @@ async def create_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Create a new resume from a PDF file.
-    
+
     This endpoint accepts a PDF file upload, extracts the text content,
     and creates a new resume entry in the database.
-    
+
     Args:
         request: The incoming request
         file: Uploaded PDF resume file
@@ -140,11 +144,11 @@ async def create_resume(
         job_description: Job description to tailor the resume for
         user_id: ID of the user creating the resume
         repo: Resume repository instance
-        
+
     Returns:
     -------
         Dict containing the ID of the created resume
-        
+
     Raises:
     ------
         HTTPException: If the resume creation fails
@@ -168,13 +172,13 @@ async def create_resume(
         if not resume_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create resume"
+                detail="Failed to create resume",
             )
         return {"id": resume_id}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating resume: {str(e)}"
+            detail=f"Error creating resume: {str(e)}",
         )
 
 
@@ -190,16 +194,16 @@ async def get_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Get a specific resume by ID.
-    
+
     Args:
         resume_id: ID of the resume to retrieve
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         Dict containing the resume data
-        
+
     Raises:
     ------
         HTTPException: If the resume is not found
@@ -208,7 +212,7 @@ async def get_resume(
     if not resume_data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Resume with ID {resume_id} not found"
+            detail=f"Resume with ID {resume_id} not found",
         )
     resume_data["id"] = str(resume_data.pop("_id"))
     return resume_data
@@ -226,12 +230,12 @@ async def get_user_resumes(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Get all resumes for a specific user.
-    
+
     Args:
         user_id: ID of the user whose resumes to retrieve
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         List of resume summaries for the specified user
@@ -239,13 +243,15 @@ async def get_user_resumes(
     resumes = await repo.get_resumes_by_user_id(user_id)
     formatted_resumes = []
     for resume in resumes:
-        formatted_resumes.append({
-            "id": str(resume.get("_id")),
-            "title": resume.get("title"),
-            "ats_score": resume.get("ats_score"),
-            "created_at": resume.get("created_at"),
-            "updated_at": resume.get("updated_at"),
-        })
+        formatted_resumes.append(
+            {
+                "id": str(resume.get("_id")),
+                "title": resume.get("title"),
+                "ats_score": resume.get("ats_score"),
+                "created_at": resume.get("created_at"),
+                "updated_at": resume.get("updated_at"),
+            }
+        )
     return formatted_resumes
 
 
@@ -262,17 +268,17 @@ async def update_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Update a specific resume by ID.
-    
+
     Args:
         resume_id: ID of the resume to update
         update_data: Data to update in the resume
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         Dict indicating success status
-        
+
     Raises:
     ------
         HTTPException: If the resume is not found or update fails
@@ -281,13 +287,13 @@ async def update_resume(
     if not resume:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Resume with ID {resume_id} not found"
+            detail=f"Resume with ID {resume_id} not found",
         )
     success = await repo.update_resume(resume_id, update_data)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update resume"
+            detail="Failed to update resume",
         )
     return {"success": True}
 
@@ -304,16 +310,16 @@ async def delete_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Delete a specific resume by ID.
-    
+
     Args:
         resume_id: ID of the resume to delete
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         Dict indicating success status
-        
+
     Raises:
     ------
         HTTPException: If the resume is not found or deletion fails
@@ -322,13 +328,13 @@ async def delete_resume(
     if not resume:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Resume with ID {resume_id} not found"
+            detail=f"Resume with ID {resume_id} not found",
         )
     success = await repo.delete_resume(resume_id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete resume"
+            detail="Failed to delete resume",
         )
     return {"success": True}
 
@@ -346,26 +352,26 @@ async def optimize_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Optimize a resume using AI based on a job description.
-    
+
     This endpoint uses AI to analyze the original resume and job description,
     then generates an optimized version that's tailored to the job requirements.
-    
+
     Args:
         resume_id: ID of the resume to optimize
         optimization_request: Contains the job description for optimization
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         OptimizationResponse: Contains the optimized data and ATS score
-        
+
     Raises:
     ------
         HTTPException: If the resume is not found or optimization fails
     """
     logger.info(f"Starting resume optimization for resume_id: {resume_id}")
-    
+
     # 1. Retrieve resume
     logger.info(f"Retrieving resume with ID: {resume_id}")
     resume = await repo.get_resume_by_id(resume_id)
@@ -373,34 +379,38 @@ async def optimize_resume(
         logger.warning(f"Resume not found with ID: {resume_id}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Resume with ID {resume_id} not found"
+            detail=f"Resume with ID {resume_id} not found",
         )
     logger.info(f"Successfully retrieved resume: {resume.get('title', 'Untitled')}")
-    
+
     # 2. Get API configuration
     logger.info("Retrieving API configuration")
     api_key = os.getenv("OPENAI_API_KEY")
     api_base_url = os.getenv("OPENAI_API_BASE_URL")
     model_name = os.getenv("OPENAI_MODEL_NAME")
-    
+
     # Log API configuration (safely)
     logger.info(f"API configuration - model_name: {model_name or 'Not set'}")
     logger.info(f"API configuration - api_base_url: {api_base_url or 'Not set'}")
     logger.info(f"API Key present: {bool(api_key)}")
-    
+
     if not api_key:
-        logger.warning("API key not found in environment variables, attempting to get from app state")
+        logger.warning(
+            "API key not found in environment variables, attempting to get from app state"
+        )
         try:
             api_key = request.app.state.config.AI_API_KEY
             logger.info("Successfully retrieved API key from app state")
         except Exception as config_error:
-            logger.error(f"Failed to retrieve API key from app state: {str(config_error)}")
+            logger.error(
+                f"Failed to retrieve API key from app state: {str(config_error)}"
+            )
             logger.error(f"Config error details: {traceback.format_exc()}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="AI API key not configured"
+                detail="AI API key not configured",
             )
-    
+
     # 3. Initialize optimizer
     logger.info("Initializing AtsResumeOptimizer")
     optimizer = AtsResumeOptimizer(
@@ -409,65 +419,79 @@ async def optimize_resume(
         api_key=api_key,
         api_base=api_base_url,
     )
-    
+
     # 4. Get job description
-    job_description = optimization_request.job_description or resume.get("job_description", "")
+    job_description = optimization_request.job_description or resume.get(
+        "job_description", ""
+    )
     logger.info(f"Job description length: {len(job_description)} characters")
-    
+
     if not job_description:
         logger.warning("Job description is empty")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Job description is required for optimization"
+            detail="Job description is required for optimization",
         )
-    
+
     try:
         # 5. Generate optimized resume
         logger.info("Calling AI service to generate optimized resume")
         result = optimizer.generate_ats_optimized_resume_json(job_description)
-        
+
         # 6. Check for errors in result
         if "error" in result:
             logger.error(f"AI service returned an error: {result.get('error')}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"AI optimization error: {result['error']}"
+                detail=f"AI optimization error: {result['error']}",
             )
-        
+
         # 7. Log the structure of the result (without exposing sensitive data)
         logger.info("AI service returned result successfully")
-        logger.info(f"Result keys: {list(result.keys() if isinstance(result, dict) else [])}")
-        
+        logger.info(
+            f"Result keys: {list(result.keys() if isinstance(result, dict) else [])}"
+        )
+
         # 8. Calculate score
         logger.info("Calculating ATS score from result")
         score_bases = {
-            "skills_match": len(result.get("user_information", {}).get("skills", {}).get("hard_skills", [])),
-            "experiences": len(result.get("user_information", {}).get("experiences", [])),
+            "skills_match": len(
+                result.get("user_information", {})
+                .get("skills", {})
+                .get("hard_skills", [])
+            ),
+            "experiences": len(
+                result.get("user_information", {}).get("experiences", [])
+            ),
             "education": len(result.get("user_information", {}).get("education", [])),
             "projects": len(result.get("projects", [])),
         }
         logger.info(f"Score bases: {score_bases}")
-        
+
         base_score = 50
         max_additional = 45
-        completeness_score = sum(min(value, 5) for value in score_bases.values()) / (5 * len(score_bases))
+        completeness_score = sum(min(value, 5) for value in score_bases.values()) / (
+            5 * len(score_bases)
+        )
         ats_score = int(base_score + (completeness_score * max_additional))
         logger.info(f"Calculated ATS score: {ats_score}")
-        
+
         # 9. Parse and validate result
         logger.info("Parsing result into ResumeData model")
         try:
             optimized_data = ResumeData.parse_obj(result)
             logger.info("Successfully validated result through Pydantic model")
         except Exception as validation_error:
-            logger.error(f"Failed to parse result into ResumeData model: {str(validation_error)}")
+            logger.error(
+                f"Failed to parse result into ResumeData model: {str(validation_error)}"
+            )
             logger.error(f"Validation error details: {traceback.format_exc()}")
             logger.debug(f"Problematic data: {result}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error parsing AI response: {str(validation_error)}"
+                detail=f"Error parsing AI response: {str(validation_error)}",
             )
-        
+
         # 10. Update database
         logger.info(f"Updating resume {resume_id} with optimized data")
         try:
@@ -478,17 +502,19 @@ async def optimize_resume(
             logger.error(f"Database error details: {traceback.format_exc()}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Database error during update: {str(db_error)}"
+                detail=f"Database error during update: {str(db_error)}",
             )
-        
+
         # 11. Return success response
-        logger.info(f"Resume optimization completed successfully for resume_id: {resume_id}")
+        logger.info(
+            f"Resume optimization completed successfully for resume_id: {resume_id}"
+        )
         return {
             "resume_id": resume_id,
             "ats_score": ats_score,
-            "optimized_data": result
+            "optimized_data": result,
         }
-        
+
     except HTTPException:
         # Re-raise HTTP exceptions as they're already properly formatted
         raise
@@ -496,24 +522,24 @@ async def optimize_resume(
         # Log the full stack trace for any other exception
         logger.error(f"Unexpected error during resume optimization: {str(e)}")
         logger.error(f"Error details: {traceback.format_exc()}")
-        
+
         # Check for specific error types to provide better error messages
         if "API key" in str(e).lower() or "authentication" in str(e).lower():
             logger.error("AI service authentication error")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error authenticating with AI service. Please check API configuration."
+                detail="Error authenticating with AI service. Please check API configuration.",
             )
         elif "timeout" in str(e).lower() or "time" in str(e).lower():
             logger.error("AI service timeout error")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="AI service request timed out. Please try again later."
+                detail="AI service request timed out. Please try again later.",
             )
         else:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error during resume optimization: {str(e)}"
+                detail=f"Error during resume optimization: {str(e)}",
             )
 
 
@@ -530,21 +556,21 @@ async def download_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Download a resume as a PDF file.
-    
+
     This endpoint generates a PDF version of the resume using LaTeX templates.
     By default, it uses the optimized version of the resume.
-    
+
     Args:
         resume_id: ID of the resume to download
         use_optimized: Whether to use the optimized version of the resume
         template: LaTeX template to use for generating the PDF
         request: The incoming request
         repo: Resume repository instance
-        
+
     Returns:
     -------
         FileResponse: PDF file download
-        
+
     Raises:
     ------
         HTTPException: If the resume is not found or PDF generation fails
@@ -553,12 +579,12 @@ async def download_resume(
     if not resume:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Resume with ID {resume_id} not found"
+            detail=f"Resume with ID {resume_id} not found",
         )
     if use_optimized and not resume.get("optimized_data"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Optimized resume data not available. Please optimize the resume first."
+            detail="Optimized resume data not available. Please optimize the resume first.",
         )
     try:
         latex_dir = Path("data/sample_latex_templates")
@@ -572,7 +598,7 @@ async def download_resume(
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Downloading original resume as PDF is not supported. Please optimize first."
+                detail="Downloading original resume as PDF is not supported. Please optimize first.",
             )
         if isinstance(json_data, str):
             generator.parse_json_from_string(json_data)
@@ -582,25 +608,25 @@ async def download_resume(
         if not latex_content:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to generate LaTeX content"
+                detail="Failed to generate LaTeX content",
             )
         pdf_path = create_temporary_pdf(latex_content)
         if not pdf_path:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create PDF"
+                detail="Failed to create PDF",
             )
         filename = f"{resume.get('title', 'resume')}_{secrets.token_hex(4)}.pdf"
         return FileResponse(
-            path=pdf_path, 
+            path=pdf_path,
             filename=filename,
             media_type="application/pdf",
-            background=None
+            background=None,
         )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error generating PDF: {str(e)}"
+            detail=f"Error generating PDF: {str(e)}",
         )
 
 
@@ -615,21 +641,21 @@ async def preview_resume(
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
     """Preview a resume (not implemented).
-    
+
     This endpoint is intended for previewing a resume, but it's not yet implemented.
-    
+
     Args:
         resume_id: ID of the resume to preview
         request: The incoming request
         repo: Resume repository instance
-        
+
     Raises:
     ------
         HTTPException: Always raises a 501 Not Implemented error
     """
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Resume preview not implemented. Use the download endpoint to generate a PDF."
+        detail="Resume preview not implemented. Use the download endpoint to generate a PDF.",
     )
 
 
@@ -644,17 +670,17 @@ async def submit_contact_form(
     request: ContactFormRequest = Body(...),
 ) -> ContactFormResponse:
     """Submit a contact form.
-    
+
     This endpoint processes contact form submissions from users wanting to reach out
     to the project maintainers, report issues, or ask questions.
-    
+
     Args:
         request: The contact form data including name, email, subject, and message
-        
+
     Returns:
     -------
         ContactFormResponse: Success status and confirmation message
-        
+
     Raises:
     ------
         HTTPException: If there's an issue processing the form
@@ -664,17 +690,17 @@ async def submit_contact_form(
         # 1. Store the message in a database
         # 2. Send an email notification to administrators
         # 3. Potentially send an auto-response to the user
-        
+
         # For now, we'll just return a success response
         # TODO: Implement actual email sending functionality
-        
+
         return ContactFormResponse(
             success=True,
-            message="Thank you for your message! We'll get back to you soon."
+            message="Thank you for your message! We'll get back to you soon.",
         )
     except Exception as e:
         # Log the error in a production environment
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process your message: {str(e)}"
+            detail=f"Failed to process your message: {str(e)}",
         )

@@ -40,7 +40,7 @@ class LaTeXGenerator:
         generate_from_template: Generates a LaTeX document from a template and the loaded JSON data.
         create_simple_template: Creates a simple LaTeX resume template with Jinja2 placeholders.
     """
-    
+
     def __init__(self, template_dir=None):
         """Initialize the LaTeX generator.
 
@@ -90,34 +90,34 @@ class LaTeXGenerator:
         self.env = Environment(
             loader=FileSystemLoader(self.template_dir),
             autoescape=False,
-            block_start_string='<%',
-            block_end_string='%>',
-            variable_start_string='<<',
-            variable_end_string='>>',
-            comment_start_string='<#',
-            comment_end_string='#>'
+            block_start_string="<%",
+            block_end_string="%>",
+            variable_start_string="<<",
+            variable_end_string=">>",
+            comment_start_string="<#",
+            comment_end_string="#>",
         )
 
-        self.env.filters['format_date'] = self.format_date
-        self.env.filters['bold_numbers'] = self.bold_numbers
-        self.env.filters['latex_escape'] = self.latex_escape
+        self.env.filters["format_date"] = self.format_date
+        self.env.filters["bold_numbers"] = self.bold_numbers
+        self.env.filters["latex_escape"] = self.latex_escape
 
     def load_json(self, json_path):
         """Load and parse the JSON data from a file.
-        
+
         Args:
             json_path (str): Path to the JSON file to be loaded.
-            
+
         Returns:
         -------
             bool: True if JSON was successfully loaded, False otherwise.
-            
+
         Side effects:
             Sets self.json_data with the parsed JSON content when successful.
             Prints error message to console when loading fails.
         """
         try:
-            with open(json_path, 'r', encoding='utf-8') as file:
+            with open(json_path, "r", encoding="utf-8") as file:
                 self.json_data = json.load(file)
             return True
         except Exception as e:
@@ -126,14 +126,14 @@ class LaTeXGenerator:
 
     def parse_json_from_string(self, json_string) -> bool:
         """Parse a JSON string into a Python object.
-        
+
         Args:
             json_string (str): A string containing valid JSON data.
-            
+
         Returns:
         -------
             bool: True if parsing was successful, False otherwise.
-            
+
         Side effects:
             If successful, sets self.json_data to the parsed JSON object.
             If unsuccessful, prints an error message.
@@ -157,10 +157,10 @@ class LaTeXGenerator:
 
         Returns:
         -------
-            str: The formatted date string. Returns 'Present' if input is empty or 
+            str: The formatted date string. Returns 'Present' if input is empty or
                 'present' (case insensitive). Returns the original string if parsing fails.
         """
-        if not date_str or date_str.lower() == 'present':
+        if not date_str or date_str.lower() == "present":
             return "Present"
 
         try:
@@ -173,35 +173,31 @@ class LaTeXGenerator:
     @staticmethod
     def bold_numbers(text) -> str:
         r"""Makes all numbers in text bold by wrapping them with LaTeX \textbf command.
-        
+
         Args:
             text (str): The input text containing numbers to be made bold.
-        
+
         Returns:
         -------
             str: The text with all numbers wrapped in \textbf{} LaTeX command.
-            
+
         Example:
             >>> bold_numbers("I have 42 apples and a 99.5% success rate")
             "I have \\textbf{42} apples and a \\textbf{99.5\\%} success rate"
-        
+
         Notes:
         -----
             - Matches integers, decimals, numbers with commas, and numbers with % or + suffix
             - Doesn't affect numbers that are already part of a LaTeX command
         """
-        return re.sub(
-            r'(\d+[\d,.]*(?:\+|\%?))', 
-            r'\\textbf{\1}', 
-            text
-        )
+        return re.sub(r"(\d+[\d,.]*(?:\+|\%?))", r"\\textbf{\1}", text)
 
     @staticmethod
     def latex_escape(text) -> str:
         r"""Escape special LaTeX characters in a string to make it safe for LaTeX documents.
 
         This function replaces special LaTeX characters with their escaped equivalents.
-        It first unescapes any HTML entities using html.unescape, 
+        It first unescapes any HTML entities using html.unescape,
         then performs LaTeX-specific escaping.
 
         Args:
@@ -219,37 +215,38 @@ class LaTeXGenerator:
             return text
 
         text = html.unescape(text)
-        
-        text = text.replace('\\', r'\textbackslash{}')
+
+        text = text.replace("\\", r"\textbackslash{}")
 
         replacements = {
-            '&': r'\&',
-            '%': r'\%',
-            '$': r'\$',
-            '#': r'\#',
-            '_': r'\_',
-            '{': r'\{',
-            '}': r'\}',
-            '~': r'\textasciitilde{}',
-            '^': r'\textasciicircum{}',
+            "&": r"\&",
+            "%": r"\%",
+            "$": r"\$",
+            "#": r"\#",
+            "_": r"\_",
+            "{": r"\{",
+            "}": r"\}",
+            "~": r"\textasciitilde{}",
+            "^": r"\textasciicircum{}",
         }
 
         for char, replacement in replacements.items():
             text = text.replace(char, replacement)
-        
+
         return text
 
     def preprocess_json_data(self) -> None:
         """Preprocesses the JSON data stored in the instance by recursively unescaping HTML entities.
-        
+
         This method traverses through the entire JSON data structure (dictionaries, lists, and strings)
         and converts any HTML escaped characters (like &amp;, &lt;, etc.) back to their original form.
         The processed data replaces the original json_data attribute.
-        
+
         Returns:
         -------
             None: The method modifies the self.json_data attribute in place.
         """
+
         def process_value(value):
             if isinstance(value, str):
                 return html.unescape(value)
@@ -274,7 +271,7 @@ class LaTeXGenerator:
                                 in the Jinja2 environment).
 
         Returns:
-            str or bool: The rendered LaTeX content as a string if successful, 
+            str or bool: The rendered LaTeX content as a string if successful,
                         False if an error occurs.
 
         Raises:
@@ -299,21 +296,21 @@ class LaTeXGenerator:
 
     def create_simple_template(self) -> bool:
         """Creates a simple LaTeX resume template with Jinja2 placeholders.
-        
+
         This method generates a basic LaTeX resume template file in the template directory
         with appropriate Jinja2 placeholders for rendering resume data. This serves as
         a starting point for customizing resume templates.
-        
+
         Returns:
             bool: True if the template was created successfully, False otherwise.
-            
+
         Side effects:
             Creates a file named 'resume_template.tex' in the template directory.
         """
         try:
             if not self.template_dir:
                 raise ValueError("Template directory not specified")
-                
+
             template_content = r"""
 \documentclass[11pt,a4paper]{article}
 
@@ -372,21 +369,22 @@ class LaTeXGenerator:
 
 \end{document}
 """
-            
+
             template_path = f"{self.template_dir}/resume_template.tex"
-            with open(template_path, 'w', encoding='utf-8') as file:
+            with open(template_path, "w", encoding="utf-8") as file:
                 file.write(template_content)
-            
+
             print(f"Simple template created at {template_path}")
             return True
-            
+
         except Exception as e:
             print(f"Error creating simple template: {e}")
             return False
 
+
 def main():
     """Execute demonstration of the LaTeXGenerator class functionality.
-    
+
     This function serves as a simple test/demo for the LaTeXGenerator class.
     It performs the following operations:
     1. Creates a LaTeXGenerator instance with the sample templates directory
@@ -394,7 +392,7 @@ def main():
     3. Loads example JSON data from a file
     4. Generates LaTeX content using the template and data
     5. Prints the generated LaTeX content to the console
-    
+
     Returns:
         None
     """
@@ -404,7 +402,7 @@ def main():
     generator.create_simple_template()
 
     file_path = "../../../data/sample_responses/example.json"
-    
+
     with open(file_path, "r", encoding="utf-8") as file:
         json_data = file.read()
     print("Parsing JSON data...")
@@ -412,6 +410,7 @@ def main():
     result = generator.generate_from_template("resume_template.tex")
     print("Generated LaTeX content successfully.")
     print(result)
+
 
 if __name__ == "__main__":
     main()

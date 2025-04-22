@@ -12,18 +12,18 @@ from app.database.connector import MongoConnectionManager
 
 class BaseRepository:
     """Base repository class for database operations.
-    
+
     This class implements common database operations like finding, inserting,
     updating, and deleting documents. It uses the MongoDB connection manager
     to handle database connections and provides a consistent interface for
     all repositories in the application.
-    
+
     Attributes:
         db_name: The name of the database to use
         collection_name: The name of the collection to use
         connection_manager: Instance of MongoDB connection manager
     """
-    
+
     def __init__(self, db_name: str, collection_name: str):
         """Initialize the BaseRepository with database and collection names.
 
@@ -151,10 +151,10 @@ class BaseRepository:
 
     async def delete_one(self, query: Dict) -> bool:
         """Delete a single document matching the query.
-        
+
         Args:
             query (Dict): The query to match documents for deletion.
-            
+
         Returns:
         -------
             bool: True if deletion was successful, False otherwise.
@@ -171,10 +171,10 @@ class BaseRepository:
 
     async def get_entity_by_email(self, email: str):
         """Retrieve an entity document by email address.
-        
+
         Args:
             email (str): The email address to search for.
-            
+
         Returns:
         -------
             Dict or None: The entity document if found, None otherwise.

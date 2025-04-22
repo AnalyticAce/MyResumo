@@ -19,6 +19,7 @@ templates = Jinja2Templates(directory=str(templates_path))
 
 core_web_router = WebRouter()
 
+
 @core_web_router.get(
     "/",
     summary="Homepage",
@@ -29,21 +30,19 @@ async def home(
     request: Request,
 ):
     """Render the homepage.
-    
-    This endpoint renders the main landing page with information about the 
+
+    This endpoint renders the main landing page with information about the
     application and a call-to-action to create a resume.
-    
+
     Args:
         request: The incoming HTTP request
-        
+
     Returns:
     -------
         HTMLResponse: The rendered home page
     """
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 @core_web_router.get(
     "/about",
@@ -55,21 +54,19 @@ async def about(
     request: Request,
 ):
     """Render the about page.
-    
+
     This endpoint renders information about MyResumo, its features,
     and the team behind it.
-    
+
     Args:
         request: The incoming HTTP request
-        
+
     Returns:
     -------
         HTMLResponse: The rendered about page
     """
-    return templates.TemplateResponse(
-        "about.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("about.html", {"request": request})
+
 
 @core_web_router.get(
     "/contribution",
@@ -81,15 +78,12 @@ async def contribution(
     request: Request,
 ):
     """Render the contribution page.
-    
+
     Args:
         request: The FastAPI request object
-        
+
     Returns:
     -------
         HTMLResponse: Rendered HTML template for contribution page
     """
-    return templates.TemplateResponse(
-        "contribution.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("contribution.html", {"request": request})
