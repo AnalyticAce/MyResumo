@@ -9,7 +9,7 @@ and API documentation.
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import EmailStr, Field, validator
+from pydantic import EmailStr, Field, field_validator
 
 from app.database.models.base import BaseSchema
 
@@ -190,8 +190,9 @@ class Resume(BaseSchema):
     updated_at: datetime = Field(default_factory=datetime.now)
     latex_template: str = "resume_template.tex"
 
-    @validator("ats_score")
-    def validate_ats_score(self, v):
+    @field_validator("ats_score")
+    @classmethod
+    def validate_ats_score(cls, v):
         """Validate that ATS score is between 0 and 100."""
         if v is not None and (v < 0 or v > 100):
             raise ValueError("ATS score must be between 0 and 100")
