@@ -1,20 +1,39 @@
-from typing import List, Dict, Optional, Any
-from fastapi import APIRouter, Depends, HTTPException, Request, status, UploadFile, File, Form, Body
+"""Resume API router module for resume management operations.
+
+This module implements the API endpoints for resume-related functionality including
+resume creation, retrieval, optimization, PDF generation and deletion. It handles
+the interface between HTTP requests and the resume repository, and coordinates
+AI-powered resume optimization services.
+"""
+
+import logging
+import os
+import secrets
+import tempfile
+import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr, Field
+
 from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.resume_repository import ResumeRepository
 from app.services.ai.model_ai import AtsResumeOptimizer
 from app.services.resume.latex_generator import LaTeXGenerator
-from app.utils.file_handling import extract_text_from_pdf, create_temporary_pdf
-import os
-import tempfile
-from pathlib import Path
-import secrets
-from datetime import datetime
-import logging
-import traceback
-
+from app.utils.file_handling import create_temporary_pdf, extract_text_from_pdf
 
 # Configure logging
 logging.basicConfig(
@@ -26,9 +45,8 @@ logger = logging.getLogger(__name__)
 
 # Request and response models
 class CreateResumeRequest(BaseModel):
-    """
-    Schema for creating a new resume.
-    """
+    """Schema for creating a new resume."""
+
     user_id: str = Field(..., description="Unique identifier for the user")
     title: str = Field(..., description="Title of the resume")
     original_content: str = Field(..., description="Original content of the resume")
@@ -36,16 +54,14 @@ class CreateResumeRequest(BaseModel):
 
 
 class OptimizeResumeRequest(BaseModel):
-    """
-    Schema for optimizing an existing resume.
-    """
+    """Schema for optimizing an existing resume."""
+
     job_description: str = Field(..., description="Job description to tailor the resume for")
 
 
 class ResumeSummary(BaseModel):
-    """
-    Schema for resume summary information.
-    """
+    """Schema for resume summary information."""
+
     id: str = Field(..., description="Unique identifier for the resume")
     title: str = Field(..., description="Title of the resume")
     ats_score: Optional[int] = Field(None, description="ATS score of the resume if optimized")
@@ -54,18 +70,16 @@ class ResumeSummary(BaseModel):
 
 
 class OptimizationResponse(BaseModel):
-    """
-    Schema for resume optimization response.
-    """
+    """Schema for resume optimization response."""
+
     resume_id: str = Field(..., description="Unique identifier for the optimized resume")
     ats_score: int = Field(..., description="ATS score of the optimized resume")
     optimized_data: Dict[str, Any] = Field(..., description="Optimized resume data")
 
 
 class ContactFormRequest(BaseModel):
-    """
-    Schema for contact form submission.
-    """
+    """Schema for contact form submission."""
+
     name: str = Field(..., description="Full name of the person reaching out")
     email: EmailStr = Field(..., description="Email address for return communication")
     subject: str = Field(..., description="Subject of the contact message")
@@ -73,9 +87,8 @@ class ContactFormRequest(BaseModel):
 
 
 class ContactFormResponse(BaseModel):
-    """
-    Schema for contact form response.
-    """
+    """Schema for contact form response."""
+
     success: bool = Field(..., description="Whether the message was sent successfully")
     message: str = Field(..., description="Status message")
 
@@ -89,13 +102,13 @@ resume_router = APIRouter(
 
 # Helper function to get repository instance
 async def get_resume_repository(request: Request) -> ResumeRepository:
-    """
-    Dependency for getting the resume repository instance.
+    """Dependency for getting the resume repository instance.
     
     Args:
         request: The incoming request
         
     Returns:
+    -------
         ResumeRepository: An instance of the resume repository
     """
     return ResumeRepository()
@@ -115,8 +128,7 @@ async def create_resume(
     user_id: str = Form(...),
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Create a new resume from a PDF file.
+    """Create a new resume from a PDF file.
     
     This endpoint accepts a PDF file upload, extracts the text content,
     and creates a new resume entry in the database.
@@ -130,9 +142,11 @@ async def create_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         Dict containing the ID of the created resume
         
     Raises:
+    ------
         HTTPException: If the resume creation fails
     """
     try:
@@ -175,8 +189,7 @@ async def get_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Get a specific resume by ID.
+    """Get a specific resume by ID.
     
     Args:
         resume_id: ID of the resume to retrieve
@@ -184,9 +197,11 @@ async def get_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         Dict containing the resume data
         
     Raises:
+    ------
         HTTPException: If the resume is not found
     """
     resume_data = await repo.get_resume_by_id(resume_id)
@@ -210,8 +225,7 @@ async def get_user_resumes(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Get all resumes for a specific user.
+    """Get all resumes for a specific user.
     
     Args:
         user_id: ID of the user whose resumes to retrieve
@@ -219,6 +233,7 @@ async def get_user_resumes(
         repo: Resume repository instance
         
     Returns:
+    -------
         List of resume summaries for the specified user
     """
     resumes = await repo.get_resumes_by_user_id(user_id)
@@ -246,8 +261,7 @@ async def update_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Update a specific resume by ID.
+    """Update a specific resume by ID.
     
     Args:
         resume_id: ID of the resume to update
@@ -256,9 +270,11 @@ async def update_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         Dict indicating success status
         
     Raises:
+    ------
         HTTPException: If the resume is not found or update fails
     """
     resume = await repo.get_resume_by_id(resume_id)
@@ -287,8 +303,7 @@ async def delete_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Delete a specific resume by ID.
+    """Delete a specific resume by ID.
     
     Args:
         resume_id: ID of the resume to delete
@@ -296,9 +311,11 @@ async def delete_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         Dict indicating success status
         
     Raises:
+    ------
         HTTPException: If the resume is not found or deletion fails
     """
     resume = await repo.get_resume_by_id(resume_id)
@@ -328,8 +345,7 @@ async def optimize_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Optimize a resume using AI based on a job description.
+    """Optimize a resume using AI based on a job description.
     
     This endpoint uses AI to analyze the original resume and job description,
     then generates an optimized version that's tailored to the job requirements.
@@ -341,9 +357,11 @@ async def optimize_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         OptimizationResponse: Contains the optimized data and ATS score
         
     Raises:
+    ------
         HTTPException: If the resume is not found or optimization fails
     """
     logger.info(f"Starting resume optimization for resume_id: {resume_id}")
@@ -511,8 +529,7 @@ async def download_resume(
     request: Request = None,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Download a resume as a PDF file.
+    """Download a resume as a PDF file.
     
     This endpoint generates a PDF version of the resume using LaTeX templates.
     By default, it uses the optimized version of the resume.
@@ -525,9 +542,11 @@ async def download_resume(
         repo: Resume repository instance
         
     Returns:
+    -------
         FileResponse: PDF file download
         
     Raises:
+    ------
         HTTPException: If the resume is not found or PDF generation fails
     """
     resume = await repo.get_resume_by_id(resume_id)
@@ -595,8 +614,7 @@ async def preview_resume(
     request: Request,
     repo: ResumeRepository = Depends(get_resume_repository),
 ):
-    """
-    Preview a resume (not implemented).
+    """Preview a resume (not implemented).
     
     This endpoint is intended for previewing a resume, but it's not yet implemented.
     
@@ -606,6 +624,7 @@ async def preview_resume(
         repo: Resume repository instance
         
     Raises:
+    ------
         HTTPException: Always raises a 501 Not Implemented error
     """
     raise HTTPException(
@@ -624,8 +643,7 @@ async def preview_resume(
 async def submit_contact_form(
     request: ContactFormRequest = Body(...),
 ) -> ContactFormResponse:
-    """
-    Submit a contact form.
+    """Submit a contact form.
     
     This endpoint processes contact form submissions from users wanting to reach out
     to the project maintainers, report issues, or ask questions.
@@ -634,9 +652,11 @@ async def submit_contact_form(
         request: The contact form data including name, email, subject, and message
         
     Returns:
+    -------
         ContactFormResponse: Success status and confirmation message
         
     Raises:
+    ------
         HTTPException: If there's an issue processing the form
     """
     try:

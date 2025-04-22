@@ -1,23 +1,29 @@
+"""Main application entry point for MyResumo.
+
+This module initializes the FastAPI application, configures routers, middleware,
+and handles application startup and shutdown events. It serves as the central
+coordination point for the entire application.
+"""
+
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.database.connector import MongoConnectionManager
+
 from app.api.routers.resume import resume_router
+from app.database.connector import MongoConnectionManager
 from app.web.core import core_web_router
 from app.web.dashboard import web_router
-
 
 # Initialize templates
 templates = Jinja2Templates(directory="app/templates")
 
 
 async def startup_logic(app: FastAPI) -> None:
-    """
-    Execute startup logic for the FastAPI application.
+    """Execute startup logic for the FastAPI application.
     
     Initialize database connections and other resources needed by the application.
     
@@ -25,6 +31,7 @@ async def startup_logic(app: FastAPI) -> None:
         app: The FastAPI application instance
         
     Raises:
+    ------
         Exception: If any startup operation fails
     """
     try:
@@ -36,8 +43,7 @@ async def startup_logic(app: FastAPI) -> None:
 
 
 async def shutdown_logic(app: FastAPI) -> None:
-    """
-    Execute shutdown logic for the FastAPI application.
+    """Execute shutdown logic for the FastAPI application.
     
     Properly close database connections and clean up resources.
     
@@ -68,8 +74,8 @@ app = FastAPI(
 # Exception handlers
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    """
-    Custom exception handler for HTTP exceptions.
+    """Custom exception handler for HTTP exceptions.
+
     Renders the 404.html template for 404 errors.
     For other HTTP errors, renders a basic error page or returns JSON for API routes.
     
@@ -78,6 +84,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         exc: The HTTP exception that was raised
         
     Returns:
+    -------
         An appropriate response based on the request type and error
     """
     if exc.status_code == 404:
@@ -88,7 +95,11 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
                 content={"detail": "Resource not found"}
             )
         # For web requests, render our custom 404 page
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+        return templates.TemplateResponse(
+            "404.html", 
+            {"request": request},
+            status_code=404
+        )
     
     # For API routes, return JSON error
     if request.url.path.startswith("/api"):
@@ -111,14 +122,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """
-    Custom exception handler for request validation errors.
+    """Custom exception handler for request validation errors.
     
     Args:
         request: The incoming request
         exc: The validation error that was raised
         
     Returns:
+    -------
         JSON response for API routes or template response for web routes
     """
     # For API routes, return JSON error
@@ -142,14 +153,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.middleware("http")
 async def add_response_headers(request: Request, call_next):
-    """
-    Middleware to add response headers and handle flashed messages.
+    """Middleware to add response headers and handle flashed messages.
     
     Args:
         request: The incoming request
         call_next: The next middleware or route handler
         
     Returns:
+    -------
         The response with added security headers
     """
     response = await call_next(request)
@@ -177,13 +188,14 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
-    """
-    Serve custom Swagger UI HTML for API documentation.
+    """Serve custom Swagger UI HTML for API documentation.
     
     Returns:
+    -------
         HTMLResponse: Custom Swagger UI HTML
     
     Raises:
+    ------
         FileNotFoundError: If the custom Swagger template is not found
     """
     try:
@@ -207,10 +219,10 @@ async def custom_swagger_ui_html():
 
 @app.get("/health", tags=["Health"], summary="Health Check")
 async def health_check():
-    """
-    Health check endpoint for monitoring and container orchestration.
+    """Health check endpoint for monitoring and container orchestration.
     
     Returns:
+    -------
         JSONResponse: Status information about the application.
     """
     return JSONResponse(
@@ -231,8 +243,8 @@ app.include_router(web_router)
 # Catch-all for not found pages - IMPORTANT: This must come AFTER including all routers
 @app.get("/{path:path}", include_in_schema=False)
 async def catch_all(request: Request, path: str):
-    """
-    Catch-all route handler for undefined paths.
+    """Catch-all route handler for undefined paths.
+
     This must be defined AFTER all other routes to avoid intercepting valid routes.
     
     Args:
@@ -240,6 +252,7 @@ async def catch_all(request: Request, path: str):
         path: The path that was not matched by any other route
         
     Returns:
+    -------
         Template response with 404 page
     """
     # Skip handling for paths that should be handled by other middleware/routers

@@ -1,8 +1,17 @@
-from fastapi import Request
-from app.web.base_router import WebRouter
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+"""Core web module for primary web routes.
+
+This module implements core web interface routes for the application,
+handling primary pages like the landing page, about page, and other
+central web content.
+"""
+
 from pathlib import Path
+
+from fastapi import Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.web.base_router import WebRouter
 
 # Setup templates
 templates_path = Path(__file__).parent.parent / "templates"
@@ -19,8 +28,7 @@ core_web_router = WebRouter()
 async def home(
     request: Request,
 ):
-    """
-    Render the homepage.
+    """Render the homepage.
     
     This endpoint renders the main landing page with information about the 
     application and a call-to-action to create a resume.
@@ -29,6 +37,7 @@ async def home(
         request: The incoming HTTP request
         
     Returns:
+    -------
         HTMLResponse: The rendered home page
     """
     return templates.TemplateResponse(
@@ -45,8 +54,7 @@ async def home(
 async def about(
     request: Request,
 ):
-    """
-    Render the about page.
+    """Render the about page.
     
     This endpoint renders information about MyResumo, its features,
     and the team behind it.
@@ -55,6 +63,7 @@ async def about(
         request: The incoming HTTP request
         
     Returns:
+    -------
         HTMLResponse: The rendered about page
     """
     return templates.TemplateResponse(
@@ -71,13 +80,13 @@ async def about(
 async def contribution(
     request: Request,
 ):
-    """
-    Render the contribution page.
+    """Render the contribution page.
     
     Args:
         request: The FastAPI request object
         
     Returns:
+    -------
         HTMLResponse: Rendered HTML template for contribution page
     """
     return templates.TemplateResponse(

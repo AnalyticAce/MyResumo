@@ -1,8 +1,15 @@
-from fastapi import Request, Path
-from app.web.base_router import WebRouter
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+"""Dashboard web module for user-specific interfaces.
 
+This module implements the dashboard interface routes, handling user-specific
+views such as resume management, profile settings, and personalized features
+that require user context.
+"""
+
+from fastapi import Path, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from app.web.base_router import WebRouter
 
 web_router = WebRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -17,8 +24,7 @@ templates = Jinja2Templates(directory="app/templates")
 async def dashboard(
     request: Request,
 ):
-    """
-    Render the user dashboard.
+    """Render the user dashboard.
     
     This endpoint displays the user's resume collection, optimization statistics,
     and actions they can take to create or optimize resumes.
@@ -27,6 +33,7 @@ async def dashboard(
         request: The incoming HTTP request
         
     Returns:
+    -------
         HTMLResponse: The rendered dashboard page
     """
     return templates.TemplateResponse(
@@ -44,8 +51,7 @@ async def dashboard(
 async def create_resume(
     request: Request,
 ):
-    """
-    Render the resume creation page.
+    """Render the resume creation page.
     
     This endpoint displays the form for creating a new resume, including
     file upload for the original resume and input for job descriptions.
@@ -54,6 +60,7 @@ async def create_resume(
         request: The incoming HTTP request
         
     Returns:
+    -------
         HTMLResponse: The rendered resume creation page
     """
     return templates.TemplateResponse(
@@ -72,8 +79,7 @@ async def view_resume(
     request: Request,
     resume_id: str = Path(..., title="Resume ID"),
 ):
-    """
-    Render the detailed view of a specific resume.
+    """Render the detailed view of a specific resume.
     
     This endpoint displays the details of a specific resume, including
     optimization results, ATS score, and options to download or edit.
@@ -83,6 +89,7 @@ async def view_resume(
         resume_id: The ID of the resume to view
         
     Returns:
+    -------
         HTMLResponse: The rendered resume view page
     """
     # In a complete implementation, we would fetch the resume data
@@ -105,8 +112,7 @@ async def view_resume(
 async def settings(
     request: Request,
 ):
-    """
-    Render the user settings page.
+    """Render the user settings page.
     
     This endpoint displays user profile settings, preferences,
     and account management options.
@@ -115,6 +121,7 @@ async def settings(
         request: The incoming HTTP request
         
     Returns:
+    -------
         HTMLResponse: The rendered settings page
     """
     return templates.TemplateResponse(

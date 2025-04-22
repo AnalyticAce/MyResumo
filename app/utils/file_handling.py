@@ -1,16 +1,23 @@
+"""File handling utilities for document processing.
+
+This module provides functions and classes for handling various file operations,
+including file uploads, downloads, conversion between formats, and temporary
+file management for the MyResumo application.
+"""
+
 import os
-import tempfile
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Optional
+
 import PyPDF2
 import pytesseract
 from pdf2image import convert_from_path
 
 
 def extract_text_from_pdf(pdf_path: str) -> str:
-    """
-    Extract text content from a PDF file.
+    """Extract text content from a PDF file.
     
     This function attempts to extract text in two ways:
     1. Direct text extraction using PyPDF2
@@ -20,9 +27,9 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         pdf_path: Path to the PDF file
         
     Returns:
+    -------
         str: Extracted text content
     """
-    # Try direct extraction first
     try:
         with open(pdf_path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
@@ -59,8 +66,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
 
 
 def save_pdf_file(content: bytes, filename: str, directory: str) -> str:
-    """
-    Save PDF content to a file in the specified directory.
+    """Save PDF content to a file in the specified directory.
     
     Args:
         content: PDF file content as bytes
@@ -68,6 +74,7 @@ def save_pdf_file(content: bytes, filename: str, directory: str) -> str:
         directory: Directory to save the file in
         
     Returns:
+    -------
         str: Path to the saved file
     """
     # Ensure directory exists
@@ -84,13 +91,13 @@ def save_pdf_file(content: bytes, filename: str, directory: str) -> str:
 
 
 def create_temporary_pdf(latex_content: str) -> Optional[str]:
-    """
-    Generate a PDF from LaTeX content.
+    """Generate a PDF from LaTeX content.
     
     Args:
         latex_content: LaTeX source code
         
     Returns:
+    -------
         Optional[str]: Path to the generated PDF file, or None if generation fails
     """
     # Create a temporary directory for LaTeX compilation
@@ -118,7 +125,8 @@ def create_temporary_pdf(latex_content: str) -> Optional[str]:
                 print(f"PDF generation failed: {process.stderr}")
                 return None
             
-            # Copy the PDF to a location that will persist after the temp directory is deleted
+            # Copy the PDF to a location that will 
+            # persist after the temp directory is deleted
             permanent_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
             permanent_pdf.close()
             

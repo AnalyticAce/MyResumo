@@ -174,6 +174,49 @@ pytest tests/
 4. **Review and Edit**: Make any final adjustments to the generated content
 5. **Export**: Download your optimized resume in your preferred format
 
+## Code Quality
+
+### Linting
+
+This project uses [Ruff](https://github.com/charliermarsh/ruff) for code linting and formatting. Ruff is a fast Python linter written in Rust that helps maintain consistent code quality across the project.
+
+#### CI Linting
+
+Our GitHub Actions workflow automatically runs Ruff on all Python files whenever code is pushed or a pull request is created. The workflow:
+- Checks code against our style rules
+- Verifies code formatting
+- Reports any issues directly in the PR or commit
+
+#### Local Linting
+
+To run the linter locally:
+
+1. Install Ruff:
+   ```bash
+   pip install ruff
+   ```
+
+2. Run the linter:
+   ```bash
+   ruff check .
+   ```
+
+3. Check formatting:
+   ```bash
+   ruff format --check .
+   ```
+
+4. Auto-format code:
+   ```bash
+   ruff format .
+   ```
+
+Our configuration (in `pyproject.toml`) enforces:
+- Google-style docstrings
+- Import sorting
+- Line length of 88 characters
+- Standard Python code style conventions
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please check the [contribution guidelines](CONTRIBUTING.md) for more details.

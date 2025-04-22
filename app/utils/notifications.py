@@ -1,12 +1,12 @@
-"""
-Notifications utility module for MyResumo.
+"""Notifications utility module for MyResumo.
 
 This module provides helper functions for creating and managing notifications,
 including toast messages for the frontend.
 """
-from typing import Dict, Any, Literal
-from starlette.responses import HTMLResponse, JSONResponse, Response as StarletteResponse
+from typing import Any, Dict, Literal
 
+from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import Response as StarletteResponse
 
 NotificationType = Literal["success", "error", "warning", "info"]
 
@@ -16,8 +16,7 @@ def create_toast_data(
     type: NotificationType = "info",
     duration: int = 5000,
 ) -> Dict[str, Any]:
-    """
-    Create toast notification data.
+    """Create toast notification data.
 
     Args:
         message: The text message to display in the toast notification.
@@ -25,6 +24,7 @@ def create_toast_data(
         duration: The duration in milliseconds for the toast to be displayed.
 
     Returns:
+    -------
         A dictionary with the toast notification data.
     """
     return {
@@ -40,8 +40,7 @@ def inject_toast_script(
     type: NotificationType = "info",
     duration: int = 5000
 ) -> StarletteResponse:
-    """
-    Inject a toast notification script into an HTML response.
+    """Inject a toast notification script into an HTML response.
 
     This function adds a script tag to show a toast notification when the page loads.
     It should only be used for HTML responses.
@@ -53,6 +52,7 @@ def inject_toast_script(
         duration: The duration in milliseconds for the toast to be displayed.
 
     Returns:
+    -------
         The modified response with the toast script injected.
     """
     if not isinstance(response, HTMLResponse):
@@ -86,8 +86,7 @@ def add_toast_header(
     type: NotificationType = "info",
     duration: int = 5000
 ) -> StarletteResponse:
-    """
-    Add a toast notification header to a response.
+    """Add a toast notification header to a response.
     
     This allows the client-side JavaScript to read the header and display a toast.
     Useful for API responses that redirect to HTML pages.
@@ -99,6 +98,7 @@ def add_toast_header(
         duration: The duration in milliseconds for the toast to be displayed.
 
     Returns:
+    -------
         The modified response with the toast header added.
     """
     response.headers["X-Toast-Message"] = message
@@ -115,8 +115,7 @@ def create_response_with_toast(
     duration: int = 5000,
     headers: Dict[str, str] = None
 ) -> JSONResponse:
-    """
-    Create a JSON response with toast notification headers.
+    """Create a JSON response with toast notification headers.
 
     Args:
         content: The content of the JSON response.
@@ -127,6 +126,7 @@ def create_response_with_toast(
         headers: Additional headers to add to the response.
 
     Returns:
+    -------
         A JSONResponse with toast notification headers if a message was provided.
     """
     headers = headers or {}
