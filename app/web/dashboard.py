@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException, Request, status, Depends, Path
+from fastapi import Request, Path
 from app.web.base_router import WebRouter
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
+
 
 web_router = WebRouter()
 templates = Jinja2Templates(directory="app/templates")
+
 
 @web_router.get(
     "/dashboard",
@@ -32,6 +34,7 @@ async def dashboard(
         {"request": request}
     )
 
+
 @web_router.get(
     "/create",
     summary="Create Resume",
@@ -57,6 +60,7 @@ async def create_resume(
         "create.html",
         {"request": request}
     )
+
 
 @web_router.get(
     "/resume/{resume_id}",
@@ -90,6 +94,7 @@ async def view_resume(
             "resume_id": resume_id
         }
     )
+
 
 @web_router.get(
     "/settings",
