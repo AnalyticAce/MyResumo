@@ -5,6 +5,7 @@ CRUD operations for resume data in the database, including storing, retrieving,
 updating, and deleting resume information.
 """
 
+import os
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -21,7 +22,7 @@ class ResumeRepository(BaseRepository):
     working with resume documents in the database.
     """
 
-    def __init__(self, db_name: str = "myresumo", collection_name: str = "resumes"):
+    def __init__(self, db_name: str = os.getenv("DB_NAME", "myresumo"), collection_name: str = "resumes"):
         """Initialize the resume repository with database and collection names.
 
         Args:
@@ -40,7 +41,7 @@ class ResumeRepository(BaseRepository):
         -------
             str: ID of the created resume document, or empty string if operation fails.
         """
-        resume_dict = resume.dict(by_alias=True)
+        resume_dict = resume.model_dump(by_alias=True)
         return await self.insert_one(resume_dict)
 
     async def get_resume_by_id(self, resume_id: str) -> Optional[Dict]:

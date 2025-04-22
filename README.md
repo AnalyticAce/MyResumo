@@ -96,7 +96,6 @@ Create a `.env` file in the project root with the following variables:
 ```
 DEEPSEEK_API_KEY=your_api_key_here
 MONGODB_URI=mongodb://username:password@host:port/
-DB_NAME=myresumo
 ```
 
 ### Using Official Docker Image (Recommended)
@@ -114,7 +113,6 @@ docker run -d --name myresumo \
   -p 8080:8080 \
   -e DEEPSEEK_API_KEY=your_api_key_here \
   -e MONGODB_URI=mongodb://username:password@host:port/ \
-  -e DB_NAME=myresumo \
   ghcr.io/analyticace/myresumo:latest
 ```
 

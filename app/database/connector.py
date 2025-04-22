@@ -15,8 +15,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGO_CONNECTION_STRING = os.getenv(
-    "MONGO_CONNECTION_STRING", "mongodb://localhost:27017"
+MONGODB_URI = os.getenv(
+    "MONGODB_URI", "mongodb://localhost:27017"
 )
 
 
@@ -60,7 +60,7 @@ class MongoConnectionManager:
 
         The initialization only happens once due to the singleton pattern.
         """
-        self.url = MONGO_CONNECTION_STRING
+        self.url = MONGODB_URI
 
     async def get_client(self) -> motor.motor_asyncio.AsyncIOMotorClient:
         """Get the MongoDB client instance, creating it if it doesn't exist.

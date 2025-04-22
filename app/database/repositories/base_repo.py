@@ -5,6 +5,7 @@ for database operations, offering common CRUD methods that other repository clas
 can inherit and extend.
 """
 
+import os
 from typing import Dict, List, Optional
 
 from app.database.connector import MongoConnectionManager
@@ -31,7 +32,7 @@ class BaseRepository:
             db_name (str): The name of the database.
             collection_name (str): The name of the collection.
         """
-        self.db_name = db_name
+        self.db_name = db_name or os.getenv("DB_NAME", "myresumo")
         self.collection_name = collection_name
         self.connection_manager = MongoConnectionManager()
 

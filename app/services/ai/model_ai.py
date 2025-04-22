@@ -73,7 +73,7 @@ class AtsResumeOptimizer:
         self.model_name = model_name or os.getenv("MODEL_NAME", "deepseek-chat")
         self.resume = resume
         self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
-        self.api_base = api_base or os.getenv("DEEPSEEK_API_BASE", "")
+        self.api_base = api_base or os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
 
         # Initialize LLM component and output parser
         self.llm = self._get_openai_model()
