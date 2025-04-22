@@ -385,9 +385,9 @@ async def optimize_resume(
 
     # 2. Get API configuration
     logger.info("Retrieving API configuration")
-    api_key = os.getenv("OPENAI_API_KEY")
-    api_base_url = os.getenv("OPENAI_API_BASE_URL")
-    model_name = os.getenv("OPENAI_MODEL_NAME")
+    api_key = os.getenv("DEEPSEEK_API_KEY")
+    api_base_url = os.getenv("DEEPSEEK_API_BASE")
+    model_name = os.getenv("MODEL_NAME")
 
     # Log API configuration (safely)
     logger.info(f"API configuration - model_name: {model_name or 'Not set'}")

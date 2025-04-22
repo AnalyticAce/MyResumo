@@ -10,8 +10,8 @@ import os
 import re
 from typing import Any, Dict
 
-from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts import PromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 
 
@@ -32,7 +32,6 @@ class AtsResumeOptimizer:
         resume: The resume text to be optimized
         api_key: OpenAI API key for authentication
         api_base: Base URL for the OpenAI API
-        language: Language for processing the resume
         llm: The initialized language model instance
         output_parser: Parser for converting LLM output to JSON format
 
@@ -60,8 +59,7 @@ class AtsResumeOptimizer:
         model_name: str = "gpt-3.5-turbo",
         resume: str = "",
         api_key: str = "",
-        api_base: str = "https://api.openai.com/v1/chat/completions",
-        language: str = "en",
+        api_base: str = "",
     ) -> None:
         """Initialize the AI model for resume processing.
 
@@ -72,11 +70,10 @@ class AtsResumeOptimizer:
             api_base: Base URL for the OpenAI API.
             language: Language for processing the resume.
         """
-        self.model_name = model_name
+        self.model_name = model_name or os.getenv("MODEL_NAME", "deepseek-chat")
         self.resume = resume
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY", "")
-        self.api_base = api_base
-        self.language = language
+        self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
+        self.api_base = api_base or os.getenv("DEEPSEEK_API_BASE", "")
 
         # Initialize LLM component and output parser
         self.llm = self._get_openai_model()
