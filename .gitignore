@@ -170,3 +170,4 @@ node_modules
 .env
 
 myresumo-prd.md
+.ruff_cache/

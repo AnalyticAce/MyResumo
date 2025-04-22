@@ -1,87 +1,93 @@
-from langchain.prompts import PromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
-from langchain_openai import ChatOpenAI
-from typing import Dict, Any
+"""AI-powered resume optimization module.
+
+This module provides the AtsResumeOptimizer class that leverages AI language models
+to analyze and optimize resumes based on job descriptions, improving compatibility
+with Applicant Tracking Systems (ATS).
+"""
+
 import json
+import os
 import re
+from typing import Any, Dict
+
+from langchain.output_parsers import JsonOutputParser
+from langchain.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+
 
 class AtsResumeOptimizer:
+    """ATS Resume Optimizer.
+
+    A class that uses AI language models to optimize resumes for Applicant Tracking
+    Systems (ATS) based on specific job descriptions.
+
+    This class leverages OpenAI's language models to analyze a job description and a
+    provided resume, then generates an ATS-optimized version of the resume in JSON format.
+    The optimization focuses on incorporating relevant keywords, formatting for ATS
+    readability, and highlighting the most relevant experience for the target position.
+
+    Attributes:
+    ----------
+        model_name: The name of the OpenAI model to use for processing
+        resume: The resume text to be optimized
+        api_key: OpenAI API key for authentication
+        api_base: Base URL for the OpenAI API
+        language: Language for processing the resume
+        llm: The initialized language model instance
+        output_parser: Parser for converting LLM output to JSON format
+
+    Methods:
+    -------
+        _get_openai_model()
+            Initialize the OpenAI model with appropriate settings
+        _get_prompt_template()
+            Create the PromptTemplate for ATS resume optimization
+        _setup_chain()
+            Set up the processing pipeline for job descriptions and resumes
+        generate_ats_optimized_resume_json(job_description)
+            Generate an ATS-optimized resume in JSON format based on the provided job description
+
+    Example:
+        >>> # Note: Ensure to replace "your_api_key" and "your resume text" with actual values
+        >>> optimizer = AtsResumeOptimizer(api_key="your_api_key", resume="your resume text")
+        >>> optimized_resume = optimizer.generate_ats_optimized_resume_json("job description text")
+        >>> print(optimized_resume)
+        >>> # Output: JSON object with optimized resume
     """
-    ATS Resume Optimizer
 
-    A class that uses AI language models to optimize resumes for Applicant Tracking Systems (ATS)
-    based on specific job descriptions.
+    def __init__(
+        self,
+        model_name: str = "gpt-3.5-turbo",
+        resume: str = "",
+        api_key: str = "",
+        api_base: str = "https://api.openai.com/v1/chat/completions",
+        language: str = "en",
+    ) -> None:
+        """Initialize the AI model for resume processing.
 
-    This class leverages OpenAI's language models to analyze a job description and a provided resume,
-    then generates an ATS-optimized version of the resume in JSON format. The optimization focuses on
-    incorporating relevant keywords, formatting for ATS readability, and highlighting the most relevant
-    experience for the target position.
-
-    Attributes
-    model_name : str
-        The name of the OpenAI model to use for processing
-    resume : str
-        The resume text to be optimized
-    api_key : str
-        OpenAI API key for authentication
-    api_base : str
-        Base URL for the OpenAI API
-    language : str
-        Language for processing the resume
-    llm : ChatOpenAI
-        The initialized language model instance
-    output_parser : JsonOutputParser
-        Parser for converting LLM output to JSON format
-
-    Methods
-    _get_openai_model()
-        Initialize the OpenAI model with appropriate settings
-    _get_prompt_template()
-        Create the PromptTemplate for ATS resume optimization
-    _setup_chain()
-        Set up the processing pipeline for job descriptions and resumes
-    generate_ats_optimized_resume_json(job_description)
-        Generate an ATS-optimized resume in JSON format based on the provided job description
-
-    Example
-    >>> # Note: Ensure to replace "your_api_key" and "your resume text" with actual values.
-    >>> optimizer = AtsResumeOptimizer(api_key="your_api_key", resume="your resume text")
-    >>> optimized_resume = optimizer.generate_ats_optimized_resume_json("job description text")
-    >>> print(optimized_resume)
-    >>> # Output: JSON object with optimized resume
-    """
-    def __init__(self, model_name: str = "gpt-3.5-turbo", resume: str = "", api_key: str = "", api_base = "https://api.openai.com/v1/chat/completions", language: str = "en") -> None:
-        """
-        Initialize the AI model for resume processing.
-
-        Parameters
-        ----------
-        model_name : str, optional
-            The name of the OpenAI model to use, by default "gpt-3.5-turbo"
-        resume : str, optional
-            The resume text to analyze, by default ""
-        api_key : str, optional
-            The API key for OpenAI, by default ""
-        api_base : str, optional
-            The base URL for the OpenAI API, by default "https://api.openai.com/v1/chat/completions"
-        language : str, optional
-            The language for processing the resume, by default "en"
-
-        Returns
-        -------
-        None
+        Args:
+            model_name: The name of the OpenAI model to use.
+            resume: The resume text to be optimized.
+            api_key: OpenAI API key for authentication.
+            api_base: Base URL for the OpenAI API.
+            language: Language for processing the resume.
         """
         self.model_name = model_name
         self.resume = resume
-        self.api_key = api_key
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY", "")
         self.api_base = api_base
         self.language = language
+
+        # Initialize LLM component and output parser
         self.llm = self._get_openai_model()
         self.output_parser = JsonOutputParser()
+        self.chain = None
+
+        # Setup the processing chain
         self._setup_chain()
 
     def _get_openai_model(self) -> ChatOpenAI:
-        """Initialize the OpenAI model with appropriate settings"""
+        """Initialize the OpenAI model with appropriate settings."""
         if self.model_name:
             return ChatOpenAI(
                 model_name=self.model_name,
@@ -93,7 +99,7 @@ class AtsResumeOptimizer:
             return ChatOpenAI(temperature=0)
 
     def _get_prompt_template(self) -> PromptTemplate:
-        """Create the PromptTemplate for ATS resume optimization"""
+        """Create the PromptTemplate for ATS resume optimization."""
         template = """
         # ROLE: Expert ATS Resume Optimization Specialist
 
@@ -225,81 +231,89 @@ class AtsResumeOptimizer:
         return PromptTemplate.from_template(template=template)
 
     def _setup_chain(self) -> None:
-        """
-        Set up the processing pipeline for job descriptions and resumes using the modern
-        functional composition approach with the pipe operator.
+        """Set up the processing pipeline for job descriptions and resumes.
+
+        This method configures the functional composition approach with the pipe operator
+        to create a processing chain from prompt template to language model.
         """
         prompt_template = self._get_prompt_template()
         # Using the recommended pipe-based approach instead of deprecated LLMChain
         self.chain = prompt_template | self.llm
 
-    def generate_ats_optimized_resume_json(self, job_description: str) -> Dict[str, Any]:
-        """
-        Generate an ATS-optimized resume in JSON format
+    def generate_ats_optimized_resume_json(
+        self, job_description: str
+    ) -> Dict[str, Any]:
+        """Generate an ATS-optimized resume in JSON format.
 
         Args:
-            job_description (str): The target job description
+            job_description: The target job description.
 
         Returns:
-            dict: The optimized resume in JSON format
+        -------
+            dict: The optimized resume in JSON format.
         """
         if not self.resume:
             return {"error": "Resume not provided"}
 
         try:
             # Updated invocation for the pipe-based chain
-            result = self.chain.invoke({
-                "job_description": job_description,
-                "resume": self.resume
-            })
-            
+            result = self.chain.invoke(
+                {"job_description": job_description, "resume": self.resume}
+            )
+
             try:
                 # Extract the content from AIMessage object if needed
-                if hasattr(result, 'content'):
+                if hasattr(result, "content"):
                     # For AIMessage objects
                     content = result.content
                 else:
                     # For string responses
                     content = result
-                
+
                 # Try to parse content as JSON directly
                 try:
                     json_result = json.loads(content)
                     return json_result
                 except json.JSONDecodeError:
-                    json_match = re.search(r'```(?:json)?\s*([\s\S]*?)\s*```', content)
+                    json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
                     if json_match:
                         json_str = json_match.group(1)
                         return json.loads(json_str)
 
-                    json_str = re.search(r'(\{[\s\S]*\})', content)
+                    json_str = re.search(r"(\{[\s\S]*\})", content)
                     if json_str:
                         return json.loads(json_str.group(1))
 
-                    return {"error": f"Could not extract valid JSON from response: {content[:100]}..."}
+                    return {
+                        "error": f"Could not extract valid JSON from response: {content[:100]}..."
+                    }
             except Exception as e:
-                return {"error": f"JSON parsing error: {str(e)}", "raw_response": str(result)[:500]}
+                return {
+                    "error": f"JSON parsing error: {str(e)}",
+                    "raw_response": str(result)[:500],
+                }
 
         except Exception as e:
             return {"error": f"Error processing request: {str(e)}"}
 
+
 if __name__ == "__main__":
     with open("../../../data/sample_resumes/resume.txt", "r") as f:
         resume = f.read()
-    
+
     with open("../../../data/sample_descriptions/job_description_1.txt", "r") as f:
         job_description = f.read()
 
     DEEPSEEK_API_KEY = "sk-********************"
     DEEPSEEK_API_BASE = "https://api.deepseek.com/v1"
     MODEL_NAME = "deepseek-chat"
-    
+
     model = AtsResumeOptimizer(
         model_name=MODEL_NAME,
         resume=resume,
         api_key=DEEPSEEK_API_KEY,
         api_base=DEEPSEEK_API_BASE,
-        language="en"
+        language="en",
     )
 
     result = model.generate_ats_optimized_resume_json(job_description)
