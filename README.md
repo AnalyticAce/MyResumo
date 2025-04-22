@@ -212,7 +212,6 @@ To run the linter locally:
 Our configuration (in `pyproject.toml`) enforces:
 - Google-style docstrings
 - Import sorting
-- Line length of 88 characters
 - Standard Python code style conventions
 
 ## 🤝 Contributing
