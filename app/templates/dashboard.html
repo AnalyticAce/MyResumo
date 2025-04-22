@@ -3,14 +3,15 @@
 {% block title %}Dashboard - MyResumo{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" x-data="dashboardApp()" x-init="init()" x-cloak>
+    <!-- Dashboard Header -->
     <div class="md:flex md:items-center md:justify-between mb-8">
         <div class="flex-1 min-w-0">
             <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p class="text-gray-500 mt-2">Manage your resumes and track your optimization history</p>
+            <p class="text-gray-500 mt-2">Manage your resumes and track your optimization progress</p>
         </div>
         <div class="mt-4 md:mt-0">
-            <a href="/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+            <a href="/create" class="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-sm transition-all duration-200 ease-in-out transform hover:-translate-y-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
@@ -19,204 +20,376 @@
         </div>
     </div>
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg" 
-         x-data="dashboardApp()" 
-         x-init="init()"
-         x-cloak>
-        <!-- Stats Overview -->
-        <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
-            <h3 class="text-lg font-medium text-gray-900">Overview</h3>
-            <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
-                <!-- Total Resumes -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-primary-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Total Resumes
-                                </dt>
-                                <dd class="flex items-baseline">
-                                    <div class="text-2xl font-semibold text-gray-900" x-text="resumes.length">
-                                        0
-                                    </div>
-                                </dd>
-                            </div>
-                        </div>
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <!-- Total Resumes -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-500">Total Resumes</h2>
+                    <p class="text-2xl font-semibold text-gray-900" x-text="resumes.length">0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Average ATS Score -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-emerald-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-500">Average ATS Score</h2>
+                    <div class="flex items-center">
+                        <p class="text-2xl font-semibold text-gray-900" x-text="averageScore + '%'">0%</p>
+                        <template x-if="averageScore < 60">
+                            <span class="ml-2 text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">Needs Improvement</span>
+                        </template>
+                        <template x-if="averageScore >= 60 && averageScore < 80">
+                            <span class="ml-2 text-xs font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Good</span>
+                        </template>
+                        <template x-if="averageScore >= 80">
+                            <span class="ml-2 text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Excellent</span>
+                        </template>
                     </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Last Updated -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-violet-50 rounded-lg p-3">
+                    <svg class="h-6 w-6 text-violet-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h2 class="text-sm font-medium text-gray-500">Last Updated</h2>
+                    <p class="text-lg font-semibold text-gray-900" x-text="lastUpdated || 'Never'">Never</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabbed Interface for Resume View Options -->
+    <div class="mb-6">
+        <div class="flex border-b border-gray-200">
+            <button 
+                @click="viewMode = 'table'" 
+                class="py-3 px-6 font-medium text-sm transition-colors duration-200"
+                :class="viewMode === 'table' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-500 hover:text-gray-700'"
+            >
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    List View
+                </div>
+            </button>
+            <button 
+                @click="viewMode = 'grid'" 
+                class="py-3 px-6 font-medium text-sm transition-colors duration-200"
+                :class="viewMode === 'grid' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-500 hover:text-gray-700'"
+            >
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    Grid View
+                </div>
+            </button>
+        </div>
+    </div>
 
-                <!-- Average Score -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Average ATS Score
-                                </dt>
-                                <dd class="flex items-baseline">
-                                    <div class="text-2xl font-semibold text-gray-900" x-text="averageScore + '%'">
-                                        0%
-                                    </div>
-                                </dd>
-                            </div>
+    <!-- Resume List Container -->
+    <div class="bg-white shadow-sm rounded-xl overflow-hidden">
+        <!-- Search and Filter Bar -->
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div class="flex flex-wrap items-center gap-4 justify-between">
+                <h2 class="text-lg font-medium text-gray-900">Your Resumes</h2>
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            x-model="searchQuery" 
+                            placeholder="Search resumes..." 
+                            class="pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-full md:w-auto"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
                     </div>
-                </div>
-
-                <!-- Last Updated -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-                                <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Last Updated
-                                </dt>
-                                <dd class="flex items-baseline">
-                                    <div class="text-2xl font-semibold text-gray-900" x-text="lastUpdated || 'Never'">
-                                        Never
-                                    </div>
-                                </dd>
-                            </div>
+                    <div class="relative">
+                        <select 
+                            x-model="sortBy" 
+                            @change="sortResumes()"
+                            class="pl-3 pr-10 py-2 border border-gray-300 rounded-lg text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        >
+                            <option value="updated_at">Sort by: Last Updated</option>
+                            <option value="title">Sort by: Title</option>
+                            <option value="ats_score">Sort by: ATS Score</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Resume List -->
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">Your Resumes</h3>
-            
-            <!-- Empty state -->
-            <template x-if="resumes.length === 0">
-                <div class="py-12 text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No resumes</h3>
-                    <p class="mt-1 text-sm text-gray-500">Get started by creating a new resume.</p>
-                    <div class="mt-6">
-                        <a href="/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
-                            Create Resume
-                        </a>
-                    </div>
+        
+        <!-- Empty State -->
+        <template x-if="resumes.length === 0">
+            <div class="py-16 text-center">
+                <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">No resumes yet</h3>
+                <p class="mt-2 text-gray-500 max-w-md mx-auto">Start building your professional resume with our AI-powered tools to increase your chances of landing your dream job.</p>
+                <div class="mt-8">
+                    <a href="/create" class="inline-flex items-center px-5 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-md transition-all duration-200 ease-in-out transform hover:-translate-y-1">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Create Your First Resume
+                    </a>
                 </div>
-            </template>
-            
-            <!-- Resume list -->
-            <template x-if="resumes.length > 0">
-                <div class="bg-white shadow overflow-hidden sm:rounded-md">
-                    <ul class="divide-y divide-gray-200">
-                        <template x-for="resume in resumes" :key="resume.id">
-                            <li>
-                                <div class="block hover:bg-gray-50">
-                                    <div class="flex items-center px-4 py-4 sm:px-6">
-                                        <div class="min-w-0 flex-1 flex items-center">
-                                            <div class="flex-shrink-0">
-                                                <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
-                                                    <svg class="h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-0 flex-1 px-4">
-                                                <div>
-                                                    <div class="flex items-center">
-                                                        <p class="text-sm font-medium text-primary-600 truncate" x-text="resume.title"></p>
-                                                        <template x-if="resume.ats_score">
-                                                            <div class="ml-2 flex-shrink-0 flex">
-                                                                <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                                                                   :class="{
-                                                                       'bg-green-100 text-green-800': resume.ats_score >= 80,
-                                                                       'bg-yellow-100 text-yellow-800': resume.ats_score >= 60 && resume.ats_score < 80,
-                                                                       'bg-red-100 text-red-800': resume.ats_score < 60
-                                                                   }"
-                                                                   x-text="`ATS: ${resume.ats_score}%`"></p>
-                                                            </div>
-                                                        </template>
-                                                    </div>
-                                                    <div class="mt-2 flex">
-                                                        <div class="flex items-center text-sm text-gray-500">
-                                                            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                                                            </svg>
-                                                            <span x-text="formatDate(resume.updated_at)"></span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+            </div>
+        </template>
+        
+        <!-- Table View -->
+        <template x-if="resumes.length > 0 && viewMode === 'table'">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resume Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ATS Score</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="resume in filteredResumes" :key="resume.id">
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-8 w-8 rounded-md bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+                                            <svg class="h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
                                         </div>
-                                        <div class="flex space-x-2">
-                                            <button @click="viewResume(resume.id)" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none">
-                                                View
-                                            </button>
-                                            <button @click="downloadResume(resume.id)" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none">
-                                                Download
-                                            </button>
-                                            <button @click="deleteResume(resume.id)" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none">
-                                                Delete
-                                            </button>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900" x-text="resume.title"></div>
+                                            <div class="text-xs text-gray-500" x-text="getResumeMainProfession(resume)"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" x-text="formatDate(resume.updated_at)"></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <template x-if="resume.ats_score !== null">
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-medium mr-2" x-text="resume.ats_score + '%'"></span>
+                                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                                <div class="h-2 rounded-full" 
+                                                    :class="{
+                                                        'bg-green-500': resume.ats_score >= 80,
+                                                        'bg-yellow-500': resume.ats_score >= 60 && resume.ats_score < 80,
+                                                        'bg-red-500': resume.ats_score < 60
+                                                    }"
+                                                    :style="`width: ${resume.ats_score}%`"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template x-if="resume.ats_score === null">
+                                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Not Analyzed</span>
+                                    </template>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-wrap gap-1">
+                                        <template x-if="resume.optimized_data && resume.optimized_data.user_information && resume.optimized_data.user_information.skills">
+                                            <template x-for="(skill, index) in resume.optimized_data.user_information.skills.hard_skills.slice(0, 2)" :key="index">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700" x-text="skill"></span>
+                                            </template>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <button @click="viewResume(resume.id)" class="text-primary-600 hover:text-primary-900 focus:outline-none focus:underline" title="View Resume">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            <span class="sr-only">View</span>
+                                        </button>
+                                        <button @click="downloadResume(resume.id)" class="text-green-600 hover:text-green-900 focus:outline-none focus:underline" title="Download Resume">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            <span class="sr-only">Download</span>
+                                        </button>
+                                        <button @click="deleteResume(resume.id)" class="text-red-600 hover:text-red-900 focus:outline-none focus:underline" title="Delete Resume">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span class="sr-only">Delete</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         </template>
-                    </ul>
-                </div>
-            </template>
-        </div>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        
+        <!-- Grid View -->
+        <template x-if="resumes.length > 0 && viewMode === 'grid'">
+            <div class="p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <template x-for="resume in filteredResumes" :key="resume.id">
+                        <div class="group relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+                            <!-- Resume Content -->
+                            <div class="p-5">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center mr-3">
+                                            <svg class="h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-medium text-gray-900 truncate max-w-[150px]" x-text="resume.title"></h3>
+                                            <p class="text-xs text-gray-500 mt-1" x-text="formatDate(resume.updated_at)"></p>
+                                        </div>
+                                    </div>
+                                    <template x-if="resume.ats_score !== null">
+                                        <div>
+                                            <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" 
+                                                :class="{
+                                                    'bg-green-100 text-green-800': resume.ats_score >= 80,
+                                                    'bg-yellow-100 text-yellow-800': resume.ats_score >= 60 && resume.ats_score < 80,
+                                                    'bg-red-100 text-red-800': resume.ats_score < 60
+                                                }">
+                                                <span x-text="`${resume.ats_score}%`"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
 
-        <!-- Confirmation Modal -->
-        <div x-show="showDeleteModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <!-- Background overlay -->
-                <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                
-                <!-- Modal panel -->
-                <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                Delete Resume
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">
-                                    Are you sure you want to delete this resume? This action cannot be undone.
-                                </p>
+                                <!-- Progress bar -->
+                                <template x-if="resume.ats_score !== null">
+                                    <div class="w-full bg-gray-100 rounded-full h-1.5 mb-4">
+                                        <div class="h-1.5 rounded-full" 
+                                            :class="{
+                                                'bg-green-500': resume.ats_score >= 80,
+                                                'bg-yellow-500': resume.ats_score >= 60 && resume.ats_score < 80,
+                                                'bg-red-500': resume.ats_score < 60
+                                            }"
+                                            :style="`width: ${resume.ats_score}%`"></div>
+                                    </div>
+                                </template>
+                                
+                                <!-- Skills -->
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    <template x-if="resume.optimized_data && resume.optimized_data.user_information && resume.optimized_data.user_information.skills">
+                                        <template x-for="(skill, index) in resume.optimized_data.user_information.skills.hard_skills.slice(0, 3)" :key="index">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700" x-text="skill"></span>
+                                        </template>
+                                    </template>
+                                </div>
+                                
+                                <!-- Main job title -->
+                                <template x-if="resume.optimized_data && resume.optimized_data.user_information && resume.optimized_data.user_information.main_job_title">
+                                    <p class="text-sm text-gray-600 truncate mb-4" x-text="resume.optimized_data.user_information.main_job_title"></p>
+                                </template>
+                                
+                                <!-- Action buttons -->
+                                <div class="flex gap-2 justify-between mt-auto">
+                                    <button @click="viewResume(resume.id)" class="flex-1 inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-primary-700 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        View
+                                    </button>
+                                    <button @click="downloadResume(resume.id)" class="flex-1 inline-flex items-center justify-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        Download
+                                    </button>
+                                    <button @click="deleteResume(resume.id)" class="inline-flex items-center justify-center p-1.5 border border-transparent text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <span class="sr-only">Delete</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Empty Search Results -->
+        <template x-if="resumes.length > 0 && filteredResumes.length === 0">
+            <div class="py-8 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 class="mt-2 text-base font-medium text-gray-900">No matching resumes</h3>
+                <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria</p>
+            </div>
+        </template>
+    </div>
+
+    <!-- Confirmation Modal with improved design -->
+    <div x-show="showDeleteModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay with blur effect -->
+            <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-filter backdrop-blur-sm transition-opacity" aria-hidden="true"></div>
+            
+            <!-- Modal panel -->
+            <div x-show="showDeleteModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
                     </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <button @click="confirmDelete()" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Delete
-                        </button>
-                        <button @click="cancelDelete()" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
-                            Cancel
-                        </button>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Delete Resume
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">
+                                Are you sure you want to delete this resume? This action cannot be undone and all associated data will be permanently removed.
+                            </p>
+                        </div>
                     </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button @click="confirmDelete()" type="button" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
+                        Delete
+                    </button>
+                    <button @click="cancelDelete()" type="button" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm transition-colors duration-200">
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>
@@ -229,12 +402,16 @@
     function dashboardApp() {
         return {
             resumes: [],
+            filteredResumes: [],
+            searchQuery: '',
             isLoading: true,
             averageScore: 0,
             lastUpdated: null,
             showDeleteModal: false,
             resumeToDelete: null,
             pageLeaving: false,
+            viewMode: 'table', // 'table' or 'grid'
+            sortBy: 'updated_at', // Default sort by last updated
             
             // Initialize the component and fetch data
             async init() {
@@ -242,6 +419,12 @@
                 this.pageLeaving = false;
                 this.showDeleteModal = false;
                 this.resumeToDelete = null;
+                
+                // Initialize view mode from localStorage if available
+                const savedViewMode = localStorage.getItem('resumeDashboardViewMode');
+                if (savedViewMode) {
+                    this.viewMode = savedViewMode;
+                }
                 
                 // Add multiple event listeners for different browser behaviors
                 window.addEventListener('beforeunload', () => {
@@ -271,6 +454,76 @@
                 
                 await this.loadResumes();
                 this.calculateStats();
+                this.sortResumes(); // Initial sort
+                
+                // Set up watchers
+                this.$watch('searchQuery', value => {
+                    this.filterResumes();
+                });
+                
+                this.$watch('viewMode', value => {
+                    // Save preference to localStorage
+                    localStorage.setItem('resumeDashboardViewMode', value);
+                });
+            },
+            
+            // Filter resumes based on search query
+            filterResumes() {
+                if (!this.searchQuery.trim()) {
+                    this.filteredResumes = [...this.resumes]; // Create a copy for sorting
+                    this.sortResumes();
+                    return;
+                }
+                
+                const query = this.searchQuery.toLowerCase().trim();
+                this.filteredResumes = this.resumes.filter(resume => 
+                    resume.title.toLowerCase().includes(query) || 
+                    this.getResumeMainProfession(resume).toLowerCase().includes(query) ||
+                    this.getResumeSkills(resume).some(skill => skill.toLowerCase().includes(query))
+                );
+                
+                // Apply sorting to filtered results
+                this.sortResumes();
+            },
+            
+            // Sort resumes based on selected criteria
+            sortResumes() {
+                if (this.sortBy === 'title') {
+                    this.filteredResumes.sort((a, b) => a.title.localeCompare(b.title));
+                } else if (this.sortBy === 'ats_score') {
+                    // Handle null scores by placing them at the end
+                    this.filteredResumes.sort((a, b) => {
+                        if (a.ats_score === null && b.ats_score === null) return 0;
+                        if (a.ats_score === null) return 1;
+                        if (b.ats_score === null) return -1;
+                        return b.ats_score - a.ats_score;
+                    });
+                } else { // 'updated_at' (default)
+                    this.filteredResumes.sort((a, b) => 
+                        new Date(b.updated_at) - new Date(a.updated_at)
+                    );
+                }
+            },
+            
+            // Get main profession from resume data
+            getResumeMainProfession(resume) {
+                if (resume.optimized_data && 
+                    resume.optimized_data.user_information && 
+                    resume.optimized_data.user_information.main_job_title) {
+                    return resume.optimized_data.user_information.main_job_title;
+                }
+                return "Not specified";
+            },
+            
+            // Extract skills from resume data
+            getResumeSkills(resume) {
+                if (resume.optimized_data && 
+                    resume.optimized_data.user_information && 
+                    resume.optimized_data.user_information.skills) {
+                    const skills = resume.optimized_data.user_information.skills;
+                    return [...(skills.hard_skills || []), ...(skills.soft_skills || [])];
+                }
+                return [];
             },
             
             // Load resumes from the API
@@ -285,11 +538,15 @@
                     if (response.ok) {
                         const data = await response.json();
                         this.resumes = data;
+                        this.filteredResumes = [...data]; // Initialize filtered resumes
                     } else {
                         console.error('Failed to load resumes');
+                        // Show a notification for error
+                        this.showNotification('Error loading resumes', 'error');
                     }
                 } catch (error) {
                     console.error('Error loading resumes:', error);
+                    this.showNotification('Error connecting to server', 'error');
                 } finally {
                     this.isLoading = false;
                 }
@@ -327,6 +584,13 @@
                 });
             },
             
+            // Show notification toast (could be implemented with a library or custom component)
+            showNotification(message, type = 'info') {
+                // This is a placeholder - implement with your preferred notification system
+                console.log(`Notification (${type}): ${message}`);
+                // Example implementation could use a toast library or custom Alpine component
+            },
+            
             // View resume details
             viewResume(resumeId) {
                 // Set flag to prevent unintended actions during navigation
@@ -347,6 +611,9 @@
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
+                
+                // Show a notification
+                this.showNotification('Resume download started', 'success');
             },
             
             // Delete resume (show confirmation modal)
@@ -377,14 +644,16 @@
                     if (response.ok) {
                         // Remove from local state
                         this.resumes = this.resumes.filter(r => r.id !== resumeId);
+                        this.filterResumes(); // Update filtered resumes
                         this.calculateStats();
+                        this.showNotification('Resume deleted successfully', 'success');
                     } else {
                         console.error('Failed to delete resume');
-                        alert('Failed to delete resume. Please try again.');
+                        this.showNotification('Failed to delete resume', 'error');
                     }
                 } catch (error) {
                     console.error('Error deleting resume:', error);
-                    alert('Error deleting resume. Please try again.');
+                    this.showNotification('Error connecting to server', 'error');
                 } finally {
                     // Reset state variables
                     this.showDeleteModal = false;
