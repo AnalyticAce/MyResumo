@@ -57,7 +57,7 @@ class ATSScorerLLM:
         self.model_name = model_name or os.environ.get("MODEL_NAME")
         if not self.api_key:
             raise ValueError("An LLM API key is required. Provide it or set API_KEY environment variable.")
-          
+
         if not self.api_base:
             raise ValueError("An LLM API base is required. Provide it or set API_BASE environment variable.")
         
