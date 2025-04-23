@@ -385,8 +385,8 @@ async def optimize_resume(
 
     # 2. Get API configuration
     logger.info("Retrieving API configuration")
-    api_key = os.getenv("DEEPSEEK_API_KEY")
-    api_base_url = os.getenv("DEEPSEEK_API_BASE")
+    api_key = os.getenv("API_KEY")
+    api_base_url = os.getenv("API_BASE")
     model_name = os.getenv("MODEL_NAME")
 
     # Log API configuration (safely)

@@ -94,7 +94,7 @@ docker run -d --name mongodb -p 27017:27017 mongo:latest
 Create a `.env` file in the project root with the following variables:
 
 ```
-DEEPSEEK_API_KEY=your_api_key_here
+API_KEY=your_api_key_here
 MONGODB_URI=mongodb://username:password@host:port/
 ```
 
@@ -111,7 +111,9 @@ Run the container with your environment variables:
 ```bash
 docker run -d --name myresumo \
   -p 8080:8080 \
-  -e DEEPSEEK_API_KEY=your_api_key_here \
+  -e API_KEY=your_api_key_here \
+  -e API_BASE=https://api.deepseek.com/v1 \
+  -e MODEL_NAME=deepseek-chat \
   -e MONGODB_URI=mongodb://username:password@host:port/ \
   ghcr.io/analyticace/myresumo:latest
 ```

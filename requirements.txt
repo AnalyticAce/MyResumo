@@ -34,3 +34,5 @@ langchain-community
 langchain
 langchain-openai
 PyPDF2
+scikit-learn
+sentence-transformers

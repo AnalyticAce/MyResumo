@@ -56,10 +56,10 @@ class AtsResumeOptimizer:
 
     def __init__(
         self,
-        model_name: str = "gpt-3.5-turbo",
-        resume: str = "",
-        api_key: str = "",
-        api_base: str = "",
+        model_name: str = None,
+        resume: str = None,
+        api_key: str = None,
+        api_base: str = None,
     ) -> None:
         """Initialize the AI model for resume processing.
 
@@ -70,10 +70,10 @@ class AtsResumeOptimizer:
             api_base: Base URL for the OpenAI API.
             language: Language for processing the resume.
         """
-        self.model_name = model_name or os.getenv("MODEL_NAME", "deepseek-chat")
+        self.model_name = model_name or os.getenv("MODEL_NAME")
         self.resume = resume
-        self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
-        self.api_base = api_base or os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com/v1")
+        self.api_key = api_key or os.getenv("API_KEY")
+        self.api_base = api_base or os.getenv("API_BASE")
 
         # Initialize LLM component and output parser
         self.llm = self._get_openai_model()
@@ -301,15 +301,15 @@ if __name__ == "__main__":
     with open("../../../data/sample_descriptions/job_description_1.txt", "r") as f:
         job_description = f.read()
 
-    DEEPSEEK_API_KEY = "sk-********************"
-    DEEPSEEK_API_BASE = "https://api.deepseek.com/v1"
+    API_KEY = "sk-********************"
+    API_BASE = "https://api.deepseek.com/v1"
     MODEL_NAME = "deepseek-chat"
 
     model = AtsResumeOptimizer(
         model_name=MODEL_NAME,
         resume=resume,
-        api_key=DEEPSEEK_API_KEY,
-        api_base=DEEPSEEK_API_BASE,
+        api_key=API_KEY,
+        api_base=API_BASE,
         language="en",
     )
 
