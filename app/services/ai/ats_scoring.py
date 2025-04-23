@@ -226,7 +226,7 @@ class ATSScorerLLM:
             
             # If we can't parse as JSON, extract the fields manually
             score_match = re.search(r'["\']?score["\']?\s*:\s*(\d+)', result, re.IGNORECASE)
-            score = int(score_match.group(1)) if score_match else 75  # Default to 75 if not found
+            score = int(score_match.group(1)) if score_match else 50  # Default to 75 if not found
             
             # Extract matching skills
             matching_section = re.search(r'["\']?matching_skills["\']?\s*:\s*\[(.*?)\]', result, re.DOTALL)

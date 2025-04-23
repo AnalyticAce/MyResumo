@@ -118,6 +118,40 @@ docker run -d --name myresumo \
   ghcr.io/analyticace/myresumo:latest
 ```
 
+## Alternative AI Models
+
+MyResumo supports multiple AI backends to power its resume customization features:
+
+### Environment Variable Configuration
+
+You can easily switch between different AI providers by configuring these environment variables:
+
+```bash
+# For Deepseek (default)
+API_KEY=your_deepseek_api_key
+API_BASE=https://api.deepseek.com/v1
+MODEL_NAME=deepseek-chat
+
+# For OpenAI
+API_KEY=your_openai_api_key
+API_BASE=https://api.openai.com/v1
+MODEL_NAME=gpt-4
+
+# For other providers, configure accordingly
+```
+
+When running the Docker container, simply pass these environment variables:
+
+```bash
+docker run -d --name myresumo \
+   -p 8080:8080 \
+   -e API_KEY=your_api_key_here \
+   -e API_BASE=your_provider_base_url \
+   -e MODEL_NAME=your_preferred_model \
+   -e MONGODB_URI=mongodb://username:password@host:port/ \
+   ghcr.io/analyticace/myresumo:latest
+```
+
 Access the application at `http://localhost:8080`
 
 ### Local Development

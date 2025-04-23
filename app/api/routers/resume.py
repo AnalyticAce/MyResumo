@@ -162,12 +162,14 @@ async def create_resume(
             resume_text = extract_text_from_pdf(temp_file_path)
         finally:
             os.unlink(temp_file_path)
+
         new_resume = Resume(
             user_id=user_id,
             title=title,
             original_content=resume_text,
             job_description=job_description,
         )
+
         resume_id = await repo.create_resume(new_resume)
         if not resume_id:
             raise HTTPException(

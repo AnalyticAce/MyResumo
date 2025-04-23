@@ -3,7 +3,7 @@
 {% block title %}Dashboard - MyResumo{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8" x-data="dashboardApp()" x-init="init()" x-cloak>
+<div class="max-w-full sm:max-w-7xl mx-auto py-4 sm:py-6 px-2 sm:px-6 lg:px-8 overflow-hidden" x-data="dashboardApp()" x-init="init()" x-cloak>
     <!-- Dashboard Header - Improved mobile responsiveness -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 sm:mb-8">
         <div class="flex-1 min-w-0 mb-4 md:mb-0">
@@ -109,7 +109,7 @@
         </div>
     </div>
 
-    <!-- Resume List Container -->
+    <!-- Resume List Container - Fixed width constraints for mobile -->
     <div class="bg-white shadow-sm rounded-xl overflow-hidden">
         <!-- Search and Filter Bar - Stacked on mobile -->
         <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
@@ -168,41 +168,41 @@
             </div>
         </template>
         
-        <!-- Table View - Mobile responsive with horizontal scroll -->
+        <!-- Table View - Fixed mobile responsiveness -->
         <template x-if="resumes.length > 0 && viewMode === 'table'">
-            <div class="overflow-x-auto" style="scrollbar-width: thin;">
-                <table class="min-w-full divide-y divide-gray-200">
+            <div class="w-full overflow-x-auto overflow-y-hidden" style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed md:table-auto">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resume</th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Last Updated</th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ATS Score</th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Skills</th>
-                            <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[40%] md:w-auto">Resume</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell w-[20%] md:w-auto">Last Updated</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%] md:w-auto">ATS Score</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Skills</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%] md:w-auto">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         <template x-for="resume in filteredResumes" :key="resume.id">
                             <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <td class="px-3 sm:px-6 py-3 sm:py-4">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-8 w-8 rounded-md bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
                                             <svg class="h-4 w-4 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </div>
-                                        <div class="ml-3 sm:ml-4">
-                                            <div class="text-xs sm:text-sm font-medium text-gray-900" x-text="resume.title"></div>
-                                            <div class="text-xs text-gray-500 block sm:hidden" x-text="formatDate(resume.updated_at)"></div>
+                                        <div class="ml-2 sm:ml-4 min-w-0">
+                                            <div class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[150px] sm:max-w-xs" x-text="resume.title"></div>
+                                            <div class="text-xs text-gray-500 block sm:hidden truncate max-w-[150px]" x-text="formatDate(resume.updated_at)"></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell" x-text="formatDate(resume.updated_at)"></td>
-                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden sm:table-cell" x-text="formatDate(resume.updated_at)"></td>
+                                <td class="px-3 sm:px-6 py-3 sm:py-4">
                                     <template x-if="resume.ats_score !== null">
                                         <div class="flex items-center">
-                                            <span class="text-xs sm:text-sm font-medium mr-1.5 sm:mr-2" x-text="resume.ats_score + '%'"></span>
-                                            <div class="w-16 sm:w-24 bg-gray-200 rounded-full h-1.5 sm:h-2">
+                                            <span class="text-xs sm:text-sm font-medium mr-1 sm:mr-2" x-text="resume.ats_score + '%'"></span>
+                                            <div class="w-12 sm:w-24 bg-gray-200 rounded-full h-1.5 sm:h-2">
                                                 <div class="h-1.5 sm:h-2 rounded-full" 
                                                     :class="{
                                                         'bg-green-500': resume.ats_score >= 80,
@@ -217,17 +217,17 @@
                                         <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Not Analyzed</span>
                                     </template>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden md:table-cell">
+                                <td class="px-3 sm:px-6 py-3 sm:py-4 hidden md:table-cell">
                                     <div class="flex flex-wrap gap-1">
                                         <template x-if="resume.optimized_data && resume.optimized_data.user_information && resume.optimized_data.user_information.skills">
                                             <template x-for="(skill, index) in resume.optimized_data.user_information.skills.hard_skills.slice(0, 2)" :key="index">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700" x-text="skill"></span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 truncate max-w-[100px]" x-text="skill"></span>
                                             </template>
                                         </template>
                                     </div>
                                 </td>
-                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
+                                <td class="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs sm:text-sm font-medium">
+                                    <div class="flex justify-end items-center space-x-2">
                                         <button @click="viewResume(resume.id)" class="text-primary-600 hover:text-primary-900 focus:outline-none focus:underline" title="View Resume">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

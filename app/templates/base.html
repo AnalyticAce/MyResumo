@@ -120,28 +120,12 @@
         {% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <div class="md:flex md:items-center md:justify-between">
-                <div class="flex justify-center md:justify-start space-x-6">
-                    <a href="/about" class="text-gray-400 hover:text-gray-500">About</a>
-                    <a href="/privacy" class="text-gray-400 hover:text-gray-500">Privacy Policy</a>
-                    <a href="/terms" class="text-gray-400 hover:text-gray-500">Terms of Service</a>
-                </div>
-                <div class="mt-8 md:mt-0">
-                    <p class="text-center text-sm text-gray-400">&copy; 2025 MyResumo. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <!-- Flash messages -->
     {% if messages %}
     <div class="fixed bottom-4 right-4 z-50">
         {% for message in messages %}
             <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
-                 class="mb-2 p-4 rounded-md shadow-md {% if message.type == 'success' %}bg-green-50 text-green-800 border border-green-100{% elif message.type == 'error' %}bg-red-50 text-red-800 border border-red-100{% else %}bg-blue-50 text-blue-800 border border-blue-100{% endif %}">
+                class="mb-2 p-4 rounded-md shadow-md {% if message.type == 'success' %}bg-green-50 text-green-800 border border-green-100{% elif message.type == 'error' %}bg-red-50 text-red-800 border border-red-100{% else %}bg-blue-50 text-blue-800 border border-blue-100{% endif %}">
                 <div class="flex">
                     <div class="flex-shrink-0">
                         {% if message.type == 'success' %}
