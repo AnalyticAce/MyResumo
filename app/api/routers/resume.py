@@ -162,12 +162,14 @@ async def create_resume(
             resume_text = extract_text_from_pdf(temp_file_path)
         finally:
             os.unlink(temp_file_path)
+
         new_resume = Resume(
             user_id=user_id,
             title=title,
             original_content=resume_text,
             job_description=job_description,
         )
+
         resume_id = await repo.create_resume(new_resume)
         if not resume_id:
             raise HTTPException(
@@ -385,9 +387,9 @@ async def optimize_resume(
 
     # 2. Get API configuration
     logger.info("Retrieving API configuration")
-    api_key = os.getenv("OPENAI_API_KEY")
-    api_base_url = os.getenv("OPENAI_API_BASE_URL")
-    model_name = os.getenv("OPENAI_MODEL_NAME")
+    api_key = os.getenv("API_KEY")
+    api_base_url = os.getenv("API_BASE")
+    model_name = os.getenv("MODEL_NAME")
 
     # Log API configuration (safely)
     logger.info(f"API configuration - model_name: {model_name or 'Not set'}")

@@ -94,9 +94,8 @@ docker run -d --name mongodb -p 27017:27017 mongo:latest
 Create a `.env` file in the project root with the following variables:
 
 ```
-DEEPSEEK_API_KEY=your_api_key_here
+API_KEY=your_api_key_here
 MONGODB_URI=mongodb://username:password@host:port/
-DB_NAME=myresumo
 ```
 
 ### Using Official Docker Image (Recommended)
@@ -112,10 +111,45 @@ Run the container with your environment variables:
 ```bash
 docker run -d --name myresumo \
   -p 8080:8080 \
-  -e DEEPSEEK_API_KEY=your_api_key_here \
+  -e API_KEY=your_api_key_here \
+  -e API_BASE=https://api.deepseek.com/v1 \
+  -e MODEL_NAME=deepseek-chat \
   -e MONGODB_URI=mongodb://username:password@host:port/ \
-  -e DB_NAME=myresumo \
   ghcr.io/analyticace/myresumo:latest
+```
+
+## Alternative AI Models
+
+MyResumo supports multiple AI backends to power its resume customization features:
+
+### Environment Variable Configuration
+
+You can easily switch between different AI providers by configuring these environment variables:
+
+```bash
+# For Deepseek (default)
+API_KEY=your_deepseek_api_key
+API_BASE=https://api.deepseek.com/v1
+MODEL_NAME=deepseek-chat
+
+# For OpenAI
+API_KEY=your_openai_api_key
+API_BASE=https://api.openai.com/v1
+MODEL_NAME=gpt-4
+
+# For other providers, configure accordingly
+```
+
+When running the Docker container, simply pass these environment variables:
+
+```bash
+docker run -d --name myresumo \
+   -p 8080:8080 \
+   -e API_KEY=your_api_key_here \
+   -e API_BASE=your_provider_base_url \
+   -e MODEL_NAME=your_preferred_model \
+   -e MONGODB_URI=mongodb://username:password@host:port/ \
+   ghcr.io/analyticace/myresumo:latest
 ```
 
 Access the application at `http://localhost:8080`
@@ -214,7 +248,6 @@ To run the linter locally:
 Our configuration (in `pyproject.toml`) enforces:
 - Google-style docstrings
 - Import sorting
-- Line length of 88 characters
 - Standard Python code style conventions
 
 ## 🤝 Contributing
