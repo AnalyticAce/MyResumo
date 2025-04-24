@@ -1,34 +1,48 @@
+# Reference: https://mestrak.com/blog/semantic-release-with-python-poetry-github-actions-20nn
+
 name: Release
 
 on:
   workflow_dispatch:
 
 jobs:
-  release:
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.12
+
+    - name: Install Python Poetry
+      uses: abatilo/actions-poetry@v2.1.0
+      with:
+        poetry-version: 1.1.2
+
+    - name: Configure poetry
+      shell: bash
+      run: python -m poetry config virtualenvs.in-project true
+
+    - name: View poetry version
+      run: poetry --version
+
+    - name: Install dependencies
+      run: |
+        python -m poetry install
+
+  release:
+    needs: setup
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
         with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm ci
-
-      - name: Get Release Token
-        id: get_workflow_token
-        uses: peter-murray/workflow-application-token-action@v3
-        with:
-          application_id: ${{ secrets.RELEASE_APP_ID }}
-          application_private_key: ${{ secrets.RELEASE_APP_CERT }}
-
-      - run: npx semantic-release
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          python-version: 3.8
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Semantic Release
+        run: |
+            pip install python-semantic-release
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            semantic-release publish
