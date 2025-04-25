@@ -28,7 +28,6 @@
 - **🔍 ATS Optimization**: Enhances keyword matching for better visibility in applicant tracking systems
 - **📊 Skills Gap Analysis**: Identifies missing skills based on job descriptions
 - **📝 Resume Generation**: Creates formatted, professional resumes in multiple formats
-- **💬 Interactive Chat Interface**: Get personalized resume advice through conversational AI
 - **🔄 Version Management**: Track different versions of your resume for various applications
 
 ## 🚀 Technologies
@@ -266,6 +265,7 @@ Contributions are welcome! Please check the [contribution guidelines](CONTRIBUTI
 
 - [ ] Multi-language support
 - [ ] Resume analytics dashboard
+- [ ] Get personalized resume advice through conversational AI
 - [ ] Interview preparation suggestions
 - [ ] Cover letter generation
 - [ ] Integration with job search platforms
