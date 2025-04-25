@@ -94,6 +94,39 @@ async def view_resume(
 
 
 @web_router.get(
+    "/resume/{resume_id}/optimize",
+    summary="Optimize Resume",
+    response_description="Optimize a specific resume",
+    response_class=HTMLResponse,
+)
+async def optimize_resume_page(
+    request: Request,
+    resume_id: str = Path(..., title="Resume ID"),
+):
+    """Render the resume optimization page.
+
+    This page allows users to optimize a specific resume with AI-powered tools
+    after viewing its ATS score.
+
+    Args:
+        request: The incoming request
+        resume_id: The unique identifier of the resume
+
+    Returns:
+    -------
+        HTMLResponse: Rendered resume optimization page
+    """
+    return templates.TemplateResponse(
+        "resume_optimize.html",
+        {
+            "request": request,
+            "resume_id": resume_id,
+            "page_title": "Optimize Resume",
+        },
+    )
+
+
+@web_router.get(
     "/settings",
     summary="Settings",
     response_description="Manage your settings",
