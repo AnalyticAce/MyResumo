@@ -56,6 +56,7 @@ known-third-party = ["fastapi", "pydantic", "sqlalchemy"]
 [tool.semantic_release]
 version_variable = ["pyproject.toml:version"]
 branch = "main"
+changelog = "CHANGELOG.md"
 upload_to_pypi = false
 upload_to_release = true
 build_command = "pip install poetry && poetry build"
