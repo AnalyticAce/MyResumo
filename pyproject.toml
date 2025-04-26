@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "myresumo"
-version = "0.1.0"
+version = "2.0.0"
 description = "MyResumo is an AI-powered resume customization platform that tailors your professional profile to match specific job descriptions."
 authors = ["DOSSEH Shalom <dossehdosseh14@gmail.com>"]
 readme = "README.md"
