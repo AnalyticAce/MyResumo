@@ -22,7 +22,11 @@ class ResumeRepository(BaseRepository):
     working with resume documents in the database.
     """
 
-    def __init__(self, db_name: str = os.getenv("DB_NAME", "myresumo"), collection_name: str = "resumes"):
+    def __init__(
+        self,
+        db_name: str = os.getenv("DB_NAME", "myresumo"),
+        collection_name: str = "resumes",
+    ):
         """Initialize the resume repository with database and collection names.
 
         Args:

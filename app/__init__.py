@@ -4,4 +4,4 @@ This package contains all the modules and subpackages that make up the MyResumo 
 a resume creation and optimization system using AI technologies.
 """
 
-__version__ = '2.0.0'
+__version__ = "2.0.0"
