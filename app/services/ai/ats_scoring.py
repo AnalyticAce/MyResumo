@@ -1,17 +1,21 @@
+"""AI-powered ATS Soring module.
+
+This module provides the ATSScorerLLM class that leverages AI language models
+to analyze and score resumes based on job descriptions.
+"""
+
 import json
 import os
 import re
 from typing import List, Optional
-
-# Replace SentenceTransformer with sklearn's TF-IDF
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 from langchain.chains import LLMChain
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class SkillsExtraction(BaseModel):

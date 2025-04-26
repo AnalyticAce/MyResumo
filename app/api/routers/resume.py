@@ -6,6 +6,7 @@ the interface between HTTP requests and the resume repository, and coordinates
 AI-powered resume optimization services.
 """
 
+import json
 import logging
 import os
 import secrets
@@ -14,7 +15,6 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-import json
 
 from fastapi import (
     APIRouter,
@@ -32,8 +32,8 @@ from pydantic import BaseModel, EmailStr, Field
 
 from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.resume_repository import ResumeRepository
-from app.services.ai.model_ai import AtsResumeOptimizer
 from app.services.ai.ats_scoring import ATSScorerLLM
+from app.services.ai.model_ai import AtsResumeOptimizer
 from app.services.resume.latex_generator import LaTeXGenerator
 from app.utils.file_handling import create_temporary_pdf, extract_text_from_pdf
 
@@ -127,11 +127,9 @@ class ResumeScoreResponse(BaseModel):
     job_requirements: List[str] = Field([], description="Requirements extracted from the job description")
 
 
-# Initialize the API router
 resume_router = APIRouter(prefix="/api/resume", tags=["Resume"])
 
 
-# Helper function to get repository instance
 async def get_resume_repository(request: Request) -> ResumeRepository:
     """Dependency for getting the resume repository instance.
 
@@ -419,7 +417,6 @@ async def optimize_resume(
     api_base_url = os.getenv("API_BASE")
     model_name = os.getenv("MODEL_NAME")
 
-    # Log API configuration (safely)
     logger.info(f"API configuration - model_name: {model_name or 'Not set'}")
     logger.info(f"API configuration - api_base_url: {api_base_url or 'Not set'}")
     logger.info(f"API Key present: {bool(api_key)}")
