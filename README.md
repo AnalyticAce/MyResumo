@@ -20,7 +20,7 @@
   <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="800"/>
 </div> -->
 
-![Watch Demo Video](https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/myresumo.gif)
+![Watch Demo Video](https://github.com/user-attachments/assets/19e3c502-d829-455b-85e9-e7822f575360)
 
 ## ✨ Key Features
 
