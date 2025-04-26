@@ -20,7 +20,7 @@
   <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="800"/>
 </div> -->
 
-![Watch Demo Video](https://github-production-user-asset-6210df.s3.amazonaws.com/114688102/437686634-19e3c502-d829-455b-85e9-e7822f575360.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250426%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250426T075331Z&X-Amz-Expires=3000000000000000000000000&X-Amz-Signature=adea7240a9b6d322c7223cea6102138d90cd5fe9ebfb005a411137e48be657ba&X-Amz-SignedHeaders=host)
+![Watch Demo Video](https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/.myresumo.mp4)
 
 ## ✨ Key Features
 
