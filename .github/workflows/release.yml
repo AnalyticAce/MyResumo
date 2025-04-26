@@ -29,23 +29,28 @@ jobs:
     needs: setup
     permissions:
       contents: write
-      packages: write
+      id-token: write
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v4
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Python Setup
+        uses: actions/setup-python@v4
         with:
           python-version: 3.12
+      
       - name: Install dependencies
         run: |
-          pip install python-semantic-release
+          pip install python-semantic-release==7.34.6
+      
       - name: Semantic Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           semantic-release publish
