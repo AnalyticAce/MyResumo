@@ -14,6 +14,7 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import json
 
 from fastapi import (
     APIRouter,
@@ -32,6 +33,7 @@ from pydantic import BaseModel, EmailStr, Field
 from app.database.models.resume import Resume, ResumeData
 from app.database.repositories.resume_repository import ResumeRepository
 from app.services.ai.model_ai import AtsResumeOptimizer
+from app.services.ai.ats_scoring import ATSScorerLLM
 from app.services.resume.latex_generator import LaTeXGenerator
 from app.utils.file_handling import create_temporary_pdf, extract_text_from_pdf
 
@@ -80,7 +82,12 @@ class OptimizationResponse(BaseModel):
     resume_id: str = Field(
         ..., description="Unique identifier for the optimized resume"
     )
-    ats_score: int = Field(..., description="ATS score of the optimized resume")
+    original_ats_score: int = Field(..., description="ATS score before optimization")
+    optimized_ats_score: int = Field(..., description="ATS score after optimization")
+    score_improvement: int = Field(..., description="Score improvement after optimization")
+    matching_skills: List[str] = Field([], description="Skills that match the job description")
+    missing_skills: List[str] = Field([], description="Skills missing from the resume")
+    recommendation: str = Field("", description="AI recommendation for improvement")
     optimized_data: Dict[str, Any] = Field(..., description="Optimized resume data")
 
 
@@ -98,6 +105,26 @@ class ContactFormResponse(BaseModel):
 
     success: bool = Field(..., description="Whether the message was sent successfully")
     message: str = Field(..., description="Status message")
+
+
+class ScoreResumeRequest(BaseModel):
+    """Schema for scoring an existing resume."""
+
+    job_description: str = Field(
+        ..., description="Job description to score the resume against"
+    )
+
+
+class ResumeScoreResponse(BaseModel):
+    """Schema for resume score response."""
+
+    resume_id: str = Field(..., description="Unique identifier for the resume")
+    ats_score: int = Field(..., description="ATS compatibility score (0-100)")
+    matching_skills: List[str] = Field([], description="Skills that match the job description")
+    missing_skills: List[str] = Field([], description="Skills missing from the resume")
+    recommendation: str = Field("", description="AI recommendation for improvement")
+    resume_skills: List[str] = Field([], description="Skills extracted from the resume")
+    job_requirements: List[str] = Field([], description="Requirements extracted from the job description")
 
 
 # Initialize the API router
@@ -357,6 +384,7 @@ async def optimize_resume(
 
     This endpoint uses AI to analyze the original resume and job description,
     then generates an optimized version that's tailored to the job requirements.
+    It also compares the ATS scores before and after optimization.
 
     Args:
         resume_id: ID of the resume to optimize
@@ -366,7 +394,7 @@ async def optimize_resume(
 
     Returns:
     -------
-        OptimizationResponse: Contains the optimized data and ATS score
+        OptimizationResponse: Contains the optimized data, before/after ATS scores, and skill analysis
 
     Raises:
     ------
@@ -413,11 +441,10 @@ async def optimize_resume(
                 detail="AI API key not configured",
             )
 
-    # 3. Initialize optimizer
-    logger.info("Initializing AtsResumeOptimizer")
-    optimizer = AtsResumeOptimizer(
+    # 3. Initialize ATS scorer
+    logger.info("Initializing ATSScorerLLM for pre-optimization scoring")
+    ats_scorer = ATSScorerLLM(
         model_name=model_name,
-        resume=resume["original_content"],
         api_key=api_key,
         api_base=api_base_url,
     )
@@ -436,11 +463,27 @@ async def optimize_resume(
         )
 
     try:
-        # 5. Generate optimized resume
+        # 5. Score the original resume
+        logger.info("Scoring original resume against job description")
+        original_score_result = ats_scorer.compute_match_score(
+            resume["original_content"], job_description
+        )
+        original_ats_score = int(original_score_result["final_score"])
+        logger.info(f"Original resume ATS score: {original_ats_score}")
+
+        # 6. Initialize optimizer and generate optimized resume
+        logger.info("Initializing AtsResumeOptimizer")
+        optimizer = AtsResumeOptimizer(
+            model_name=model_name,
+            resume=resume["original_content"],
+            api_key=api_key,
+            api_base=api_base_url,
+        )
+
         logger.info("Calling AI service to generate optimized resume")
         result = optimizer.generate_ats_optimized_resume_json(job_description)
 
-        # 6. Check for errors in result
+        # 7. Check for errors in result
         if "error" in result:
             logger.error(f"AI service returned an error: {result.get('error')}")
             raise HTTPException(
@@ -448,35 +491,11 @@ async def optimize_resume(
                 detail=f"AI optimization error: {result['error']}",
             )
 
-        # 7. Log the structure of the result (without exposing sensitive data)
+        # 8. Log the structure of the result (without exposing sensitive data)
         logger.info("AI service returned result successfully")
         logger.info(
             f"Result keys: {list(result.keys() if isinstance(result, dict) else [])}"
         )
-
-        # 8. Calculate score
-        logger.info("Calculating ATS score from result")
-        score_bases = {
-            "skills_match": len(
-                result.get("user_information", {})
-                .get("skills", {})
-                .get("hard_skills", [])
-            ),
-            "experiences": len(
-                result.get("user_information", {}).get("experiences", [])
-            ),
-            "education": len(result.get("user_information", {}).get("education", [])),
-            "projects": len(result.get("projects", [])),
-        }
-        logger.info(f"Score bases: {score_bases}")
-
-        base_score = 50
-        max_additional = 45
-        completeness_score = sum(min(value, 5) for value in score_bases.values()) / (
-            5 * len(score_bases)
-        )
-        ats_score = int(base_score + (completeness_score * max_additional))
-        logger.info(f"Calculated ATS score: {ats_score}")
 
         # 9. Parse and validate result
         logger.info("Parsing result into ResumeData model")
@@ -494,10 +513,24 @@ async def optimize_resume(
                 detail=f"Error parsing AI response: {str(validation_error)}",
             )
 
-        # 10. Update database
+        # 10. Score the optimized resume
+        logger.info("Generating JSON text representation of the optimized resume")
+        optimized_resume_text = json.dumps(result)
+        
+        logger.info("Scoring optimized resume against job description")
+        optimized_score_result = ats_scorer.compute_match_score(
+            optimized_resume_text, job_description
+        )
+        optimized_ats_score = int(optimized_score_result["final_score"])
+        logger.info(f"Optimized resume ATS score: {optimized_ats_score}")
+        
+        score_improvement = optimized_ats_score - original_ats_score
+        logger.info(f"Score improvement: {score_improvement}")
+
+        # 11. Update database
         logger.info(f"Updating resume {resume_id} with optimized data")
         try:
-            await repo.update_optimized_data(resume_id, optimized_data, ats_score)
+            await repo.update_optimized_data(resume_id, optimized_data, optimized_ats_score)
             logger.info("Successfully updated resume with optimized data")
         except Exception as db_error:
             logger.error(f"Database error during update: {str(db_error)}")
@@ -507,13 +540,16 @@ async def optimize_resume(
                 detail=f"Database error during update: {str(db_error)}",
             )
 
-        # 11. Return success response
-        logger.info(
-            f"Resume optimization completed successfully for resume_id: {resume_id}"
-        )
+        # 12. Return success response with both scores and skill analysis
+        logger.info(f"Resume optimization completed successfully for resume_id: {resume_id}")
         return {
             "resume_id": resume_id,
-            "ats_score": ats_score,
+            "original_ats_score": original_ats_score,
+            "optimized_ats_score": optimized_ats_score,
+            "score_improvement": score_improvement,
+            "matching_skills": optimized_score_result["matching_skills"],
+            "missing_skills": optimized_score_result["missing_skills"],
+            "recommendation": optimized_score_result["recommendation"],
             "optimized_data": result,
         }
 
@@ -542,6 +578,118 @@ async def optimize_resume(
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error during resume optimization: {str(e)}",
+            )
+
+
+@resume_router.post(
+    "/{resume_id}/score",
+    response_model=ResumeScoreResponse,
+    summary="Score a resume against a job description",
+    response_description="Resume scored successfully",
+)
+async def score_resume(
+    resume_id: str,
+    scoring_request: ScoreResumeRequest,
+    request: Request,
+    repo: ResumeRepository = Depends(get_resume_repository),
+):
+    """Score a resume against a job description using ATS algorithms.
+    
+    This endpoint analyzes the resume against the provided job description and
+    returns an ATS compatibility score along with matching skills and recommendations.
+    
+    Args:
+        resume_id: ID of the resume to score
+        scoring_request: Contains the job description to score against
+        request: The incoming request
+        repo: Resume repository instance
+    
+    Returns:
+    -------
+        ResumeScoreResponse: Contains the ATS score and skill analysis
+        
+    Raises:
+    ------
+        HTTPException: If the resume is not found or scoring fails
+    """
+    logger.info(f"Starting resume scoring for resume_id: {resume_id}")
+    
+    # Retrieve resume
+    logger.info(f"Retrieving resume with ID: {resume_id}")
+    resume = await repo.get_resume_by_id(resume_id)
+    if not resume:
+        logger.warning(f"Resume not found with ID: {resume_id}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Resume with ID {resume_id} not found",
+        )
+    
+    # Get API configuration
+    api_key = os.getenv("API_KEY")
+    api_base_url = os.getenv("API_BASE")
+    model_name = os.getenv("MODEL_NAME")
+    
+    if not api_key:
+        logger.warning("API key not found in environment variables, attempting to get from app state")
+        try:
+            api_key = request.app.state.config.AI_API_KEY
+        except Exception as config_error:
+            logger.error(f"Failed to retrieve API key from app state: {str(config_error)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="AI API key not configured",
+            )
+    
+    # Initialize ATS scorer
+    try:
+        ats_scorer = ATSScorerLLM(
+            model_name=model_name,
+            api_key=api_key,
+            api_base=api_base_url,
+        )
+        
+        # Get job description
+        job_description = scoring_request.job_description
+        if not job_description:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Job description is required for scoring",
+            )
+        
+        # Score the resume
+        logger.info("Scoring resume against job description")
+        score_result = ats_scorer.compute_match_score(resume["original_content"], job_description)
+        ats_score = int(score_result["final_score"])
+        
+        return {
+            "resume_id": resume_id,
+            "ats_score": ats_score,
+            "matching_skills": score_result.get("matching_skills", []),
+            "missing_skills": score_result.get("missing_skills", []),
+            "recommendation": score_result.get("recommendation", ""),
+            "resume_skills": score_result.get("resume_skills", []),
+            "job_requirements": score_result.get("job_requirements", []),
+        }
+        
+    except Exception as e:
+        logger.error(f"Error during resume scoring: {str(e)}")
+        logger.error(f"Error details: {traceback.format_exc()}")
+        
+        # Check for specific error types
+        if "API key" in str(e).lower() or "authentication" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error authenticating with AI service. Please check API configuration.",
+            )
+        elif "timeout" in str(e).lower() or "time" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="AI service request timed out. Please try again later.",
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error during resume scoring: {str(e)}",
             )
 
 

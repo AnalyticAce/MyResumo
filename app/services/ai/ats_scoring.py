@@ -1,24 +1,17 @@
-"""ATS scoring module for analyzing resume compatibility with job descriptions.
-
-This module provides functionality to analyze and score resumes against job descriptions
-using AI techniques including LLM-based analysis and semantic similarity matching.
-It extracts skills, experience, and qualifications from both resumes and job descriptions
-and provides a comprehensive match analysis.
-"""
-
 import json
 import os
+import re
 from typing import List, Optional
+
+# Replace SentenceTransformer with sklearn's TF-IDF
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from langchain.chains import LLMChain
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-
-sentence_model = SentenceTransformer('all-mpnet-base-v2')
 
 
 class SkillsExtraction(BaseModel):
@@ -71,7 +64,13 @@ class ATSScorerLLM:
             openai_api_base=self.api_base
         )
 
-        self.sentence_model = sentence_model
+        # Replace SentenceTransformer with TfidfVectorizer
+        self.vectorizer = TfidfVectorizer(
+            lowercase=True,
+            stop_words='english',
+            ngram_range=(1, 2),  # Use both unigrams and bigrams
+            max_features=5000
+        )
         
         self.parser = PydanticOutputParser(pydantic_object=SkillsExtraction)
 
@@ -187,14 +186,36 @@ class ATSScorerLLM:
             return result
     
     def calculate_semantic_similarity(self, text1, text2):
-        """Calculate semantic similarity between two texts using sentence transformers."""
+        """Calculate semantic similarity between two texts using TF-IDF and cosine similarity."""
         try:
-            embeddings = self.sentence_model.encode([text1, text2])
-            similarity = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+            # Fit and transform the texts
+            tfidf_matrix = self.vectorizer.fit_transform([text1, text2])
+            
+            # Calculate cosine similarity
+            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
             return similarity
         except Exception as e:
             print(f"Error calculating semantic similarity: {e}")
             return 0.5  # Default to middle value
+    
+    def calculate_keyword_overlap(self, resume_skills, job_skills):
+        """Calculate a simple keyword overlap score as an additional signal."""
+        if not resume_skills or not job_skills:
+            return 0.5
+            
+        # Convert all skills to lowercase for better matching
+        resume_skills_lower = [skill.lower() for skill in resume_skills]
+        job_skills_lower = [skill.lower() for skill in job_skills]
+        
+        # Count matches
+        matches = sum(1 for skill in job_skills_lower if any(
+            job_skill in skill or skill in job_skill for job_skill in resume_skills_lower
+        ))
+        
+        # Calculate overlap score
+        if len(job_skills_lower) > 0:
+            return matches / len(job_skills_lower)
+        return 0.5
     
     def analyze_match(self, resume_analysis, job_analysis):
         """Have the LLM analyze the match between resume and job requirements."""
@@ -212,7 +233,6 @@ class ATSScorerLLM:
             )
             
             # Try to find a JSON object in the response
-            import re
             json_match = re.search(r'\{.*\}', result, re.DOTALL)
             
             if json_match:
@@ -226,7 +246,7 @@ class ATSScorerLLM:
             
             # If we can't parse as JSON, extract the fields manually
             score_match = re.search(r'["\']?score["\']?\s*:\s*(\d+)', result, re.IGNORECASE)
-            score = int(score_match.group(1)) if score_match else 50  # Default to 75 if not found
+            score = int(score_match.group(1)) if score_match else 50  # Default to 50 if not found
             
             # Extract matching skills
             matching_section = re.search(r'["\']?matching_skills["\']?\s*:\s*\[(.*?)\]', result, re.DOTALL)
@@ -266,16 +286,22 @@ class ATSScorerLLM:
         """Calculate comprehensive match score between resume and job."""
         if weights is None:
             weights = {
-                'llm_analysis': 0.6,
-                'semantic': 0.4
+                'llm_analysis': 0.5,
+                'semantic': 0.3,
+                'keyword_overlap': 0.2  # Added keyword overlap as a lightweight signal
             }
         
         # Extract information using LLM
         resume_analysis = self.extract_resume_info(resume_text)
         job_analysis = self.extract_job_info(job_text)
         
-        # Calculate semantic similarity
+        # Calculate semantic similarity with TF-IDF
         semantic_score = self.calculate_semantic_similarity(resume_text, job_text)
+        
+        # Calculate keyword overlap score
+        resume_skills = resume_analysis.skills if hasattr(resume_analysis, 'skills') else []
+        job_skills = job_analysis.skills if hasattr(job_analysis, 'skills') else []
+        keyword_score = self.calculate_keyword_overlap(resume_skills, job_skills)
         
         # Get LLM analysis of match
         match_analysis = self.analyze_match(resume_analysis, job_analysis)
@@ -284,16 +310,18 @@ class ATSScorerLLM:
         # Calculate final weighted score
         final_score = (
             weights['llm_analysis'] * llm_score +
-            weights['semantic'] * semantic_score
+            weights['semantic'] * semantic_score +
+            weights['keyword_overlap'] * keyword_score
         )
         
         # Format the result
         result = {
             "llm_score": round(llm_score * 100, 2),
             "semantic_score": round(semantic_score * 100, 2),
+            "keyword_overlap_score": round(keyword_score * 100, 2),
             "final_score": round(final_score * 100, 2),
-            "resume_skills": resume_analysis.skills if hasattr(resume_analysis, 'skills') else [],
-            "job_requirements": job_analysis.skills if hasattr(job_analysis, 'skills') else [],
+            "resume_skills": resume_skills,
+            "job_requirements": job_skills,
             "matching_skills": match_analysis.get("matching_skills", []),
             "missing_skills": match_analysis.get("missing_skills", []),
             "recommendation": match_analysis.get("recommendation", "")

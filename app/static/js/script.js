@@ -157,3 +157,111 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize AJAX handlers
     initAjaxToastHandler();
 });
+
+// Score Resume modal functions
+function scoreResume(resumeId) {
+    // Set the current resume ID to score
+    window.currentResumeId = resumeId;
+    
+    // Reset the job description field and hide any previous results
+    document.getElementById('job-description').value = '';
+    
+    // Show the modal
+    Alpine.store('app').showScoreModal = true;
+}
+
+function cancelScoreModal() {
+    Alpine.store('app').showScoreModal = false;
+    window.currentResumeId = null;
+}
+
+async function submitScoreResume() {
+    const jobDescription = document.getElementById('job-description').value.trim();
+    
+    if (!jobDescription) {
+        alert('Please enter a job description to score your resume against.');
+        return;
+    }
+    
+    if (!window.currentResumeId) {
+        alert('No resume selected. Please try again.');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        Alpine.store('app').isScoring = true;
+        
+        // Call the API to score the resume
+        const response = await fetch(`/api/resume/${window.currentResumeId}/score`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                job_description: jobDescription
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
+        }
+        
+        // Parse the response
+        const result = await response.json();
+        
+        // Update the score results in Alpine store
+        Alpine.store('app').scoreResults = {
+            ats_score: result.ats_score,
+            matching_skills: result.matching_skills || [],
+            missing_skills: result.missing_skills || [],
+            recommendation: result.recommendation || 'No specific recommendations available.'
+        };
+        
+        // Hide score modal and show results modal
+        Alpine.store('app').showScoreModal = false;
+        Alpine.store('app').showScoreResultsModal = true;
+        
+    } catch (error) {
+        console.error('Error scoring resume:', error);
+        alert('There was a problem scoring your resume. Please try again.');
+    } finally {
+        Alpine.store('app').isScoring = false;
+    }
+}
+
+function closeScoreResultsModal() {
+    Alpine.store('app').showScoreResultsModal = false;
+    window.currentResumeId = null;
+}
+
+function optimizeResumeFromScore() {
+    if (!window.currentResumeId) {
+        alert('Resume ID not found. Please try again.');
+        return;
+    }
+    
+    // Close the current modal
+    Alpine.store('app').showScoreResultsModal = false;
+    
+    // Redirect to the optimize page with the resume ID
+    window.location.href = `/resume/${window.currentResumeId}/optimize`;
+}
+
+// Add Alpine store for managing global state
+document.addEventListener('alpine:init', () => {
+    Alpine.store('app', {
+        // Score modal state
+        showScoreModal: false,
+        isScoring: false,
+        
+        // Score results modal state
+        showScoreResultsModal: false,
+        scoreResults: {
+            ats_score: 0,
+            matching_skills: [],
+            missing_skills: [],
+            recommendation: ''
+        }
+    });
+});

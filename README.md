@@ -16,9 +16,11 @@
 
 **MyResumo** is an AI-powered resume customization platform that tailors your professional profile to match specific job descriptions. By leveraging advanced natural language processing, it analyzes job requirements and adapts your resume to highlight relevant skills and experiences, significantly improving your chances of passing through Applicant Tracking Systems (ATS) and catching recruiters' attention.
 
-<div align="center">
+<!-- <div align="center">
   <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="800"/>
-</div>
+</div> -->
+
+https://github.com/user-attachments/assets/19e3c502-d829-455b-85e9-e7822f575360
 
 ## ✨ Key Features
 
@@ -26,7 +28,6 @@
 - **🔍 ATS Optimization**: Enhances keyword matching for better visibility in applicant tracking systems
 - **📊 Skills Gap Analysis**: Identifies missing skills based on job descriptions
 - **📝 Resume Generation**: Creates formatted, professional resumes in multiple formats
-- **💬 Interactive Chat Interface**: Get personalized resume advice through conversational AI
 - **🔄 Version Management**: Track different versions of your resume for various applications
 
 ## 🚀 Technologies
@@ -264,6 +265,7 @@ Contributions are welcome! Please check the [contribution guidelines](CONTRIBUTI
 
 - [ ] Multi-language support
 - [ ] Resume analytics dashboard
+- [ ] Get personalized resume advice through conversational AI
 - [ ] Interview preparation suggestions
 - [ ] Cover letter generation
 - [ ] Integration with job search platforms
