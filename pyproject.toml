@@ -1,3 +1,18 @@
+[tool.poetry]
+name = "myresumo"
+version = "2.0.0"
+description = "MyResumo is an AI-powered resume customization platform that tailors your professional profile to match specific job descriptions."
+authors = ["DOSSEH Shalom <dossehdosseh14@gmail.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -44,11 +59,9 @@ convention = "google"
 known-third-party = ["fastapi", "pydantic", "sqlalchemy"]
 
 [tool.semantic_release]
-version_variable = [
-    "app/__init__.py:__version__",
-    "pyproject.toml:version"
-]
+version_variable = ["pyproject.toml:version"]
 branch = "main"
+changelog = "CHANGELOG.md"
 upload_to_pypi = false
 upload_to_release = true
 build_command = "pip install poetry && poetry build"

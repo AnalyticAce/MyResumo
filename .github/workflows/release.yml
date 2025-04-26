@@ -4,28 +4,23 @@ name: Release
 
 on:
   workflow_dispatch:
-
 jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
       with:
         python-version: 3.12
-
     - name: Install Python Poetry
-      uses: abatilo/actions-poetry@v2.1.0
+      uses: abatilo/actions-poetry@v2.3.0
       with:
-        poetry-version: 1.1.2
-
+        poetry-version: 1.7.1
     - name: Configure poetry
       shell: bash
       run: python -m poetry config virtualenvs.in-project true
-
     - name: View poetry version
       run: poetry --version
-
     - name: Install dependencies
       run: |
         python -m poetry install
@@ -34,15 +29,30 @@ jobs:
     needs: setup
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
         with:
-          python-version: 3.8
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Semantic Release
-        run: |
-            pip install python-semantic-release
-            git config user.name github-actions
-            git config user.email github-actions@github.com
-            semantic-release publish
+          fetch-depth: 0
+
+      - name: Python Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Action | Semantic Version Release
+        id: release
+        uses: python-semantic-release/python-semantic-release@v9.21.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git_committer_name: "github-actions"
+          git_committer_email: "actions@users.noreply.github.com"
+
+      - name: Publish | Upload to GitHub Release Assets
+        uses: python-semantic-release/publish-action@v9.21.0
+        if: steps.release.outputs.released == 'true'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.release.outputs.tag }}
