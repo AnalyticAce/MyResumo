@@ -4,9 +4,14 @@ version = "2.0.0"
 description = "MyResumo is an AI-powered resume customization platform that tailors your professional profile to match specific job descriptions."
 authors = ["DOSSEH Shalom <dossehdosseh14@gmail.com>"]
 readme = "README.md"
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
