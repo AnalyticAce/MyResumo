@@ -179,12 +179,12 @@ async function submitScoreResume() {
     const jobDescription = document.getElementById('job-description').value.trim();
     
     if (!jobDescription) {
-        alert('Please enter a job description to score your resume against.');
+        window.showWarningToast('Please enter a job description to score your resume against.');
         return;
     }
     
     if (!window.currentResumeId) {
-        alert('No resume selected. Please try again.');
+        window.showErrorToast('No resume selected. Please try again.');
         return;
     }
     
@@ -224,7 +224,7 @@ async function submitScoreResume() {
         
     } catch (error) {
         console.error('Error scoring resume:', error);
-        alert('There was a problem scoring your resume. Please try again.');
+        window.showErrorToast('There was a problem scoring your resume. Please try again.');
     } finally {
         Alpine.store('app').isScoring = false;
     }
@@ -237,7 +237,7 @@ function closeScoreResultsModal() {
 
 function optimizeResumeFromScore() {
     if (!window.currentResumeId) {
-        alert('Resume ID not found. Please try again.');
+        window.showErrorToast('Resume ID not found. Please try again.');
         return;
     }
     
