@@ -117,7 +117,7 @@ docker run -d --name myresumo \
   ghcr.io/analyticace/myresumo:latest
 ```
 
-## 🖼️ Showcase
+<!--## 🖼️ Showcase
 
 Below are screenshots showcasing the main features of MyResumo:
 
@@ -126,7 +126,7 @@ The landing page introduces users to the AI-powered resume optimization service,
 
 ![MyResumo Landing Page](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/landing-page.png)
 
-<!-- ### Dashboard
+### Dashboard
 The user dashboard provides an overview of all your resumes, including ATS scores, last update dates, and quick access to actions like viewing, editing, downloading, or deleting each resume.
 
 ![MyResumo Dashboard](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/dashboard.png)
