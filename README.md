@@ -20,15 +20,13 @@
   <img src="https://github.com/AnalyticAce/MyResumo/blob/develop/.github/assets/demo-screenshot.png" alt="MyResumo Screenshot" width="800"/>
 </div> -->
 
-https://github.com/user-attachments/assets/19e3c502-d829-455b-85e9-e7822f575360
-
 ## ✨ Key Features
 
-- **🤖 AI-Powered Resume Customization**: Automatically tailors your resume content to match job requirements
-- **🔍 ATS Optimization**: Enhances keyword matching for better visibility in applicant tracking systems
-- **📊 Skills Gap Analysis**: Identifies missing skills based on job descriptions
-- **📝 Resume Generation**: Creates formatted, professional resumes in multiple formats
-- **🔄 Version Management**: Track different versions of your resume for various applications
+- **AI-Powered Resume Customization**: Automatically tailors your resume content to match job requirements
+- **ATS Optimization**: Enhances keyword matching for better visibility in applicant tracking systems
+- **Skills Gap Analysis**: Identifies missing skills based on job descriptions
+- **Resume Generation**: Creates formatted, professional resumes in multiple formats
+- **Version Management**: Track different versions of your resume for various applications
 
 ## 🚀 Technologies
 
@@ -118,6 +116,30 @@ docker run -d --name myresumo \
   -e MONGODB_URI=mongodb://username:password@host:port/ \
   ghcr.io/analyticace/myresumo:latest
 ```
+
+## 🖼️ Showcase
+
+Below are screenshots showcasing the main features of MyResumo:
+
+### Landing Page
+The landing page introduces users to the AI-powered resume optimization service, highlighting the key benefits of using MyResumo to tailor resumes for specific job applications.
+
+![MyResumo Landing Page](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/landing-page.png)
+
+<!-- ### Dashboard
+The user dashboard provides an overview of all your resumes, including ATS scores, last update dates, and quick access to actions like viewing, editing, downloading, or deleting each resume.
+
+![MyResumo Dashboard](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/dashboard.png)
+
+### Resume Optimization
+The resume optimization page analyzes your resume against job descriptions, providing detailed feedback on missing keywords, skills, and suggestions for improvement.
+
+![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimization.png)
+
+### Resume Creation
+The intuitive resume creation interface allows you to build professional resumes with AI assistance, ensuring they're optimized for both ATS systems and human reviewers.
+
+![Resume Creation](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/creation.png) -->
 
 ## Alternative AI Models
 

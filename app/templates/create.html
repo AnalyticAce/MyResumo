@@ -487,7 +487,7 @@
                     
                 } catch (error) {
                     console.error('Error uploading resume:', error);
-                    alert('Failed to upload resume. Please try again.');
+                    window.showErrorToast('Failed to upload resume. Please try again.');
                 } finally {
                     this.isUploading = false;
                 }
@@ -562,7 +562,7 @@
                     
                 } catch (error) {
                     console.error('Error optimizing resume:', error);
-                    alert('Failed to optimize resume. Please try again.');
+                    window.showErrorToast('Failed to upload resume. Please try again.');
                     this.currentStep = 1;
                     this.isAnalyzing = false;
                     clearInterval(this.resetProgressInterval);
@@ -651,7 +651,7 @@
                     window.open(`/api/resume/${this.resumeId}/download?use_optimized=true`, '_blank');
                 } catch (error) {
                     console.error('Error downloading resume:', error);
-                    alert('Failed to download resume. Please try again.');
+                    window.showErrorToast('Failed to download resume. Please try again.');
                 }
             },
             
