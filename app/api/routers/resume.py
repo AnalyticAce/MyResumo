@@ -674,19 +674,47 @@ async def score_resume(
                 detail="Job description is required for scoring",
             )
 
-        # Score the resume
-        logger.info("Scoring resume against job description")
+        # Get resume content - first check if optimized data exists, use that for comparison
+        resume_content = resume["original_content"]
+        
+        # Optionally also score the optimized version if it exists
+        optimized_data = resume.get("optimized_data")
+        optimized_score = None
+        
+        # Score the original resume
+        logger.info("Scoring original resume against job description")
         score_result = ats_scorer.compute_match_score(
-            resume["original_content"], job_description
+            resume_content, job_description
         )
         ats_score = int(score_result["final_score"])
+        
+        # If optimized data exists, score it too for comparison
+        if optimized_data:
+            logger.info("Scoring optimized resume for comparison")
+            if isinstance(optimized_data, str):
+                optimized_content = optimized_data
+            else:
+                optimized_content = json.dumps(optimized_data)
+            
+            optimized_score_result = ats_scorer.compute_match_score(
+                optimized_content, job_description
+            )
+            optimized_score = int(optimized_score_result["final_score"])
+            logger.info(f"Original score: {ats_score}, Optimized score: {optimized_score}")
+        
+        # Prepare enhanced recommendation if we have both scores
+        recommendation = score_result.get("recommendation", "")
+        if optimized_score:
+            improvement = optimized_score - ats_score
+            if improvement > 0:
+                recommendation += f"\n\nYour optimized resume scores {improvement} points higher ({optimized_score}%). Consider using the optimized version for better results."
 
         return {
             "resume_id": resume_id,
             "ats_score": ats_score,
             "matching_skills": score_result.get("matching_skills", []),
             "missing_skills": score_result.get("missing_skills", []),
-            "recommendation": score_result.get("recommendation", ""),
+            "recommendation": recommendation,
             "resume_skills": score_result.get("resume_skills", []),
             "job_requirements": score_result.get("job_requirements", []),
         }

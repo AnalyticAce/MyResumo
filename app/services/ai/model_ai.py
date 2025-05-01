@@ -130,6 +130,7 @@ class AtsResumeOptimizer:
         - Highlight them prominently in the skills section
         - Look for ways to showcase these skills in past experience descriptions
         - Ensure you're using the exact terminology as listed
+        - Look for related skills or experience that could be reframed to match these requirements
         - Do NOT fabricate experience with these skills, only highlight them if they exist
         """
         
@@ -156,6 +157,7 @@ class AtsResumeOptimizer:
             - Identify technical requirements (software, tools, frameworks, etc.)
             - Detect company values and culture indicators
             - Determine desired experience level and specific metrics/achievements valued
+            - Pay special attention to both hard skills (technical) and soft skills (interpersonal)
 
         2. **EVALUATE THE CURRENT RESUME**
             - Compare existing content against job requirements
@@ -164,6 +166,7 @@ class AtsResumeOptimizer:
             - Assess the presentation of achievements and results
             - Calculate an initial "match score" to identify improvement areas
             - Note transferable skills that could be reframed for the target position
+            - Look for implied skills that might not be explicitly stated
 
         3. **CREATE AN ATS-OPTIMIZED RESUME**
             - Use a clean, ATS-friendly format with standard section headings
@@ -177,6 +180,8 @@ class AtsResumeOptimizer:
             - Remove irrelevant information that doesn't support this application
             - Ensure job titles, company names, dates, and locations are clearly formatted
             - Include a skills section with relevant hard and soft skills using job description terminology
+            - Highlight both technical capabilities and relevant soft skills like communication, teamwork, leadership
+            - Emphasize transferable skills when direct experience is lacking
 
         4. **ATS OPTIMIZATION TECHNIQUES**
             - Use standard section headings (e.g., "Work Experience" not "Career Adventures")
@@ -188,6 +193,8 @@ class AtsResumeOptimizer:
             - Keep formatting consistent throughout the document
             - For technical positions, include relevant projects with clear descriptions
             - Limit project listings to 3-4 most relevant examples
+            - Use synonyms and related terms for key skills to maximize keyword matching
+            - Make connections between past experience and job requirements clear and explicit
 
         5. **ETHICAL GUIDELINES**
             - Only include truthful information from the original resume
@@ -195,6 +202,7 @@ class AtsResumeOptimizer:
             - Focus on highlighting relevant actual experience, not inventing new experience
             - Reframe existing experience to highlight relevant skills
             - Optimize language and presentation while maintaining accuracy
+            - When appropriate, add context to existing skills to make them more relevant to the job
 
         ## OUTPUT FORMAT:
 
@@ -290,29 +298,46 @@ class AtsResumeOptimizer:
     ) -> Dict[str, Any]:
         """Generate an ATS-optimized resume in JSON format.
 
+        This method performs a comprehensive ATS analysis of the resume against the job
+        description, extracts valuable insights such as missing skills and keyword matches,
+        and then uses this information to generate an optimized resume tailored to the
+        specific job requirements.
+
         Args:
             job_description: The target job description.
 
         Returns:
         -------
-            dict: The optimized resume in JSON format.
+            dict: The optimized resume in JSON format with additional ATS metrics.
         """
         if not self.resume:
             return {"error": "Resume not provided"}
 
         try:
             missing_skills = []
+            score_results = {}
+            
+            # First perform ATS scoring analysis to identify gaps and opportunities
             if self.ats_scorer:
                 try:
-                    score_result = self.ats_scorer.compute_match_score(
+                    score_results = self.ats_scorer.compute_match_score(
                         self.resume, job_description
                     )
-                    missing_skills = score_result.get("missing_skills", [])
+                    missing_skills = score_results.get("missing_skills", [])
+                    matching_skills = score_results.get("matching_skills", [])
+                    
+                    # Setup chain with the missing skills information
                     self._setup_chain(missing_skills)
+                    
+                    # Log the scoring results for debugging
+                    print(f"Initial ATS Score: {score_results.get('final_score', 'N/A')}%")
+                    print(f"Found {len(missing_skills)} missing skills to incorporate")
+                    print(f"Found {len(matching_skills)} matching skills to emphasize")
                 except Exception as e:
                     print(f"Warning: ATS scoring failed, proceeding without skill recommendations: {str(e)}")
                     pass
 
+            # Generate the optimized resume
             result = self.chain.invoke(
                 {"job_description": job_description, "resume": self.resume}
             )
@@ -325,16 +350,48 @@ class AtsResumeOptimizer:
 
                 try:
                     json_result = json.loads(content)
+                    
+                    # Add ATS score metrics to the result if available
+                    if score_results:
+                        json_result["ats_metrics"] = {
+                            "initial_score": score_results.get("final_score", 0),
+                            "matching_skills": score_results.get("matching_skills", []),
+                            "missing_skills": score_results.get("missing_skills", []),
+                            "recommendation": score_results.get("recommendation", "")
+                        }
+                    
                     return json_result
                 except json.JSONDecodeError:
                     json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
                     if json_match:
                         json_str = json_match.group(1)
-                        return json.loads(json_str)
+                        json_result = json.loads(json_str)
+                        
+                        # Add ATS score metrics to the result if available
+                        if score_results:
+                            json_result["ats_metrics"] = {
+                                "initial_score": score_results.get("final_score", 0),
+                                "matching_skills": score_results.get("matching_skills", []),
+                                "missing_skills": score_results.get("missing_skills", []),
+                                "recommendation": score_results.get("recommendation", "")
+                            }
+                        
+                        return json_result
 
                     json_str = re.search(r"(\{[\s\S]*\})", content)
                     if json_str:
-                        return json.loads(json_str.group(1))
+                        json_result = json.loads(json_str.group(1))
+                        
+                        # Add ATS score metrics to the result if available
+                        if score_results:
+                            json_result["ats_metrics"] = {
+                                "initial_score": score_results.get("final_score", 0),
+                                "matching_skills": score_results.get("matching_skills", []),
+                                "missing_skills": score_results.get("missing_skills", []),
+                                "recommendation": score_results.get("recommendation", "")
+                            }
+                        
+                        return json_result
 
                     return {
                         "error": f"Could not extract valid JSON from response: {content[:100]}..."

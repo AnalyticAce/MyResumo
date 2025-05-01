@@ -101,9 +101,16 @@ class ATSScorerLLM:
         # Prompt for extracting skills from resume
         self.resume_prompt = PromptTemplate(
             template="""You are an expert ATS (Applicant Tracking System) analyzer.
-            Extract all technical skills, experience, and qualifications from the following resume text.
-            Be thorough but precise - only extract actual skills (like programming languages, tools, frameworks)
-            and professionally relevant qualifications.
+            Extract ALL skills, experience, and qualifications from the following resume text.
+            Be comprehensive and generous in your extraction, including:
+            - Technical skills (programming languages, tools, frameworks, etc.)
+            - Soft skills (communication, leadership, etc.)
+            - Domain knowledge and industry experience
+            - Implied skills based on work descriptions
+            - Educational qualifications and certifications
+            - Transferable skills from different contexts
+            
+            Be inclusive rather than restrictive - capture everything that could potentially match a job requirement.
             
             RESUME TEXT:
             {resume_text}
@@ -119,8 +126,15 @@ class ATSScorerLLM:
         # Prompt for extracting requirements from job description
         self.job_prompt = PromptTemplate(
             template="""You are an expert job analyzer.
-            Extract all required technical skills, experience requirements, and key qualifications
-            from the following job description. Focus on must-have requirements, not nice-to-have ones.
+            Extract ALL skills, experience requirements, and qualifications from the following job description.
+            Be comprehensive, including both required and preferred qualifications.
+            
+            Include:
+            - Technical skills and tools mentioned
+            - Experience and education requirements
+            - Soft skills and personal qualities
+            - Domain knowledge and industry expertise
+            - Any other attributes that would make a candidate suitable
             
             JOB DESCRIPTION:
             {job_text}
@@ -135,7 +149,7 @@ class ATSScorerLLM:
 
         # Prompt for skill matching and score analysis
         self.matching_prompt = PromptTemplate(
-            template="""You are an expert ATS (Applicant Tracking System) analyzer.
+            template="""You are an expert ATS (Applicant Tracking System) analyzer and recruiter.
             Compare the candidate's skills and qualifications with the job requirements and provide an analysis.
             
             CANDIDATE SKILLS AND QUALIFICATIONS:
@@ -145,7 +159,15 @@ class ATSScorerLLM:
             {job_requirements}
             
             Based on a detailed analysis, provide:
-            1. A scoring from 0-100 indicating how well the candidate's skills match the job requirements
+            1. A scoring from 0-100 indicating how well the candidate's skills match the job requirements:
+               - Score 70-100 if the candidate meets the core requirements and has most of the desired skills
+               - Score 50-69 if the candidate meets most core requirements but is missing some key skills
+               - Score 30-49 if the candidate meets some requirements but has significant gaps
+               - Score 0-29 if the candidate lacks most of the core requirements
+               
+               Consider transferable skills and potential ability to learn required skills when scoring.
+               If a candidate has 60% or more relevant skills, they deserve serious consideration.
+               
             2. A list of matching skills between the candidate and job requirements
             3. A list of important missing skills the candidate should highlight or develop
             4. A brief recommendation about the candidate's fit for this role
@@ -205,25 +227,62 @@ class ATSScorerLLM:
             return 0.5
 
     def calculate_keyword_overlap(self, resume_skills, job_skills):
-        """Calculate a simple keyword overlap score as an additional signal."""
+        """Calculate a more sophisticated keyword overlap score.
+        
+        This improved version looks for semantic matches between job skills and resume skills,
+        not just exact substring matches. It recognizes related concepts and synonyms.
+        """
         if not resume_skills or not job_skills:
             return 0.5
 
         resume_skills_lower = [skill.lower() for skill in resume_skills]
         job_skills_lower = [skill.lower() for skill in job_skills]
-
+        
+        # Synonym mapping for common technical skills and concepts
+        synonyms = {
+            "python": ["py", "python programming", "python development"],
+            "data science": ["data analytics", "data analysis", "analytics", "data scientist"],
+            "machine learning": ["ml", "ai", "artificial intelligence", "predictive modeling"],
+            "sql": ["database", "mysql", "postgresql", "tsql", "relational database"],
+            "communication": ["presenting", "public speaking", "writing", "interpersonal"],
+            "visualization": ["dashboard", "charts", "data viz", "looker", "tableau", "power bi"],
+            "analysis": ["analytics", "analyze", "analytical"],
+            "programming": ["coding", "development", "software engineering"],
+            "statistics": ["statistical analysis", "statistical methods", "data modeling"],
+            "cloud": ["aws", "azure", "gcp", "google cloud"],
+            "devops": ["ci/cd", "jenkins", "git", "github", "deployment"],
+        }
+        
+        extended_resume_skills = set(resume_skills_lower)
+        for skill in resume_skills_lower:
+            for key, values in synonyms.items():
+                # If skill is a key or in values, add all related skills
+                if skill == key or any(v in skill for v in values):
+                    extended_resume_skills.update(values)
+                    extended_resume_skills.add(key)
+        
+        # Count matches with the extended skill set
         matches = sum(
             1
             for skill in job_skills_lower
             if any(
-                job_skill in skill or skill in job_skill
-                for job_skill in resume_skills_lower
+                job_skill in skill or skill in job_skill 
+                for job_skill in extended_resume_skills
             )
         )
-
-        if len(job_skills_lower) > 0:
-            return matches / len(job_skills_lower)
-        return 0.5
+        
+        # Try to match multi-word concepts as well
+        for job_skill in job_skills_lower:
+            words = job_skill.split()
+            if len(words) > 1:
+                # If multiple words in a skill separately exist in resume skills
+                if sum(1 for word in words if any(word in rs for rs in resume_skills_lower)) >= len(words) / 2:
+                    matches += 0.5  # Partial match
+        
+        overlap_score = matches / len(job_skills_lower) if len(job_skills_lower) > 0 else 0.5
+        
+        # Normalize to 0-1 range
+        return min(1.0, overlap_score)
 
     def analyze_match(self, resume_analysis, job_analysis):
         """Have the LLM analyze the match between resume and job requirements."""
@@ -302,9 +361,9 @@ class ATSScorerLLM:
         """Calculate comprehensive match score between resume and job."""
         if weights is None:
             weights = {
-                "llm_analysis": 0.5,
-                "semantic": 0.3,
-                "keyword_overlap": 0.2,
+                "llm_analysis": 0.4,    # Reduced from 0.5 to give less weight to the strict LLM scoring
+                "semantic": 0.3,        # Maintained at 0.3 for document similarity
+                "keyword_overlap": 0.3, # Increased from 0.2 to give more weight to our improved keyword matching
             }
 
         # Extract information using LLM
@@ -313,6 +372,9 @@ class ATSScorerLLM:
 
         # Calculate semantic similarity with TF-IDF
         semantic_score = self.calculate_semantic_similarity(resume_text, job_text)
+        
+        # Apply a minimum baseline for semantic similarity to avoid underscoring
+        semantic_score = max(semantic_score, 0.4)  # Set a floor of 0.4 (40%) for semantic similarity
 
         # Calculate keyword overlap score
         resume_skills = (
@@ -324,13 +386,23 @@ class ATSScorerLLM:
         # Get LLM analysis of match
         match_analysis = self.analyze_match(resume_analysis, job_analysis)
         llm_score = match_analysis.get("score", 50) / 100  # Convert to 0-1 scale
-
+        
+        # Apply a minimum baseline for LLM score to prevent severe underscoring
+        llm_score = max(llm_score, 0.45)  # Set a floor of 0.45 (45%) for LLM score
+        
         # Calculate final weighted score
         final_score = (
             weights["llm_analysis"] * llm_score
             + weights["semantic"] * semantic_score
             + weights["keyword_overlap"] * keyword_score
         )
+        
+        # Apply a gentle curve to the final score to avoid excessively low scores
+        # This makes scores more realistic for real-world job applications
+        if final_score < 0.7:  # If score is below 70%
+            # Apply a gentle boost that increases lower scores more than higher ones
+            boost_factor = 0.15 * (1 - final_score)  # More boost for lower scores
+            final_score = min(final_score + boost_factor, 1.0)  # Cap at 100%
 
         # Format the result
         result = {
