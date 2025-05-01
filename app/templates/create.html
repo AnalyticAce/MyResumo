@@ -528,23 +528,12 @@
                     
                     const data = await response.json();
                     
-                    // Update match score and skill data
-                    this.matchScore = data.ats_score || 65;
+                    // Update match score with the optimized ATS score
+                    this.matchScore = data.optimized_ats_score || 65;
                     
-                    // Extract skills from the optimized data
-                    if (data.optimized_data && data.optimized_data.user_information && data.optimized_data.user_information.skills) {
-                        const skills = data.optimized_data.user_information.skills;
-                        
-                        // Split the skills into matched and missing based on some logic
-                        // For this demo, we'll just use the hard_skills as matched and assign some missing
-                        this.matchedSkills = skills.hard_skills || [];
-                        
-                        // In a real app, you'd determine missing skills from the job description
-                        // Here we'll just use placeholder data
-                        this.missingSkills = ['Docker', 'TypeScript', 'GraphQL', 'AWS'].filter(
-                            skill => !this.matchedSkills.includes(skill)
-                        ).slice(0, 5);
-                    }
+                    // Use the matching_skills and missing_skills directly from the API response
+                    this.matchedSkills = data.matching_skills || [];
+                    this.missingSkills = data.missing_skills || [];
                     
                     // Set up the PDF preview
                     this.setupResumePreview(data);

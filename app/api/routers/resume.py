@@ -476,6 +476,10 @@ async def optimize_resume(
         original_ats_score = int(original_score_result["final_score"])
         logger.info(f"Original resume ATS score: {original_ats_score}")
 
+        # Extract missing skills to be addressed in optimization
+        missing_skills = original_score_result.get("missing_skills", [])
+        logger.info(f"Identified missing skills: {missing_skills}")
+
         # 6. Initialize optimizer and generate optimized resume
         logger.info("Initializing AtsResumeOptimizer")
         optimizer = AtsResumeOptimizer(
@@ -487,6 +491,7 @@ async def optimize_resume(
 
         logger.info("Calling AI service to generate optimized resume")
         result = optimizer.generate_ats_optimized_resume_json(job_description)
+        # Note: The optimizer now automatically incorporates missing skills into the prompt
 
         # 7. Check for errors in result
         if "error" in result:
@@ -556,9 +561,9 @@ async def optimize_resume(
             "original_ats_score": original_ats_score,
             "optimized_ats_score": optimized_ats_score,
             "score_improvement": score_improvement,
-            "matching_skills": optimized_score_result["matching_skills"],
-            "missing_skills": optimized_score_result["missing_skills"],
-            "recommendation": optimized_score_result["recommendation"],
+            "matching_skills": optimized_score_result.get("matching_skills", []),
+            "missing_skills": optimized_score_result.get("missing_skills", []),
+            "recommendation": optimized_score_result.get("recommendation", ""),
             "optimized_data": result,
         }
 

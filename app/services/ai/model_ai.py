@@ -8,11 +8,13 @@ with Applicant Tracking Systems (ATS).
 import json
 import os
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
+
+from app.services.ai.ats_scoring import ATSScorerLLM
 
 
 class AtsResumeOptimizer:
@@ -34,13 +36,14 @@ class AtsResumeOptimizer:
         api_base: Base URL for the OpenAI API
         llm: The initialized language model instance
         output_parser: Parser for converting LLM output to JSON format
+        ats_scorer: ATSScorerLLM instance for scoring resume and extracting missing skills
 
     Methods:
     -------
         _get_openai_model()
             Initialize the OpenAI model with appropriate settings
-        _get_prompt_template()
-            Create the PromptTemplate for ATS resume optimization
+        _get_prompt_template(missing_skills=None)
+            Create the PromptTemplate for ATS resume optimization with missing skills
         _setup_chain()
             Set up the processing pipeline for job descriptions and resumes
         generate_ats_optimized_resume_json(job_description)
@@ -79,8 +82,16 @@ class AtsResumeOptimizer:
         self.llm = self._get_openai_model()
         self.output_parser = JsonOutputParser()
         self.chain = None
+        
+        # Initialize ATS scorer for skill extraction and analysis
+        self.ats_scorer = None
+        if self.api_key and self.api_base and self.model_name:
+            self.ats_scorer = ATSScorerLLM(
+                model_name=self.model_name,
+                api_key=self.api_key,
+                api_base=self.api_base,
+            )
 
-        # Setup the processing chain
         self._setup_chain()
 
     def _get_openai_model(self) -> ChatOpenAI:
@@ -95,44 +106,77 @@ class AtsResumeOptimizer:
         else:
             return ChatOpenAI(temperature=0)
 
-    def _get_prompt_template(self) -> PromptTemplate:
-        """Create the PromptTemplate for ATS resume optimization."""
-        template = """
+    def _get_prompt_template(self, missing_skills: Optional[List[str]] = None) -> PromptTemplate:
+        """Create the PromptTemplate for ATS resume optimization.
+        
+        Args:
+            missing_skills: A list of skills identified as missing from the resume
+                        that should be incorporated if the candidate has them.
+
+        Returns:
+            PromptTemplate: A prompt template with instructions for resume optimization.
+        """
+        recommended_skills_section = ""
+        if missing_skills and len(missing_skills) > 0:
+            skills_list = ", ".join([f"'{skill}'" for skill in missing_skills])
+            recommended_skills_section = f"""
+        ## RECOMMENDED SKILLS TO ADD
+        
+        The following skills were identified as potentially valuable for this position but may be missing or not prominently featured in the resume:
+        
+        {skills_list}
+        
+        If the candidate has any experience with these skills, even minor exposure:
+        - Highlight them prominently in the skills section
+        - Look for ways to showcase these skills in past experience descriptions
+        - Ensure you're using the exact terminology as listed
+        - Do NOT fabricate experience with these skills, only highlight them if they exist
+        """
+        
+        template = f"""
         # ROLE: Expert ATS Resume Optimization Specialist
-
         You are an expert ATS (Applicant Tracking System) Resume Optimizer with specialized knowledge in resume writing, keyword optimization, and applicant tracking systems. Your task is to transform the candidate's existing resume into a highly optimized version tailored specifically to the provided job description, maximizing the candidate's chances of passing through ATS filters while maintaining honesty and accuracy.
-
+        
         ## INPUT DATA:
 
         ### JOB DESCRIPTION:
-        {job_description}
+        {{job_description}}
 
         ### CANDIDATE'S CURRENT RESUME:
-        {resume}
+        {{resume}}
+        
+        {recommended_skills_section}
 
-        ## OPTIMIZATION INSTRUCTIONS:
+        ## OPTIMIZATION PROCESS:
 
         1. **ANALYZE THE JOB DESCRIPTION**
             - Extract key requirements, skills, qualifications, and responsibilities
             - Identify primary keywords, secondary keywords, and industry-specific terminology
             - Note the exact phrasing and terminology used by the employer
+            - Identify technical requirements (software, tools, frameworks, etc.)
+            - Detect company values and culture indicators
+            - Determine desired experience level and specific metrics/achievements valued
 
         2. **EVALUATE THE CURRENT RESUME**
             - Compare existing content against job requirements
             - Identify skills and experiences that align with the job
-            - Identify gaps or areas where alignment could be improved
+            - Detect terminology mismatches and missing keywords
+            - Assess the presentation of achievements and results
+            - Calculate an initial "match score" to identify improvement areas
+            - Note transferable skills that could be reframed for the target position
 
         3. **CREATE AN ATS-OPTIMIZED RESUME**
             - Use a clean, ATS-friendly format with standard section headings
-            - Include the candidate's name, contact information, and LinkedIn profile (if available)
+            - Include the candidate's name, contact information, and professional profiles
             - Create a targeted professional summary highlighting relevant qualifications
             - Incorporate exact keywords and phrases from the job description throughout the resume
             - Prioritize and emphasize experiences most relevant to the target position
+            - Reorder content to place most relevant experiences and skills first
             - Use industry-standard terminology that ATS systems recognize
-            - Quantify achievements with metrics where possible
+            - Quantify achievements with metrics where possible (numbers, percentages, dollar amounts)
             - Remove irrelevant information that doesn't support this application
-            - Use a chronological format unless a functional format is clearly better for this candidate
-            - Include a skills section with bullet points of relevant hard and soft skills
+            - Ensure job titles, company names, dates, and locations are clearly formatted
+            - Include a skills section with relevant hard and soft skills using job description terminology
 
         4. **ATS OPTIMIZATION TECHNIQUES**
             - Use standard section headings (e.g., "Work Experience" not "Career Adventures")
@@ -141,14 +185,15 @@ class AtsResumeOptimizer:
             - Use common file formats and fonts (Arial, Calibri, Times New Roman)
             - Include keywords in context rather than keyword stuffing
             - Use both spelled-out terms and acronyms where applicable (e.g., "Search Engine Optimization (SEO)")
-            - Ensure job titles, company names, dates, and locations are clearly formatted
-            - Keep formatting consistent throughout the document.
-            - If candidate has projects, only list the most related to the job not all of them, list 3-4 projects.
+            - Keep formatting consistent throughout the document
+            - For technical positions, include relevant projects with clear descriptions
+            - Limit project listings to 3-4 most relevant examples
 
         5. **ETHICAL GUIDELINES**
             - Only include truthful information from the original resume
             - Do not fabricate experience, skills, or qualifications
             - Focus on highlighting relevant actual experience, not inventing new experience
+            - Reframe existing experience to highlight relevant skills
             - Optimize language and presentation while maintaining accuracy
 
         ## OUTPUT FORMAT:
@@ -156,8 +201,8 @@ class AtsResumeOptimizer:
         You MUST return ONLY a valid JSON object with NO additional text, explanation, or commentary.
         The JSON must follow this EXACT structure:
 
-        {{
-            "user_information": {{
+        {{{{
+            "user_information": {{{{
                 "name": "",
                 "main_job_title": "",
                 "profile_description": "",
@@ -165,58 +210,58 @@ class AtsResumeOptimizer:
                 "linkedin": "",
                 "github": "",
                 "experiences": [
-                    {{
+                    {{{{
                         "job_title": "",
                         "company": "",
                         "start_date": "",
                         "end_date": "",
                         "location": "",
                         "four_tasks": []
-                    }}
+                    }}}}
                 ],
                 "education": [
-                    {{
+                    {{{{
                         "institution": "",
                         "degree": "",
                         "location": "",
                         "description": "",
                         "start_date": "",
                         "end_date": ""
-                    }}
+                    }}}}
                 ],
-                "skills": {{
+                "skills": {{{{
                     "hard_skills": [],
                     "soft_skills": []
-                }},
+                }}}},
                 "hobbies": []
-            }},
+            }}}},
             "projects": [
-                {{
+                {{{{
                     "project_name": "",
                     "project_link": "",
                     "two_goals_of_the_project": [],
                     "project_end_result": "",
                     "tech_stack": []
-                }}
+                }}}}
             ],
             "certificate": [
-                {{
+                {{{{
                     "name": "",
                     "link" : "",
                     "institution": "",
                     "description": "",
                     "date": ""
-                }}
+                }}}}
             ],
             "extra_curricular_activities": [
-                {{
+                {{{{
                     "name": "",
                     "description": "",
                     "start_date": "",
                     "end_date": ""
-                }}
+                }}}}
             ]
-        }}
+        }}}}
 
         IMPORTANT REQUIREMENTS:
         1. The "four_tasks" array must contain EXACTLY 4 items for each experience
@@ -227,14 +272,17 @@ class AtsResumeOptimizer:
         """
         return PromptTemplate.from_template(template=template)
 
-    def _setup_chain(self) -> None:
+    def _setup_chain(self, missing_skills: Optional[List[str]] = None) -> None:
         """Set up the processing pipeline for job descriptions and resumes.
 
         This method configures the functional composition approach with the pipe operator
         to create a processing chain from prompt template to language model.
+        
+        Args:
+            missing_skills: List of skills identified as missing that should be incorporated
+                        into the optimization prompt.
         """
-        prompt_template = self._get_prompt_template()
-        # Using the recommended pipe-based approach instead of deprecated LLMChain
+        prompt_template = self._get_prompt_template(missing_skills)
         self.chain = prompt_template | self.llm
 
     def generate_ats_optimized_resume_json(
@@ -253,21 +301,28 @@ class AtsResumeOptimizer:
             return {"error": "Resume not provided"}
 
         try:
-            # Updated invocation for the pipe-based chain
+            missing_skills = []
+            if self.ats_scorer:
+                try:
+                    score_result = self.ats_scorer.compute_match_score(
+                        self.resume, job_description
+                    )
+                    missing_skills = score_result.get("missing_skills", [])
+                    self._setup_chain(missing_skills)
+                except Exception as e:
+                    print(f"Warning: ATS scoring failed, proceeding without skill recommendations: {str(e)}")
+                    pass
+
             result = self.chain.invoke(
                 {"job_description": job_description, "resume": self.resume}
             )
 
             try:
-                # Extract the content from AIMessage object if needed
                 if hasattr(result, "content"):
-                    # For AIMessage objects
                     content = result.content
                 else:
-                    # For string responses
                     content = result
 
-                # Try to parse content as JSON directly
                 try:
                     json_result = json.loads(content)
                     return json_result
@@ -310,7 +365,6 @@ if __name__ == "__main__":
         resume=resume,
         api_key=API_KEY,
         api_base=API_BASE,
-        language="en",
     )
 
     result = model.generate_ats_optimized_resume_json(job_description)
