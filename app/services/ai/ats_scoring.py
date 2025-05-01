@@ -11,10 +11,11 @@ from typing import List, Optional
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
+from app.utils.token_tracker import TokenTracker
 
 
 class SkillsExtraction(BaseModel):
@@ -47,13 +48,14 @@ class ATSScorerLLM:
     LLM-based techniques.
     """
 
-    def __init__(self, model_name="", api_key=None, api_base=""):
+    def __init__(self, model_name="", api_key=None, api_base="", user_id=None):
         """Initialize the ATS scorer with API credentials and model configuration.
 
         Args:
             model_name (str): Name of the LLM model to use. Falls back to MODEL_NAME env var.
             api_key (str, optional): API key for the LLM service. Falls back to API_KEY env var.
             api_base (str, optional): Base URL for the API service. Falls back to API_BASE env var.
+            user_id (str, optional): User ID for token tracking.
 
         Raises:
             ValueError: If required credentials are missing after falling back to environment variables.
@@ -61,6 +63,8 @@ class ATSScorerLLM:
         self.api_key = api_key or os.getenv("API_KEY")
         self.api_base = api_base or os.getenv("API_BASE")
         self.model_name = model_name or os.getenv("MODEL_NAME")
+        self.user_id = user_id
+
         if not self.api_key:
             raise ValueError(
                 "An LLM API key is required. Provide it or set API_KEY environment variable."
@@ -76,11 +80,14 @@ class ATSScorerLLM:
                 "An LLM model name is required. Provide it or set MODEL_NAME environment variable."
             )
 
-        self.llm = ChatOpenAI(
+        # Use TokenTracker to create a tracked instance of the LLM
+        self.llm = TokenTracker.get_tracked_langchain_llm(
             model_name=self.model_name,
             temperature=0.1,
-            openai_api_key=self.api_key,
-            openai_api_base=self.api_base,
+            api_key=self.api_key,
+            api_base=self.api_base,
+            feature="ats_scoring",
+            user_id=self.user_id
         )
 
         self.vectorizer = TfidfVectorizer(
@@ -363,7 +370,7 @@ class ATSScorerLLM:
             weights = {
                 "llm_analysis": 0.4,    # Reduced from 0.5 to give less weight to the strict LLM scoring
                 "semantic": 0.3,        # Maintained at 0.3 for document similarity
-                "keyword_overlap": 0.3, # Increased from 0.2 to give more weight to our improved keyword matching
+                "keyword_overlap": 0.3,  # Increased from 0.2 to give more weight to our improved keyword matching
             }
 
         # Extract information using LLM

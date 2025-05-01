@@ -15,6 +15,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 
 from app.services.ai.ats_scoring import ATSScorerLLM
+from app.utils.token_tracker import TokenTracker
 
 
 class AtsResumeOptimizer:
@@ -63,6 +64,7 @@ class AtsResumeOptimizer:
         resume: str = None,
         api_key: str = None,
         api_base: str = None,
+        user_id: str = None,
     ) -> None:
         """Initialize the AI model for resume processing.
 
@@ -71,12 +73,13 @@ class AtsResumeOptimizer:
             resume: The resume text to be optimized.
             api_key: OpenAI API key for authentication.
             api_base: Base URL for the OpenAI API.
-            language: Language for processing the resume.
+            user_id: Optional user ID for token tracking.
         """
         self.model_name = model_name or os.getenv("MODEL_NAME")
         self.resume = resume
         self.api_key = api_key or os.getenv("API_KEY")
         self.api_base = api_base or os.getenv("API_BASE")
+        self.user_id = user_id
 
         # Initialize LLM component and output parser
         self.llm = self._get_openai_model()
@@ -90,6 +93,7 @@ class AtsResumeOptimizer:
                 model_name=self.model_name,
                 api_key=self.api_key,
                 api_base=self.api_base,
+                user_id=self.user_id,
             )
 
         self._setup_chain()
@@ -97,13 +101,18 @@ class AtsResumeOptimizer:
     def _get_openai_model(self) -> ChatOpenAI:
         """Initialize the OpenAI model with appropriate settings."""
         if self.model_name:
-            return ChatOpenAI(
+            # Use TokenTracker to get a tracked instance of ChatOpenAI
+            return TokenTracker.get_tracked_langchain_llm(
                 model_name=self.model_name,
                 temperature=0,
-                openai_api_key=self.api_key,
-                openai_api_base=self.api_base,
+                api_key=self.api_key,
+                api_base=self.api_base,
+                feature="resume_optimization",
+                user_id=self.user_id,
+                metadata={"resume_length": len(self.resume) if self.resume else 0}
             )
         else:
+            # Fallback to standard ChatOpenAI if no model name is provided
             return ChatOpenAI(temperature=0)
 
     def _get_prompt_template(self, missing_skills: Optional[List[str]] = None) -> PromptTemplate:
