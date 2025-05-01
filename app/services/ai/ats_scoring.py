@@ -434,7 +434,7 @@ def demo_ats_scorer_llm():
     
     load_dotenv()
     api_key = os.getenv("API_KEY")
-    model_name = os.getenv("API_MODEL_NAME", "gpt-3.5-turbo")
+    model_name = os.getenv("API_MODEL_NAME", "gpt-4-turbo")
     api_base = os.getenv("API_BASE", "https://api.openai.com/v1")
 
     scorer = ATSScorerLLM(api_key=api_key, model_name=model_name, api_base=api_base)

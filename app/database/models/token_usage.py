@@ -24,7 +24,7 @@ class TokenUsage(BaseSchema):
         id: Unique identifier for the token usage record
         timestamp: When the API call was made
         endpoint: The specific API endpoint or function that was called
-        model_name: The name of the LLM model used (e.g., "gpt-3.5-turbo")
+        model_name: The name of the LLM model used (e.g., "gpt-4-turbo")
         prompt_tokens: Number of tokens used in the prompt/input
         completion_tokens: Number of tokens used in the completion/output
         total_tokens: Total tokens used (prompt + completion)
