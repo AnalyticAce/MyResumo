@@ -99,9 +99,13 @@ class AtsResumeOptimizer:
         self._setup_chain()
 
     def _get_openai_model(self) -> ChatOpenAI:
-        """Initialize the OpenAI model with appropriate settings."""
+        """Initialize the OpenAI model with appropriate settings.
+        
+        Returns:
+            ChatOpenAI: Configured language model instance with token tracking
+        """
         if self.model_name:
-            # Use TokenTracker to get a tracked instance of ChatOpenAI
+            # Create LLM instance with token tracking for usage monitoring
             return TokenTracker.get_tracked_langchain_llm(
                 model_name=self.model_name,
                 temperature=0,
@@ -112,7 +116,7 @@ class AtsResumeOptimizer:
                 metadata={"resume_length": len(self.resume) if self.resume else 0}
             )
         else:
-            # Fallback to standard ChatOpenAI if no model name is provided
+            # Fallback to standard model if no specific model is configured
             return ChatOpenAI(temperature=0)
 
     def _get_prompt_template(self, missing_skills: Optional[List[str]] = None) -> PromptTemplate:
@@ -326,7 +330,7 @@ class AtsResumeOptimizer:
             missing_skills = []
             score_results = {}
             
-            # First perform ATS scoring analysis to identify gaps and opportunities
+            # Step 1: Analyze resume against job description to identify skill gaps
             if self.ats_scorer:
                 try:
                     score_results = self.ats_scorer.compute_match_score(
@@ -335,10 +339,9 @@ class AtsResumeOptimizer:
                     missing_skills = score_results.get("missing_skills", [])
                     matching_skills = score_results.get("matching_skills", [])
                     
-                    # Setup chain with the missing skills information
+                    # Reconfigure processing chain with identified missing skills
                     self._setup_chain(missing_skills)
                     
-                    # Log the scoring results for debugging
                     print(f"Initial ATS Score: {score_results.get('final_score', 'N/A')}%")
                     print(f"Found {len(missing_skills)} missing skills to incorporate")
                     print(f"Found {len(matching_skills)} matching skills to emphasize")
@@ -346,21 +349,25 @@ class AtsResumeOptimizer:
                     print(f"Warning: ATS scoring failed, proceeding without skill recommendations: {str(e)}")
                     pass
 
-            # Generate the optimized resume
+            # Step 2: Generate optimized resume using LLM
             result = self.chain.invoke(
                 {"job_description": job_description, "resume": self.resume}
             )
 
+            # Step 3: Parse and format the LLM response
             try:
+                # Extract content from different response types
                 if hasattr(result, "content"):
                     content = result.content
                 else:
                     content = result
 
+                # Step 4: Parse JSON and add ATS metrics
                 try:
+                    # Direct JSON parsing
                     json_result = json.loads(content)
                     
-                    # Add ATS score metrics to the result if available
+                    # Enrich result with ATS analysis metrics
                     if score_results:
                         json_result["ats_metrics"] = {
                             "initial_score": score_results.get("final_score", 0),
@@ -371,12 +378,13 @@ class AtsResumeOptimizer:
                     
                     return json_result
                 except json.JSONDecodeError:
+                    # Fallback 1: Extract JSON from code blocks
                     json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", content)
                     if json_match:
                         json_str = json_match.group(1)
                         json_result = json.loads(json_str)
                         
-                        # Add ATS score metrics to the result if available
+                        # Enrich result with ATS analysis metrics
                         if score_results:
                             json_result["ats_metrics"] = {
                                 "initial_score": score_results.get("final_score", 0),
@@ -387,11 +395,12 @@ class AtsResumeOptimizer:
                         
                         return json_result
 
+                    # Fallback 2: Find any JSON-like structure in the response
                     json_str = re.search(r"(\{[\s\S]*\})", content)
                     if json_str:
                         json_result = json.loads(json_str.group(1))
                         
-                        # Add ATS score metrics to the result if available
+                        # Enrich result with ATS analysis metrics
                         if score_results:
                             json_result["ats_metrics"] = {
                                 "initial_score": score_results.get("final_score", 0),
@@ -402,6 +411,7 @@ class AtsResumeOptimizer:
                         
                         return json_result
 
+                    # No valid JSON found in the response
                     return {
                         "error": f"Could not extract valid JSON from response: {content[:100]}..."
                     }

@@ -234,10 +234,17 @@ class ATSScorerLLM:
             return 0.5
 
     def calculate_keyword_overlap(self, resume_skills, job_skills):
-        """Calculate a more sophisticated keyword overlap score.
+        """Calculate a sophisticated keyword overlap score between resume and job skills.
         
-        This improved version looks for semantic matches between job skills and resume skills,
-        not just exact substring matches. It recognizes related concepts and synonyms.
+        This method identifies semantic matches between job skills and resume skills,
+        recognizing related concepts and synonyms, not just exact matches.
+        
+        Args:
+            resume_skills: List of skills extracted from the resume
+            job_skills: List of skills extracted from the job description
+            
+        Returns:
+            float: Overlap score between 0 and 1
         """
         if not resume_skills or not job_skills:
             return 0.5
@@ -245,7 +252,7 @@ class ATSScorerLLM:
         resume_skills_lower = [skill.lower() for skill in resume_skills]
         job_skills_lower = [skill.lower() for skill in job_skills]
         
-        # Synonym mapping for common technical skills and concepts
+        # Define technology and concept synonym groups to enhance matching
         synonyms = {
             "python": ["py", "python programming", "python development"],
             "data science": ["data analytics", "data analysis", "analytics", "data scientist"],
@@ -260,15 +267,16 @@ class ATSScorerLLM:
             "devops": ["ci/cd", "jenkins", "git", "github", "deployment"],
         }
         
+        # Create an expanded set of resume skills using synonyms
         extended_resume_skills = set(resume_skills_lower)
         for skill in resume_skills_lower:
             for key, values in synonyms.items():
-                # If skill is a key or in values, add all related skills
+                # Add related skills and concepts to the extended set
                 if skill == key or any(v in skill for v in values):
                     extended_resume_skills.update(values)
                     extended_resume_skills.add(key)
         
-        # Count matches with the extended skill set
+        # Count exact and semantic matches with the extended skill set
         matches = sum(
             1
             for skill in job_skills_lower
@@ -278,17 +286,18 @@ class ATSScorerLLM:
             )
         )
         
-        # Try to match multi-word concepts as well
+        # Handle composite skills (multi-word concepts)
         for job_skill in job_skills_lower:
             words = job_skill.split()
             if len(words) > 1:
-                # If multiple words in a skill separately exist in resume skills
+                # Award partial credit for partial matches of multi-word skills
                 if sum(1 for word in words if any(word in rs for rs in resume_skills_lower)) >= len(words) / 2:
                     matches += 0.5  # Partial match
         
+        # Calculate normalized overlap score
         overlap_score = matches / len(job_skills_lower) if len(job_skills_lower) > 0 else 0.5
         
-        # Normalize to 0-1 range
+        # Ensure score is within valid range
         return min(1.0, overlap_score)
 
     def analyze_match(self, resume_analysis, job_analysis):
@@ -367,10 +376,13 @@ class ATSScorerLLM:
     def compute_match_score(self, resume_text, job_text, weights=None):
         """Calculate comprehensive match score between resume and job."""
         if weights is None:
+            # Default weights for scoring components
+            # These can be adjusted based on the specific use case or user preference
+            # Default weights are set to balance the components
             weights = {
-                "llm_analysis": 0.4,    # Reduced from 0.5 to give less weight to the strict LLM scoring
-                "semantic": 0.3,        # Maintained at 0.3 for document similarity
-                "keyword_overlap": 0.3,  # Increased from 0.2 to give more weight to our improved keyword matching
+                "llm_analysis": 0.4,
+                "semantic": 0.3,
+                "keyword_overlap": 0.3,
             }
 
         # Extract information using LLM
@@ -440,161 +452,9 @@ def demo_ats_scorer_llm():
     scorer = ATSScorerLLM(api_key=api_key, model_name=model_name, api_base=api_base)
 
     resume = """
-    Shalom
-    DOSSEH
-    Data Professional
-
-    Number: (+229) 01-57-94-88-04
-    Email: dosseh.contact@gmail.com
-
-    Github: AnalyticAce
-    LinkedIn: DOSSEH Shalom
-
-    Portfolio: analyticace.github.io
-
-    WORK EXPERIENCE
-
-    Gozem - Africa's Super App,                                                                                                                                                     Cotonou, Benin
-    Data Science & Analytics - Internship                                                                                                                            July. 2024 - April 2025
-    Partnered with Gozem Money leadership to understand data requirements for the pre-launch phase of a new fintech vertical, including data extraction, and analysis across large-scale financial datasets for financial forecasting, and transaction analytics.
-    Utilized Python (Pandas, Scikit-learn), SQL, and Looker Studio to generate actionable insights and align business needs with technical solutions.
-    Leveraged SQL and Astro Airflow to design and implement real-time transaction monitoring 8,000,000+ monthly transactions, to detect and prevent fraud, money laundering, and terrorist financing activities, leveraging rule-based and anomaly detection models.
-    Collaborated with the data engineering team to gather, structure, and integrate data from multiple sources (App Stores, Firebase, Data Warehouse) into a centralized analytics repository, enabling a unified view of key product insights.
-    Worked closely with the Head of Data to define core KPIs for tracking app performance across digital storefronts, in-app engagement, and crash analytics, equipping product managers with data-driven insights to optimize user experience, and app store rankings.
-    Gozem - Africa's Super App,                                                                                                                                                      Cotonou, Benin
-    Data Analyst (Ride-hailing) - Internship                                                                                                                        Sept. 2023 - Jan. 2024
-    Executed 65%+ of the squad’s quarterly tasks, completing 92% of high-priority deliverables  efficiently.
-    Investigated transaction data, detecting and dismantling fraudulent schemes, leading to millions in recovered revenue.
-    Performed data integrity checks, identifying and resolving anomalies to maintain accurate reporting.
-    Automated routine reporting and analytics tasks, improving efficiency and precision in data insights.
-
-    PROJECT
-
-    MyResumo | Python, Streamlit, Natural Language Processing, Prompt Engineering
-    Built an AI-backed resume generator designed to tailor your resume and skills based on a given job description. This innovative tool leverages the latest advancements in AI to provide you with an ATS friendly resume.
-    MyTorch  | Python, Computational Analysis, Azure
-    Developed a neural network-based chessboard analyzer from scratch without deep learning libraries. Trained models on FEN notation to classify six game states, achieving 90% accuracy in binary classification and 60-70% in multi-class tasks.
-    Gomoku AI  | Python, Genetic Algorithm
-    Developed a high-performance Gomoku AI bot using Min-Max with Alpha-Beta pruning and heuristic scoring to optimize decision-making. Designed to compete with GomokuCup AI bots, ensuring efficiency under computational constraints.
-    PyDepViz | Python,  Package, Git Action
-    A Python-native dependency graph visualizer designed to simplify dependency management in Python projects. It helps developers visualize and resolve dependency deadlocks efficiently.
-
-    EDUCATION
-
-    EPITECH - European Institute of Technology,                                                                                                                        Cotonou, Benin
-    Bachelor's degree, Innovation and Information Technology                                                                                                  Oct. 2022 - Present
-    I have cultivated robust skills across various domains of computer science, completing nearly 130 projects and mini-projects.
-    Relevant Courses: Computer Numerical Analysis, Artificial Intelligence, Advanced DevOps, Advanced C++
-
-    SKILLS
-
-    Languages: English (Proficient),  French (Native)
-    Programming: Python, SQL, Bash
-    Soft Skills: Adaptability, Coachable, Problem-Solving, Decision-Making, Effective communication, Active listening
-    Data Tools: Pandas, NumPy, Scikit-Learn, Looker Studio, Excel
-    Cloud & DevOps: GCP, Azure, MongoDB, Docker, Jenkins, Ansible, Apache Airflow, Git Source Control, Github action, Linux.
-
-    LEADERSHIP & COMMUNITY INVOLVEMENT
-
-    Technical Workshop Facilitator, Innovation Hub at Epitech (March 2025 - Present)
-    Hosted Python, DevOps, and AI workshops, mentoring students in technical fields.
-    Partnered with industry professionals to deliver hands-on training sessions.
-    Lead Project Manager, Epitech’s Student Bureau (March 2024 - Present)
-    Led a team of 3 project managers, overseeing 30+ initiatives within time and budget constraints.
-    Developed planning & tracking tools to optimize project execution.
-
-    Event Manager & Core Member, Google Developer Students Club (June 2023 - July 2024)
-    Organized tech events, hackathons, and networking sessions to engage student developers.
-    Drove community initiatives to enhance learning in AI & Google Cloud Technologies.
-
-    Social Data Analyst, AFRIK EDUTECH - EPITECH X IMPACT (Dec 2023 - Dec 2024)
-
-    Conducted impact analysis & forecasting, guiding leadership decisions on program effectiveness.
-    Collected & cleaned large-scale datasets for resource optimization.
-
-    CERTIFICATIONS
-
-    Career Essentials in GitHub Professional Certificate (Github, Completed February 2025)
-    Data Scientist Certification (Datacamp, Expected July 2025) 
-    AI Engineer for Data Scientists Associate Certification (Datacamp, Expected Sept 2025)                                                                                                        
-    Certified Associate in Project Management (CAPM) (PMI, Expected Sept 2025)
     """
 
     job_desc = """
-    Deel is the all-in-one payroll and HR platform for global teams. Our vision is to unlock global opportunity for every person, team, and business. Built for the way the world works today, Deel combines HRIS, payroll, compliance, benefits, performance, and equipment management into one seamless platform. With AI-powered tools and a fully owned payroll infrastructure, Deel supports every worker type in 100+ countries—helping businesses scale smarter, faster, and more compliantly.
-
-    Among the largest globally distributed companies in the world, our team of 5,000 spans more than 100 countries, speaks 74 languages, and brings a connected and dynamic culture that drives continuous learning and innovation for our customers.
-
-    Why should you be part of our success story?
-
-    As the fastest-growing Software as a Service (SaaS) company in history, Deel is transforming how global talent connects with world-class companies – breaking down borders that have traditionally limited both hiring and career opportunities. We're not just building software; we're creating the infrastructure for the future of work, enabling a more diverse and inclusive global economy. In 2024 alone, we paid $11.2 billion to workers in nearly 100 currencies and provided healthcare and benefits to workers in 109 countries—ensuring people get paid and protected, no matter where they are.
-
-    Our momentum is reflected in our achievements and customer satisfaction: CNBC Disruptor 50, Forbes Cloud 100, Deloitte Fast 500, and repeated recognition on Y Combinator’s top companies list – all while maintaining a 4.83 average rating from 15,000 reviews across G2, Trustpilot, Captera, Apple and Google.
-
-    Your experience at Deel will be a career accelerator. At the forefront of the global work revolution, you'll tackle complex challenges that impact millions of people's working lives. With our momentum—backed by a $12 billion valuation and $800 million in Annual Recurring Revenue (ARR) in just over five years—you'll drive meaningful impact while building expertise that makes you a sought-after leader in the transformation of global work.
-
-    Why join our Data team?
-
-    Deel is a fast-growing company with a developing Data Science team, which gives the opportunity to contribute to our practices, direction, and tooling selection
-    The nature of the role will be mostly project focused, so a lot of opportunity to dive deep into a single problem and solve it properly
-    This role in particular aims to develop data insights from a large salary grouping. There’s scope to define how the data pipelines will work, and what statistical techniques and ML approaches to use
-    Over 90% of the team’s work makes it to production which is rare for Data science/AI teams, we aim to deliver value each quarter
-
-
-    Responsibilities
-
-    Solve real world problems using Data Science and statistical techniques
-    Implement functionality which can be served in production for internal customers as well as external customers
-    Designing, building and maintaining data sets
-    Data cleaning & modelling
-    Feature engineering
-    Feature extraction
-    Building end-to-end data & machine learning pipelines
-    Conduct reproducible research
-    Collaborate with Engineering, Operations, Product Management and other functions in the company to deliver algorithmic solutions
-    Apply software engineering practices in our code that implements our research and its infrastructure
-    Produce high quality, clean, maintainable reproducible research and code
-
-
-    Requirements
-
-    High proficiency in Python and its data science stack.
-    Background and experience in data/backend engineering, ideally in production environments (3+ years) (Mid/Senior Level role)
-    Background and hands-on experience (2+ years) in implementing research and algorithms in Python, specifically in information retrieval, text processing, NLP, and machine learning
-    Experience with developing AI solutions across a variety of domains
-    Track record of good written and verbal communication of complex things in a simple way as well as ability to collaborate well with people from different backgrounds and professions
-    A Bachelor’s degree or higher
-    Must have hands on experience working with SQL
-    Must have hands on experience working with Python (Preferably with Pandas)
-    Must be strong at applying statistical methods to data
-    Must be strong with data pipelining
-    Must be an independent thinker and have the ability to work independently to solve problems
-
-
-    Total Rewards
-
-    Our workforce deserves fair and competitive pay that meets them where they are. With scalable benefits, rewards, and perks, our total rewards programs reflect our commitment to inclusivity and access for all.
-
-    Some things you’ll enjoy
-
-    Stock grant opportunities dependent on your role, employment status and location
-    Additional perks and benefits based on your employment status and country
-    The flexibility of remote work, including optional WeWork access
-
-
-    At Deel, we’re an equal-opportunity employer that values diversity and positively encourage applications from suitably qualified and eligible candidates regardless of race, religion, sex, national origin, gender, sexual orientation, age, marital status, veteran status, disability status, pregnancy or maternity or other applicable legally protected characteristics.
-
-    Unless otherwise agreed, we will communicate with job applicants using Deel-specific emails, which include @deel.com and other acquired company emails like @payspace.com and @paygroup.com. You can view the most up-to-date job listings at Deel by visitingour careers page.
-
-    Deel is an equal-opportunity employer and is committed to cultivating a diverse and inclusive workplace that reflects different abilities, backgrounds, beliefs, experiences, identities and perspectives.
-
-    Deel will provide accommodation on request throughout the recruitment, selection and assessment process for applicants with disabilities. If you require accommodation, please inform our Talent Acquisition Team at recruiting@deel.com of the nature of the accommodation that you may require, to ensure your equal participation.
-
-    We use Covey as part of our hiring and/or promotional processes. As part of the evaluation process, we provide Covey with job requirements and candidate-submitted applications.Certain features of the platform may qualify it as an Automated Employment Decision Tool (AEDT) under applicable regulations. For positions in New York City, our use of Covey complies with NYC Local Law 144.
-
-    We began using Covey Scout for Inbound on March 30, 2025.
-
-    For more information about our data protection practices, please visit our Privacy Policy. You can review the independent bias audit report covering our use of Covey here: https://getcovey.com/nyc-local-law-144-independent-bias-audit-report/
     """
 
     result = scorer.compute_match_score(resume, job_desc)

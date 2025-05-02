@@ -19,7 +19,7 @@ from app.database.connector import MongoConnectionManager
 from app.web.core import core_web_router
 from app.web.dashboard import web_router
 
-# Initialize templates
+# Initialize Jinja2 templates for HTML rendering
 templates = Jinja2Templates(directory="app/templates")
 
 
