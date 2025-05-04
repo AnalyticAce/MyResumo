@@ -4,8 +4,9 @@ This module provides API endpoints for accessing token usage data
 and analytics for OpenAI API calls throughout the application.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import Dict, List, Optional
+from typing import Dict, Optional
+
+from fastapi import APIRouter, HTTPException, Query
 
 from app.database.models.token_usage import TokenUsageSummary
 from app.utils.token_tracker import TokenTracker

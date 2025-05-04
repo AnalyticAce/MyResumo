@@ -7,15 +7,12 @@ monitoring, usage optimization, and analytics.
 
 import json
 import logging
-import os
 import time
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Union
 
-from fastapi import Depends
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import ChatOpenAI
 
 from app.database.models.token_usage import TokenUsage, TokenUsageSummary
@@ -25,7 +22,6 @@ logger = logging.getLogger(__name__)
 
 
 # Define pricing constants for different OpenAI models (price per 1M tokens)
-# Updated pricing as of May 1, 2025
 MODEL_PRICING = {
     # GPT-4o models
     "chatgpt-4o-latest": {"input": 5.00, "output": 15.00},
@@ -283,7 +279,7 @@ class TokenTracker:
         # Create a TokenUsage record
         token_usage = TokenUsage(
             endpoint=endpoint,
-            llm_model=model_name,  # Use llm_model instead of model_name
+            llm_model=model_name,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             total_tokens=total_tokens,
@@ -346,8 +342,8 @@ class TokenTracker:
         
         for record in filtered_records:
             # Aggregate by model
-            if record.llm_model not in usage_by_model:  # Use llm_model instead of model_name
-                usage_by_model[record.llm_model] = {  # Use llm_model instead of model_name
+            if record.llm_model not in usage_by_model:
+                usage_by_model[record.llm_model] = {
                     "calls": 0,
                     "prompt_tokens": 0,
                     "completion_tokens": 0,
@@ -355,11 +351,11 @@ class TokenTracker:
                     "cost_usd": 0.0
                 }
             
-            usage_by_model[record.llm_model]["calls"] += 1  # Use llm_model instead of model_name
-            usage_by_model[record.llm_model]["prompt_tokens"] += record.prompt_tokens  # Use llm_model
-            usage_by_model[record.llm_model]["completion_tokens"] += record.completion_tokens  # Use llm_model
-            usage_by_model[record.llm_model]["total_tokens"] += record.total_tokens  # Use llm_model
-            usage_by_model[record.llm_model]["cost_usd"] += record.cost_usd  # Use llm_model
+            usage_by_model[record.llm_model]["calls"] += 1
+            usage_by_model[record.llm_model]["prompt_tokens"] += record.prompt_tokens
+            usage_by_model[record.llm_model]["completion_tokens"] += record.completion_tokens
+            usage_by_model[record.llm_model]["total_tokens"] += record.total_tokens
+            usage_by_model[record.llm_model]["cost_usd"] += record.cost_usd
             
             # Aggregate by feature
             if record.feature not in usage_by_feature:

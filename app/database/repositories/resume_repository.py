@@ -136,10 +136,9 @@ class ResumeRepository(BaseRepository):
             else:
                 corrected_improvement = score_improvement
                 
-            # Prepare update dictionary with all fields
             update_dict = {
                 "optimized_data": optimized_data.dict(),
-                "ats_score": corrected_ats_score,  # Use corrected score
+                "ats_score": corrected_ats_score,
                 "updated_at": datetime.now(),
             }
             
@@ -153,7 +152,6 @@ class ResumeRepository(BaseRepository):
             if missing_skills is not None:
                 update_dict["missing_skills"] = missing_skills
                 
-            # Use corrected improvement value
             update_dict["score_improvement"] = corrected_improvement
                 
             if recommendation is not None:

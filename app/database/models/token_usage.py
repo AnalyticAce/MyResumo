@@ -39,7 +39,7 @@ class TokenUsage(BaseSchema):
     id: UUID = Field(default_factory=uuid4)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     endpoint: str
-    llm_model: str  # Renamed from model_name to avoid Pydantic namespace conflict
+    llm_model: str
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
