@@ -541,7 +541,12 @@ async def optimize_resume(
         logger.info(f"Updating resume {resume_id} with optimized data")
         try:
             await repo.update_optimized_data(
-                resume_id, optimized_data, optimized_ats_score
+                resume_id, optimized_data, optimized_ats_score, 
+                original_ats_score=original_ats_score,
+                matching_skills=optimized_score_result.get("matching_skills", []),
+                missing_skills=optimized_score_result.get("missing_skills", []),
+                score_improvement=score_improvement,
+                recommendation=optimized_score_result.get("recommendation", "")
             )
             logger.info("Successfully updated resume with optimized data")
         except Exception as db_error:

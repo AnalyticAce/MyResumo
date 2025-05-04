@@ -57,34 +57,34 @@
             <!-- Score Comparison -->
             <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <!-- Original Score -->
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200" x-show="resume.original_ats_score !== undefined">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                     <h4 class="text-md font-medium text-gray-700 mb-2">Original Resume</h4>
                     <div class="relative pt-1">
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full" 
                                       :class="{
-                                          'text-green-600 bg-green-200': resume.original_ats_score >= 80,
-                                          'text-yellow-600 bg-yellow-200': resume.original_ats_score >= 60 && resume.original_ats_score < 80,
-                                          'text-red-600 bg-red-200': resume.original_ats_score < 60
+                                          'text-green-600 bg-green-200': (resume.original_ats_score || resume.ats_score || 0) >= 80,
+                                          'text-yellow-600 bg-yellow-200': (resume.original_ats_score || resume.ats_score || 0) >= 60 && (resume.original_ats_score || resume.ats_score || 0) < 80,
+                                          'text-red-600 bg-red-200': (resume.original_ats_score || resume.ats_score || 0) < 60
                                       }">
-                                    <span x-text="resume.original_ats_score || '-'"></span>%
+                                    <span x-text="resume.original_ats_score || resume.ats_score || '0'"></span>%
                                 </span>
                             </div>
                             <div class="text-right">
                                 <span class="text-xs font-semibold inline-block text-gray-600">
-                                    <template x-if="resume.original_ats_score >= 80">Excellent</template>
-                                    <template x-if="resume.original_ats_score >= 60 && resume.original_ats_score < 80">Good</template>
-                                    <template x-if="resume.original_ats_score < 60">Needs Improvement</template>
+                                    <template x-if="(resume.original_ats_score || resume.ats_score || 0) >= 80">Excellent</template>
+                                    <template x-if="(resume.original_ats_score || resume.ats_score || 0) >= 60 && (resume.original_ats_score || resume.ats_score || 0) < 80">Good</template>
+                                    <template x-if="(resume.original_ats_score || resume.ats_score || 0) < 60">Needs Improvement</template>
                                 </span>
                             </div>
                         </div>
                         <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 mt-2">
-                            <div :style="`width: ${resume.original_ats_score || 0}%`" 
+                            <div :style="`width: ${resume.original_ats_score || resume.ats_score || 0}%`" 
                                  :class="{
-                                     'bg-green-500': resume.original_ats_score >= 80,
-                                     'bg-yellow-500': resume.original_ats_score >= 60 && resume.original_ats_score < 80,
-                                     'bg-red-500': resume.original_ats_score < 60
+                                     'bg-green-500': (resume.original_ats_score || resume.ats_score || 0) >= 80,
+                                     'bg-yellow-500': (resume.original_ats_score || resume.ats_score || 0) >= 60 && (resume.original_ats_score || resume.ats_score || 0) < 80,
+                                     'bg-red-500': (resume.original_ats_score || resume.ats_score || 0) < 60
                                  }"
                                  class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"></div>
                         </div>
@@ -92,34 +92,34 @@
                 </div>
 
                 <!-- Optimized Score -->
-                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200" x-show="resume.optimized_ats_score !== undefined">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                     <h4 class="text-md font-medium text-gray-700 mb-2">Optimized Resume</h4>
                     <div class="relative pt-1">
                         <div class="flex items-center justify-between">
                             <div>
                                 <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full" 
                                       :class="{
-                                          'text-green-600 bg-green-200': resume.optimized_ats_score >= 80,
-                                          'text-yellow-600 bg-yellow-200': resume.optimized_ats_score >= 60 && resume.optimized_ats_score < 80,
-                                          'text-red-600 bg-red-200': resume.optimized_ats_score < 60
+                                          'text-green-600 bg-green-200': (resume.optimized_ats_score || resume.ats_score || 0) >= 80,
+                                          'text-yellow-600 bg-yellow-200': (resume.optimized_ats_score || resume.ats_score || 0) >= 60 && (resume.optimized_ats_score || resume.ats_score || 0) < 80,
+                                          'text-red-600 bg-red-200': (resume.optimized_ats_score || resume.ats_score || 0) < 60
                                       }">
-                                    <span x-text="resume.optimized_ats_score || resume.ats_score || '-'"></span>%
+                                    <span x-text="resume.optimized_ats_score || resume.ats_score || '0'"></span>%
                                 </span>
                             </div>
                             <div class="text-right">
                                 <span class="text-xs font-semibold inline-block text-gray-600">
-                                    <template x-if="(resume.optimized_ats_score || resume.ats_score) >= 80">Excellent</template>
-                                    <template x-if="(resume.optimized_ats_score || resume.ats_score) >= 60 && (resume.optimized_ats_score || resume.ats_score) < 80">Good</template>
-                                    <template x-if="(resume.optimized_ats_score || resume.ats_score) < 60">Needs Improvement</template>
+                                    <template x-if="(resume.optimized_ats_score || resume.ats_score || 0) >= 80">Excellent</template>
+                                    <template x-if="(resume.optimized_ats_score || resume.ats_score || 0) >= 60 && (resume.optimized_ats_score || resume.ats_score || 0) < 80">Good</template>
+                                    <template x-if="(resume.optimized_ats_score || resume.ats_score || 0) < 60">Needs Improvement</template>
                                 </span>
                             </div>
                         </div>
                         <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 mt-2">
                             <div :style="`width: ${resume.optimized_ats_score || resume.ats_score || 0}%`" 
                                  :class="{
-                                     'bg-green-500': (resume.optimized_ats_score || resume.ats_score) >= 80,
-                                     'bg-yellow-500': (resume.optimized_ats_score || resume.ats_score) >= 60 && (resume.optimized_ats_score || resume.ats_score) < 80,
-                                     'bg-red-500': (resume.optimized_ats_score || resume.ats_score) < 60
+                                     'bg-green-500': (resume.optimized_ats_score || resume.ats_score || 0) >= 80,
+                                     'bg-yellow-500': (resume.optimized_ats_score || resume.ats_score || 0) >= 60 && (resume.optimized_ats_score || resume.ats_score || 0) < 80,
+                                     'bg-red-500': (resume.optimized_ats_score || resume.ats_score || 0) < 60
                                  }"
                                  class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"></div>
                         </div>
@@ -128,22 +128,22 @@
             </div>
             
             <!-- Score Improvement -->
-            <div class="mt-4 flex items-center" x-show="resume.score_improvement !== undefined">
-                <div class="mr-3 rounded-full p-1.5" :class="{'bg-green-100': resume.score_improvement > 0, 'bg-yellow-100': resume.score_improvement === 0, 'bg-red-100': resume.score_improvement < 0}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{'text-green-500': resume.score_improvement > 0, 'text-yellow-500': resume.score_improvement === 0, 'text-red-500': resume.score_improvement < 0}" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" x-show="resume.score_improvement > 0"></path>
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" x-show="resume.score_improvement === 0"></path>
-                        <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" x-show="resume.score_improvement < 0"></path>
+            <div class="mt-4 flex items-center">
+                <div class="mr-3 rounded-full p-1.5" :class="{'bg-green-100': (resume.score_improvement || 0) > 0, 'bg-yellow-100': (resume.score_improvement || 0) === 0, 'bg-red-100': (resume.score_improvement || 0) < 0}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{'text-green-500': (resume.score_improvement || 0) > 0, 'text-yellow-500': (resume.score_improvement || 0) === 0, 'text-red-500': (resume.score_improvement || 0) < 0}" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd" x-show="(resume.score_improvement || 0) > 0"></path>
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" x-show="(resume.score_improvement || 0) === 0"></path>
+                        <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" x-show="(resume.score_improvement || 0) < 0"></path>
                     </svg>
                 </div>
-                <div class="text-sm font-medium" :class="{'text-green-700': resume.score_improvement > 0, 'text-yellow-700': resume.score_improvement === 0, 'text-red-700': resume.score_improvement < 0}">
-                    <span x-text="`${Math.abs(resume.score_improvement)} point ${resume.score_improvement === 1 ? 'increase' : (resume.score_improvement > 1 ? 'increase' : (resume.score_improvement === 0 ? 'no change' : (resume.score_improvement === -1 ? 'decrease' : 'decrease')))}`"></span>
+                <div class="text-sm font-medium" :class="{'text-green-700': (resume.score_improvement || 0) > 0, 'text-yellow-700': (resume.score_improvement || 0) === 0, 'text-red-700': (resume.score_improvement || 0) < 0}">
+                    <span x-text="`${Math.abs(resume.score_improvement || 0)} point ${(resume.score_improvement || 0) === 1 ? 'increase' : ((resume.score_improvement || 0) > 1 ? 'increase' : ((resume.score_improvement || 0) === 0 ? 'no change' : ((resume.score_improvement || 0) === -1 ? 'decrease' : 'decrease')))}`"></span>
                     after optimization
                 </div>
             </div>
 
             <!-- Skills Analysis -->
-            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2" x-show="resume.matching_skills !== undefined || resume.missing_skills !== undefined">
+            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <!-- Matching Skills -->
                 <div>
                     <h4 class="text-sm font-medium text-gray-700 mb-2">Matching Skills</h4>
@@ -176,10 +176,10 @@
             </div>
 
             <!-- AI Recommendation -->
-            <div class="mt-6" x-show="resume.recommendation">
+            <div class="mt-6">
                 <h4 class="text-sm font-medium text-gray-700 mb-2">AI Recommendation</h4>
                 <div class="bg-white p-3 rounded-lg border border-gray-200">
-                    <p class="text-sm text-gray-600" x-text="resume.recommendation"></p>
+                    <p class="text-sm text-gray-600" x-text="resume.recommendation || 'No recommendation available yet. Try scoring your resume against a job description to get personalized recommendations.'"></p>
                 </div>
             </div>
         </div>

@@ -175,6 +175,11 @@ class Resume(BaseSchema):
         job_description (str): The job description used for optimization
         optimized_data (Optional[ResumeData]): AI-optimized resume data
         ats_score (Optional[int]): ATS compatibility score (0-100)
+        original_ats_score (Optional[int]): Score of the original resume before optimization
+        matching_skills (Optional[List[str]]): Skills that match the job description
+        missing_skills (Optional[List[str]]): Skills missing from resume but in job description
+        score_improvement (Optional[int]): Difference between optimized and original scores
+        recommendation (Optional[str]): AI recommendation for improving the resume
         created_at (datetime): When the resume was created
         updated_at (datetime): When the resume was last updated
         latex_template (str): Name of LaTeX template to use for PDF generation
@@ -186,11 +191,16 @@ class Resume(BaseSchema):
     job_description: str
     optimized_data: Optional[ResumeData] = None
     ats_score: Optional[int] = None
+    original_ats_score: Optional[int] = None  # Score of the original resume before optimization
+    matching_skills: Optional[List[str]] = None  # Skills that match the job description
+    missing_skills: Optional[List[str]] = None  # Skills missing from resume but in job description
+    score_improvement: Optional[int] = None  # Difference between optimized and original scores
+    recommendation: Optional[str] = None  # AI recommendation for improving the resume
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
     latex_template: str = "resume_template.tex"
 
-    @field_validator("ats_score")
+    @field_validator("ats_score", "original_ats_score")
     @classmethod
     def validate_ats_score(cls, v):
         """Validate that ATS score is between 0 and 100."""

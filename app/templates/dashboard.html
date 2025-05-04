@@ -192,8 +192,8 @@
                                             </svg>
                                         </div>
                                         <div class="ml-2 sm:ml-4 min-w-0">
-                                            <div class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[150px] sm:max-w-xs" x-text="resume.title"></div>
-                                            <div class="text-xs text-gray-500 block sm:hidden truncate max-w-[150px]" x-text="formatDate(resume.updated_at)"></div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[200px]" x-text="resume.title"></div>
+                                            <div class="text-xs text-gray-500 truncate" x-text="resume.optimized_data?.user_information?.main_job_title || 'Not specified'"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -201,16 +201,24 @@
                                 <td class="px-3 sm:px-6 py-3 sm:py-4">
                                     <template x-if="resume.ats_score !== null">
                                         <div class="flex items-center">
-                                            <span class="text-xs sm:text-sm font-medium mr-1 sm:mr-2" x-text="resume.ats_score + '%'"></span>
-                                            <div class="w-12 sm:w-24 bg-gray-200 rounded-full h-1.5 sm:h-2">
-                                                <div class="h-1.5 sm:h-2 rounded-full" 
-                                                    :class="{
-                                                        'bg-green-500': resume.ats_score >= 80,
-                                                        'bg-yellow-500': resume.ats_score >= 60 && resume.ats_score < 80,
-                                                        'bg-red-500': resume.ats_score < 60
-                                                    }"
-                                                    :style="`width: ${resume.ats_score}%`"></div>
+                                            <div class="flex-shrink-0 w-16 sm:w-20">
+                                                <div class="h-1.5 sm:h-2 w-full rounded-full bg-gray-200">
+                                                    <div class="h-1.5 sm:h-2 rounded-full" 
+                                                         :class="{
+                                                             'bg-red-500': resume.ats_score < 60,
+                                                             'bg-yellow-500': resume.ats_score >= 60 && resume.ats_score < 80,
+                                                             'bg-green-500': resume.ats_score >= 80
+                                                         }" 
+                                                         :style="`width: ${resume.ats_score}%`"></div>
+                                                </div>
                                             </div>
+                                            <span class="ml-2 text-xs sm:text-sm font-medium" 
+                                                  :class="{
+                                                      'text-red-600': resume.ats_score < 60,
+                                                      'text-yellow-600': resume.ats_score >= 60 && resume.ats_score < 80,
+                                                      'text-green-600': resume.ats_score >= 80
+                                                  }" 
+                                                  x-text="resume.ats_score + '%'"></span>
                                         </div>
                                     </template>
                                     <template x-if="resume.ats_score === null">
@@ -221,22 +229,22 @@
                                     <div class="flex flex-wrap gap-1">
                                         <!-- Primary structure: hard_skills in user_information.skills -->
                                         <template x-if="resume.optimized_data && resume.optimized_data.user_information && resume.optimized_data.user_information.skills && Array.isArray(resume.optimized_data.user_information.skills.hard_skills) && resume.optimized_data.user_information.skills.hard_skills.length > 0">
-                                            <template x-for="(skill, index) in resume.optimized_data.user_information.skills.hard_skills.slice(0, 2)" :key="index">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 truncate max-w-[100px]" x-text="skill"></span>
+                                            <template x-for="(skill, index) in resume.optimized_data.user_information.skills.hard_skills.slice(0, 3)" :key="index">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" x-text="skill"></span>
                                             </template>
                                         </template>
                                         
                                         <!-- Secondary structure: direct skills array in optimized_data -->
                                         <template x-if="(!resume.optimized_data?.user_information?.skills?.hard_skills || !resume.optimized_data.user_information.skills.hard_skills.length) && resume.optimized_data && Array.isArray(resume.optimized_data.skills) && resume.optimized_data.skills.length > 0">
-                                            <template x-for="(skill, index) in resume.optimized_data.skills.slice(0, 2)" :key="index">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 truncate max-w-[100px]" x-text="skill"></span>
+                                            <template x-for="(skill, index) in resume.optimized_data.skills.slice(0, 3)" :key="index">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" x-text="skill"></span>
                                             </template>
                                         </template>
                                         
                                         <!-- Tertiary structure: matching_skills array at top level -->
                                         <template x-if="(!resume.optimized_data?.user_information?.skills?.hard_skills || !resume.optimized_data.user_information.skills.hard_skills.length) && (!resume.optimized_data?.skills || !resume.optimized_data.skills.length) && Array.isArray(resume.matching_skills) && resume.matching_skills.length > 0">
-                                            <template x-for="(skill, index) in resume.matching_skills.slice(0, 2)" :key="index">
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 truncate max-w-[100px]" x-text="skill"></span>
+                                            <template x-for="(skill, index) in resume.matching_skills.slice(0, 3)" :key="index">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800" x-text="skill"></span>
                                             </template>
                                         </template>
                                         
@@ -253,29 +261,25 @@
                                 <td class="px-3 sm:px-6 py-3 sm:py-4 text-right text-xs sm:text-sm font-medium">
                                     <div class="flex justify-end items-center space-x-2">
                                         <button @click="scoreResume(resume.id)" class="text-blue-600 hover:text-blue-900 focus:outline-none focus:underline" title="Score Resume">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                             </svg>
-                                            <span class="sr-only">Score</span>
                                         </button>
                                         <button @click="viewResume(resume.id)" class="text-primary-600 hover:text-primary-900 focus:outline-none focus:underline" title="View Resume">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            <span class="sr-only">View</span>
                                         </button>
                                         <button @click="downloadResume(resume.id)" class="text-green-600 hover:text-green-900 focus:outline-none focus:underline" title="Download Resume">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
-                                            <span class="sr-only">Download</span>
                                         </button>
                                         <button @click="deleteResume(resume.id)" class="text-red-600 hover:text-red-900 focus:outline-none focus:underline" title="Delete Resume">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            <span class="sr-only">Delete</span>
                                         </button>
                                     </div>
                                 </td>
