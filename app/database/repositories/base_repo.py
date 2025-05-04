@@ -47,9 +47,11 @@ class BaseRepository:
             Optional[Dict]: The matched document or None if not found.
         """
         try:
+            # Use context manager to handle connection lifecycle
             async with self.connection_manager.get_collection(
                 self.db_name, self.collection_name
             ) as collection:
+                # Execute query and convert MongoDB ObjectId to string
                 document = await collection.find_one(query)
                 if document:
                     document["_id"] = str(document["_id"])
@@ -69,11 +71,13 @@ class BaseRepository:
             List[Dict]: A list of matched documents.
         """
         try:
+            # Establish database connection and execute query
             async with self.connection_manager.get_collection(
                 self.db_name, self.collection_name
             ) as collection:
                 cursor = collection.find(query)
                 documents = await cursor.to_list(length=None)
+                # Convert MongoDB ObjectIds to strings for all documents
                 for doc in documents:
                     doc["_id"] = str(doc["_id"])
                 return documents
@@ -169,25 +173,3 @@ class BaseRepository:
         except Exception as e:
             print(f"Error deleting document: {e}")
             return False
-
-    async def get_entity_by_email(self, email: str):
-        """Retrieve an entity document by email address.
-
-        Args:
-            email (str): The email address to search for.
-
-        Returns:
-        -------
-            Dict or None: The entity document if found, None otherwise.
-        """
-        try:
-            async with self.connection_manager.get_collection(
-                self.db_name, self.collection_name
-            ) as collection:
-                user = await collection.find_one({"email": email})
-                if user:
-                    return {**user}
-                return None
-        except Exception as e:
-            print(f"Error in get_entity_by_email: {str(e)}")
-            return None

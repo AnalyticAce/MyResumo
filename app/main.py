@@ -14,11 +14,12 @@ from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.routers.resume import resume_router
+from app.api.routers.token_usage import router as token_usage_router
 from app.database.connector import MongoConnectionManager
 from app.web.core import core_web_router
 from app.web.dashboard import web_router
 
-# Initialize templates
+# Initialize Jinja2 templates for HTML rendering
 templates = Jinja2Templates(directory="app/templates")
 
 
@@ -221,6 +222,7 @@ async def health_check():
 
 # Include routers - These must come BEFORE the catch-all route
 app.include_router(resume_router)
+app.include_router(token_usage_router)  # Add token usage tracking API endpoints
 app.include_router(core_web_router)
 app.include_router(web_router)
 

@@ -31,7 +31,15 @@
                      :class="{'bg-blue-500 text-white': currentStep >= 3, 'bg-gray-300 text-gray-600': currentStep < 3}">
                     3
                 </div>
-                <div class="text-sm font-medium ml-2" :class="{'text-gray-900': currentStep >= 3, 'text-gray-500': currentStep < 3}">Results</div>
+                <div class="text-sm font-medium ml-2" :class="{'text-gray-900': currentStep >= 3, 'text-gray-500': currentStep < 3}">Review</div>
+            </div>
+            <div class="step-connector" :class="{'active': currentStep >= 4}"></div>
+            <div class="flex items-center">
+                <div class="rounded-full h-12 w-12 flex items-center justify-center" 
+                     :class="{'bg-blue-500 text-white': currentStep >= 4, 'bg-gray-300 text-gray-600': currentStep < 4}">
+                    4
+                </div>
+                <div class="text-sm font-medium ml-2" :class="{'text-gray-900': currentStep >= 4, 'text-gray-500': currentStep < 4}">Results</div>
             </div>
         </div>
         
@@ -268,26 +276,24 @@
             </div>
         </div>
         
-        <!-- Step 3: Results - Simplified with aligned cards -->
+        <!-- Step 3: Initial Analysis Results -->
         <div x-show="currentStep === 3" class="fade-in">
-            <!-- Compact success indicator -->
-            <div class="bg-gradient-to-br from-green-50 to-teal-50 p-6 rounded-lg mb-6">
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-lg mb-6">
                 <div class="text-center mb-5">
-                    <!-- Reduced vertical spacing -->
-                    <svg class="checkmark mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="height: 40px; width: 40px;">
-                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    <svg class="mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
-                    <h3 class="text-xl font-bold text-gray-900 mt-3 mb-1">Resume Analysis Complete!</h3>
-                    <p class="text-gray-600 text-sm">Your resume has been optimized for the job description.</p>
+                    <h3 class="text-xl font-bold text-gray-900 mt-3 mb-1">Initial Resume Analysis</h3>
+                    <p class="text-gray-600 text-sm">Here's how your resume currently matches with the job description.</p>
                 </div>
 
                 <!-- Results Cards - Grid Layout -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <!-- ATS Score -->
                     <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
-                            <h4 class="font-medium text-white">ATS Compatibility Score</h4>
+                        <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3">
+                            <h4 class="font-medium text-white">Initial ATS Score</h4>
                         </div>
                         <div class="p-4 text-center">
                             <div class="relative inline-flex items-center justify-center">
@@ -303,10 +309,10 @@
                                         cy="56"
                                     />
                                     <circle
-                                        class="text-blue-500"
+                                        class="text-amber-500"
                                         stroke-width="8"
                                         :stroke-dasharray="calculateCircumference(50)"
-                                        :stroke-dashoffset="calculateCircumference(50) - (calculateCircumference(50) * matchScore) / 100"
+                                        :stroke-dashoffset="calculateCircumference(50) - (calculateCircumference(50) * originalScore) / 100"
                                         stroke-linecap="round"
                                         stroke="currentColor"
                                         fill="transparent"
@@ -315,17 +321,17 @@
                                         cy="56"
                                     />
                                 </svg>
-                                <span class="absolute text-2xl font-bold" x-text="`${matchScore}%`"></span>
+                                <span class="absolute text-2xl font-bold" x-text="`${originalScore}%`"></span>
                             </div>
                             <p class="mt-2 text-sm text-gray-600">
-                                <template x-if="matchScore >= 80">
-                                    <span>Excellent! Your resume is highly compatible with this position.</span>
+                                <template x-if="originalScore >= 80">
+                                    <span>Your resume already has excellent compatibility!</span>
                                 </template>
-                                <template x-if="matchScore >= 60 && matchScore < 80">
-                                    <span>Good match! Your resume aligns well with the job requirements.</span>
+                                <template x-if="originalScore >= 60 && originalScore < 80">
+                                    <span>Your resume has good compatibility, but can be improved.</span>
                                 </template>
-                                <template x-if="matchScore < 60">
-                                    <span>Your resume could use some improvements to better match this job.</span>
+                                <template x-if="originalScore < 60">
+                                    <span>Your resume needs improvement to better match this job.</span>
                                 </template>
                             </p>
                         </div>
@@ -351,7 +357,7 @@
                     <!-- Missing Skills -->
                     <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
                         <div class="bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-3">
-                            <h4 class="font-medium text-white">Recommended Skills to Add</h4>
+                            <h4 class="font-medium text-white">Missing Skills</h4>
                         </div>
                         <div class="p-4 h-full">
                             <div class="flex flex-wrap gap-2">
@@ -360,9 +366,150 @@
                                 </template>
                             </div>
                             <template x-if="missingSkills.length === 0">
-                                <p class="text-sm text-gray-500">No additional skills recommended.</p>
+                                <p class="text-sm text-gray-500">No critical skills are missing.</p>
                             </template>
                         </div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendation and Continue Button -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-6">
+                    <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-3">
+                        <h4 class="font-medium text-white">AI Recommendation</h4>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-700 text-sm mb-4" x-text="recommendation || 'Our AI will optimize your resume to improve its compatibility with this job description.'"></p>
+                    </div>
+                </div>
+
+                <!-- Continue to Optimization Button -->
+                <div class="flex justify-center">
+                    <button
+                        type="button"
+                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                        @click="optimizeResume()">
+                        <span>Optimize My Resume</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 4: Final Optimized Results -->
+        <div x-show="currentStep === 4" class="fade-in">
+            <!-- Compact success indicator -->
+            <div class="bg-gradient-to-br from-green-50 to-teal-50 p-6 rounded-lg mb-6">
+                <div class="text-center mb-5">
+                    <!-- Reduced vertical spacing -->
+                    <svg class="checkmark mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="height: 40px; width: 40px;">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-900 mt-3 mb-1">Resume Optimization Complete!</h3>
+                    <p class="text-gray-600 text-sm">Your resume has been optimized to maximize compatibility with the job description.</p>
+                </div>
+
+                <!-- Final Score Card -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-6 max-w-md mx-auto">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3">
+                        <h4 class="font-medium text-white">Final ATS Compatibility Score</h4>
+                    </div>
+                    <div class="p-6 text-center">
+                        <div class="flex items-center justify-center mb-4">
+                            <!-- Score Comparison -->
+                            <div class="relative inline-flex items-center justify-center mr-6">
+                                <!-- Original Score Circle -->
+                                <svg class="w-24 h-24">
+                                    <circle
+                                        class="text-gray-200"
+                                        stroke-width="8"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="42"
+                                        cx="48"
+                                        cy="48"
+                                    />
+                                    <circle
+                                        class="text-amber-400"
+                                        stroke-width="8"
+                                        :stroke-dasharray="calculateCircumference(42)"
+                                        :stroke-dashoffset="calculateCircumference(42) - (calculateCircumference(42) * originalScore) / 100"
+                                        stroke-linecap="round"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="42"
+                                        cx="48"
+                                        cy="48"
+                                    />
+                                </svg>
+                                <div class="absolute text-center">
+                                    <span class="block text-xl font-bold" x-text="`${originalScore}%`"></span>
+                                    <span class="block text-xs text-gray-500">Original</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Arrow -->
+                            <div class="mx-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Optimized Score Circle -->
+                            <div class="relative inline-flex items-center justify-center ml-6">
+                                <svg class="w-24 h-24">
+                                    <circle
+                                        class="text-gray-200"
+                                        stroke-width="8"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="42"
+                                        cx="48"
+                                        cy="48"
+                                    />
+                                    <circle
+                                        class="text-green-500"
+                                        stroke-width="8"
+                                        :stroke-dasharray="calculateCircumference(42)"
+                                        :stroke-dashoffset="calculateCircumference(42) - (calculateCircumference(42) * matchScore) / 100"
+                                        stroke-linecap="round"
+                                        stroke="currentColor"
+                                        fill="transparent"
+                                        r="42"
+                                        cx="48"
+                                        cy="48"
+                                    />
+                                </svg>
+                                <div class="absolute text-center">
+                                    <span class="block text-xl font-bold" x-text="`${matchScore}%`"></span>
+                                    <span class="block text-xs text-gray-500">Optimized</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 text-center" x-show="matchScore > originalScore">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                <span x-text="`+${(matchScore - originalScore).toFixed(0)}% improvement`"></span>
+                            </div>
+                        </div>
+                        
+                        <p class="mt-4 text-sm text-gray-700">
+                            <template x-if="matchScore >= 80">
+                                <span>Excellent! Your optimized resume is highly compatible with this position.</span>
+                            </template>
+                            <template x-if="matchScore >= 60 && matchScore < 80">
+                                <span>Good match! Your optimized resume aligns well with the job requirements.</span>
+                            </template>
+                            <template x-if="matchScore < 60">
+                                <span>Your resume has been improved but may need further customization for this role.</span>
+                            </template>
+                        </p>
                     </div>
                 </div>
 
@@ -416,6 +563,8 @@
             matchScore: 0,
             matchedSkills: [],
             missingSkills: [],
+            originalScore: 0,
+            recommendation: '',
             // PDF preview properties
             resumePreviewLoaded: false,
             resumePreviewType: 'pdf', // Can be 'pdf' or 'structured'
@@ -528,26 +677,19 @@
                     
                     const data = await response.json();
                     
-                    // Update match score and skill data
-                    this.matchScore = data.ats_score || 65;
+                    // Update match score with the optimized ATS score
+                    this.matchScore = data.optimized_ats_score || 65;
                     
-                    // Extract skills from the optimized data
-                    if (data.optimized_data && data.optimized_data.user_information && data.optimized_data.user_information.skills) {
-                        const skills = data.optimized_data.user_information.skills;
-                        
-                        // Split the skills into matched and missing based on some logic
-                        // For this demo, we'll just use the hard_skills as matched and assign some missing
-                        this.matchedSkills = skills.hard_skills || [];
-                        
-                        // In a real app, you'd determine missing skills from the job description
-                        // Here we'll just use placeholder data
-                        this.missingSkills = ['Docker', 'TypeScript', 'GraphQL', 'AWS'].filter(
-                            skill => !this.matchedSkills.includes(skill)
-                        ).slice(0, 5);
-                    }
+                    // Use the matching_skills and missing_skills directly from the API response
+                    this.matchedSkills = data.matching_skills || [];
+                    this.missingSkills = data.missing_skills || [];
                     
                     // Set up the PDF preview
                     this.setupResumePreview(data);
+
+                    // Update original score and recommendation
+                    this.originalScore = data.original_ats_score || 50;
+                    this.recommendation = data.recommendation || '';
                     
                     // Complete the progress simulation
                     clearInterval(this.resetProgressInterval);
@@ -675,7 +817,20 @@
             // Calculate circumference for SVG circle animation
             calculateCircumference(radius) {
                 return 2 * Math.PI * radius;
-            }
+            },
+
+            // Handle optimization action after reviewing initial analysis
+            optimizeResume() {
+                // Show loading state while transitioning to final results
+                this.isAnalyzing = true;
+                
+                // We already have all the data from the initial API call, 
+                // so we can just transition to the results step
+                setTimeout(() => {
+                    this.currentStep = 4;
+                    this.isAnalyzing = false;
+                }, 800); // Small delay for visual feedback
+            },
         }
     }
 </script>

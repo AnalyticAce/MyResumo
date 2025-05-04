@@ -476,6 +476,10 @@ async def optimize_resume(
         original_ats_score = int(original_score_result["final_score"])
         logger.info(f"Original resume ATS score: {original_ats_score}")
 
+        # Extract missing skills to be addressed in optimization
+        missing_skills = original_score_result.get("missing_skills", [])
+        logger.info(f"Identified missing skills: {missing_skills}")
+
         # 6. Initialize optimizer and generate optimized resume
         logger.info("Initializing AtsResumeOptimizer")
         optimizer = AtsResumeOptimizer(
@@ -487,6 +491,7 @@ async def optimize_resume(
 
         logger.info("Calling AI service to generate optimized resume")
         result = optimizer.generate_ats_optimized_resume_json(job_description)
+        # Note: The optimizer now automatically incorporates missing skills into the prompt
 
         # 7. Check for errors in result
         if "error" in result:
@@ -536,7 +541,12 @@ async def optimize_resume(
         logger.info(f"Updating resume {resume_id} with optimized data")
         try:
             await repo.update_optimized_data(
-                resume_id, optimized_data, optimized_ats_score
+                resume_id, optimized_data, optimized_ats_score, 
+                original_ats_score=original_ats_score,
+                matching_skills=optimized_score_result.get("matching_skills", []),
+                missing_skills=optimized_score_result.get("missing_skills", []),
+                score_improvement=score_improvement,
+                recommendation=optimized_score_result.get("recommendation", "")
             )
             logger.info("Successfully updated resume with optimized data")
         except Exception as db_error:
@@ -556,9 +566,9 @@ async def optimize_resume(
             "original_ats_score": original_ats_score,
             "optimized_ats_score": optimized_ats_score,
             "score_improvement": score_improvement,
-            "matching_skills": optimized_score_result["matching_skills"],
-            "missing_skills": optimized_score_result["missing_skills"],
-            "recommendation": optimized_score_result["recommendation"],
+            "matching_skills": optimized_score_result.get("matching_skills", []),
+            "missing_skills": optimized_score_result.get("missing_skills", []),
+            "recommendation": optimized_score_result.get("recommendation", ""),
             "optimized_data": result,
         }
 
@@ -669,19 +679,47 @@ async def score_resume(
                 detail="Job description is required for scoring",
             )
 
-        # Score the resume
-        logger.info("Scoring resume against job description")
+        # Get resume content - first check if optimized data exists, use that for comparison
+        resume_content = resume["original_content"]
+        
+        # Optionally also score the optimized version if it exists
+        optimized_data = resume.get("optimized_data")
+        optimized_score = None
+        
+        # Score the original resume
+        logger.info("Scoring original resume against job description")
         score_result = ats_scorer.compute_match_score(
-            resume["original_content"], job_description
+            resume_content, job_description
         )
         ats_score = int(score_result["final_score"])
+        
+        # If optimized data exists, score it too for comparison
+        if optimized_data:
+            logger.info("Scoring optimized resume for comparison")
+            if isinstance(optimized_data, str):
+                optimized_content = optimized_data
+            else:
+                optimized_content = json.dumps(optimized_data)
+            
+            optimized_score_result = ats_scorer.compute_match_score(
+                optimized_content, job_description
+            )
+            optimized_score = int(optimized_score_result["final_score"])
+            logger.info(f"Original score: {ats_score}, Optimized score: {optimized_score}")
+        
+        # Prepare enhanced recommendation if we have both scores
+        recommendation = score_result.get("recommendation", "")
+        if optimized_score:
+            improvement = optimized_score - ats_score
+            if improvement > 0:
+                recommendation += f"\n\nYour optimized resume scores {improvement} points higher ({optimized_score}%). Consider using the optimized version for better results."
 
         return {
             "resume_id": resume_id,
             "ats_score": ats_score,
             "matching_skills": score_result.get("matching_skills", []),
             "missing_skills": score_result.get("missing_skills", []),
-            "recommendation": score_result.get("recommendation", ""),
+            "recommendation": recommendation,
             "resume_skills": score_result.get("resume_skills", []),
             "job_requirements": score_result.get("job_requirements", []),
         }

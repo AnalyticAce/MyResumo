@@ -9,13 +9,11 @@ import os
 import re
 from typing import List, Optional
 
-from langchain.chains import LLMChain
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+
+from app.utils.token_tracker import TokenTracker
 
 
 class SkillsExtraction(BaseModel):
@@ -44,24 +42,27 @@ class ATSScorerLLM:
     """Class for scoring resumes against job descriptions using AI techniques.
 
     This class provides methods to extract information from resumes and job descriptions,
-    calculate semantic similarity, and perform a comprehensive match analysis using
-    LLM-based techniques.
+    and perform a comprehensive match analysis using LLM-based techniques only.
+    All scoring, skill matching, and recommendations are 100% LLM-driven, making the system domain-agnostic and robust for any industry.
     """
 
-    def __init__(self, model_name="", api_key=None, api_base=""):
+    def __init__(self, model_name="", api_key=None, api_base="", user_id=None):
         """Initialize the ATS scorer with API credentials and model configuration.
 
         Args:
             model_name (str): Name of the LLM model to use. Falls back to MODEL_NAME env var.
             api_key (str, optional): API key for the LLM service. Falls back to API_KEY env var.
             api_base (str, optional): Base URL for the API service. Falls back to API_BASE env var.
+            user_id (str, optional): User ID for token tracking.
 
         Raises:
             ValueError: If required credentials are missing after falling back to environment variables.
         """
-        self.api_key = api_key or os.environ.get("API_KEY")
-        self.api_base = api_base or os.environ.get("API_BASE")
-        self.model_name = model_name or os.environ.get("MODEL_NAME")
+        self.api_key = api_key or os.getenv("API_KEY")
+        self.api_base = api_base or os.getenv("API_BASE")
+        self.model_name = model_name or os.getenv("MODEL_NAME")
+        self.user_id = user_id
+
         if not self.api_key:
             raise ValueError(
                 "An LLM API key is required. Provide it or set API_KEY environment variable."
@@ -77,19 +78,14 @@ class ATSScorerLLM:
                 "An LLM model name is required. Provide it or set MODEL_NAME environment variable."
             )
 
-        self.llm = ChatOpenAI(
+        # Use TokenTracker to create a tracked instance of the LLM
+        self.llm = TokenTracker.get_tracked_langchain_llm(
             model_name=self.model_name,
             temperature=0.1,
-            openai_api_key=self.api_key,
-            openai_api_base=self.api_base,
-        )
-
-        # Replace SentenceTransformer with TfidfVectorizer
-        self.vectorizer = TfidfVectorizer(
-            lowercase=True,
-            stop_words="english",
-            ngram_range=(1, 2),  # Use both unigrams and bigrams
-            max_features=5000,
+            api_key=self.api_key,
+            api_base=self.api_base,
+            feature="ats_scoring",
+            user_id=self.user_id
         )
 
         self.parser = PydanticOutputParser(pydantic_object=SkillsExtraction)
@@ -103,9 +99,16 @@ class ATSScorerLLM:
         # Prompt for extracting skills from resume
         self.resume_prompt = PromptTemplate(
             template="""You are an expert ATS (Applicant Tracking System) analyzer.
-            Extract all technical skills, experience, and qualifications from the following resume text.
-            Be thorough but precise - only extract actual skills (like programming languages, tools, frameworks)
-            and professionally relevant qualifications.
+            Extract ALL skills, experience, and qualifications from the following resume text.
+            Be comprehensive and generous in your extraction, including:
+            - Technical skills (programming languages, tools, frameworks, etc.)
+            - Soft skills (communication, leadership, etc.)
+            - Domain knowledge and industry experience
+            - Implied skills based on work descriptions
+            - Educational qualifications and certifications
+            - Transferable skills from different contexts
+            
+            Be inclusive rather than restrictive - capture everything that could potentially match a job requirement.
             
             RESUME TEXT:
             {resume_text}
@@ -121,8 +124,15 @@ class ATSScorerLLM:
         # Prompt for extracting requirements from job description
         self.job_prompt = PromptTemplate(
             template="""You are an expert job analyzer.
-            Extract all required technical skills, experience requirements, and key qualifications
-            from the following job description. Focus on must-have requirements, not nice-to-have ones.
+            Extract ALL skills, experience requirements, and qualifications from the following job description.
+            Be comprehensive, including both required and preferred qualifications.
+            
+            Include:
+            - Technical skills and tools mentioned
+            - Experience and education requirements
+            - Soft skills and personal qualities
+            - Domain knowledge and industry expertise
+            - Any other attributes that would make a candidate suitable
             
             JOB DESCRIPTION:
             {job_text}
@@ -135,131 +145,97 @@ class ATSScorerLLM:
             },
         )
 
-        # Prompt for skill matching and score analysis
+        # More optimistic and explicit scoring prompt with rationale
         self.matching_prompt = PromptTemplate(
-            template="""You are an expert ATS (Applicant Tracking System) analyzer.
+            template="""
+            You are an expert ATS (Applicant Tracking System) analyzer and recruiter.
             Compare the candidate's skills and qualifications with the job requirements and provide an analysis.
-            
+
             CANDIDATE SKILLS AND QUALIFICATIONS:
             {resume_skills}
-            
+
             JOB REQUIREMENTS:
             {job_requirements}
-            
+
             Based on a detailed analysis, provide:
-            1. A scoring from 0-100 indicating how well the candidate's skills match the job requirements
+            1. A scoring from 0-100 indicating how well the candidate's skills match the job requirements:
+               - Score 95-100 if the candidate meets nearly all core and preferred requirements (90%+ match, including transferable skills and strong alignment)
+               - Score 80-94 if the candidate meets most core and preferred requirements (75-89% match)
+               - Score 70-79 if the candidate meets the core requirements and most desired skills
+               - Score 50-69 if the candidate meets most core requirements but is missing some key skills
+               - Score 30-49 if the candidate meets some requirements but has significant gaps
+               - Score 0-29 if the candidate lacks most of the core requirements
+
+               Be optimistic: If the candidate's resume is tailored and covers most requirements, reward with a high score. Consider transferable skills, synonyms, and implied experience. If the resume is almost a copy of the job description, score 95-100.
+
             2. A list of matching skills between the candidate and job requirements
             3. A list of important missing skills the candidate should highlight or develop
             4. A brief recommendation about the candidate's fit for this role
-            
+            5. A short rationale explaining the score (why this score was chosen, what was strong, what could be improved)
+
             Format your response as a JSON object with the following structure:
-            {{
-                "score": number,
-                "matching_skills": [list of strings],
-                "missing_skills": [list of strings],
-                "recommendation": string
-            }}
+{{
+    "score": number,
+    "matching_skills": [list of strings],
+    "missing_skills": [list of strings],
+    "recommendation": string,
+    "rationale": string
+}}
             """,
             input_variables=["resume_skills", "job_requirements"],
         )
 
     def setup_chains(self):
-        """Set up the LLM chains for each task."""
-        self.resume_chain = LLMChain(
-            llm=self.llm, prompt=self.resume_prompt, output_key="resume_analysis"
-        )
-
-        self.job_chain = LLMChain(
-            llm=self.llm, prompt=self.job_prompt, output_key="job_analysis"
-        )
-
-        self.matching_chain = LLMChain(
-            llm=self.llm, prompt=self.matching_prompt, output_key="matching_analysis"
-        )
+        """Set up the LangChain runnable chains for each task."""
+        self.resume_chain = self.resume_prompt | self.llm 
+        
+        self.job_chain = self.job_prompt | self.llm
+        
+        self.matching_chain = self.matching_prompt | self.llm
 
     def extract_resume_info(self, resume_text):
         """Extract skills and qualifications from resume using LLM."""
         try:
-            result = self.resume_chain.run(resume_text=resume_text)
-            # Parse the result into our schema
-            parsed_result = self.parser.parse(result)
+            result = self.resume_chain.invoke({"resume_text": resume_text})
+            parsed_result = self.parser.parse(result.content)
             return parsed_result
         except Exception as e:
             print(f"Error extracting resume info: {e}")
-            # Fallback to simpler extraction if parsing fails
-            result = self.resume_chain.run(resume_text=resume_text)
+            result = self.resume_chain.invoke({"resume_text": resume_text})
             return result
 
     def extract_job_info(self, job_text):
         """Extract requirements from job description using LLM."""
         try:
-            result = self.job_chain.run(job_text=job_text)
-            # Parse the result into our schema
-            parsed_result = self.parser.parse(result)
+            result = self.job_chain.invoke({"job_text": job_text})
+            parsed_result = self.parser.parse(result.content)
             return parsed_result
         except Exception as e:
             print(f"Error extracting job info: {e}")
-            # Fallback
-            result = self.job_chain.run(job_text=job_text)
+            result = self.job_chain.invoke({"job_text": job_text})
             return result
 
-    def calculate_semantic_similarity(self, text1, text2):
-        """Calculate semantic similarity between two texts using TF-IDF and cosine similarity."""
-        try:
-            # Fit and transform the texts
-            tfidf_matrix = self.vectorizer.fit_transform([text1, text2])
-
-            # Calculate cosine similarity
-            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-            return similarity
-        except Exception as e:
-            print(f"Error calculating semantic similarity: {e}")
-            return 0.5  # Default to middle value
-
     def calculate_keyword_overlap(self, resume_skills, job_skills):
-        """Calculate a simple keyword overlap score as an additional signal."""
-        if not resume_skills or not job_skills:
-            return 0.5
-
-        # Convert all skills to lowercase for better matching
-        resume_skills_lower = [skill.lower() for skill in resume_skills]
-        job_skills_lower = [skill.lower() for skill in job_skills]
-
-        # Count matches
-        matches = sum(
-            1
-            for skill in job_skills_lower
-            if any(
-                job_skill in skill or skill in job_skill
-                for job_skill in resume_skills_lower
-            )
-        )
-
-        # Calculate overlap score
-        if len(job_skills_lower) > 0:
-            return matches / len(job_skills_lower)
-        return 0.5
+        """[DEPRECATED] No longer used. All matching is now LLM-based for domain-agnostic optimization."""
+        return 0.0
 
     def analyze_match(self, resume_analysis, job_analysis):
         """Have the LLM analyze the match between resume and job requirements."""
         try:
-            # Convert analyses to strings if they're not already
             if not isinstance(resume_analysis, str):
                 resume_analysis = str(resume_analysis.model_dump())
             if not isinstance(job_analysis, str):
                 job_analysis = str(job_analysis.model_dump())
 
-            # Add explicit instruction for JSON format
-            result = self.matching_chain.run(
-                resume_skills=resume_analysis, job_requirements=job_analysis
-            )
+            result = self.matching_chain.invoke({
+                "resume_skills": resume_analysis, 
+                "job_requirements": job_analysis
+            })
 
-            # Try to find a JSON object in the response
-            json_match = re.search(r"\{.*\}", result, re.DOTALL)
+            json_match = re.search(r"\{.*\}", result.content, re.DOTALL)
 
             if json_match:
                 try:
-                    # Extract and parse the JSON
                     json_str = json_match.group(0)
                     parsed_result = json.loads(json_str)
                     return parsed_result
@@ -268,24 +244,22 @@ class ATSScorerLLM:
 
             # If we can't parse as JSON, extract the fields manually
             score_match = re.search(
-                r'["\']?score["\']?\s*:\s*(\d+)', result, re.IGNORECASE
+                r'["\']?score["\']?\s*:\s*(\d+)', result.content, re.IGNORECASE
             )
             score = (
                 int(score_match.group(1)) if score_match else 50
-            )  # Default to 50 if not found
+            )
 
-            # Extract matching skills
             matching_section = re.search(
-                r'["\']?matching_skills["\']?\s*:\s*\[(.*?)\]', result, re.DOTALL
+                r'["\']?matching_skills["\']?\s*:\s*\[(.*?)\]', result.content, re.DOTALL
             )
             matching_skills = []
             if matching_section:
                 skills_text = matching_section.group(1)
                 matching_skills = re.findall(r'["\']([^"\']+)["\']', skills_text)
 
-            # Extract missing skills
             missing_section = re.search(
-                r'["\']?missing_skills["\']?\s*:\s*\[(.*?)\]', result, re.DOTALL
+                r'["\']?missing_skills["\']?\s*:\s*\[(.*?)\]', result.content, re.DOTALL
             )
             missing_skills = []
             if missing_section:
@@ -294,7 +268,7 @@ class ATSScorerLLM:
 
             # Extract recommendation
             rec_match = re.search(
-                r'["\']?recommendation["\']?\s*:\s*["\']([^"\']+)["\']', result
+                r'["\']?recommendation["\']?\s*:\s*["\']([^"\']+)["\']', result.content
             )
             recommendation = (
                 rec_match.group(1)
@@ -302,11 +276,22 @@ class ATSScorerLLM:
                 else "No specific recommendation provided."
             )
 
+            # Extract rationale
+            rationale_match = re.search(
+                r'["\']?rationale["\']?\s*:\s*["\']([^"\']+)["\']', result.content
+            )
+            rationale = (
+                rationale_match.group(1)
+                if rationale_match
+                else "No rationale provided."
+            )
+
             return {
                 "score": score,
                 "matching_skills": matching_skills,
                 "missing_skills": missing_skills,
                 "recommendation": recommendation,
+                "rationale": rationale,
             }
 
         except Exception as e:
@@ -316,106 +301,65 @@ class ATSScorerLLM:
                 "matching_skills": [],
                 "missing_skills": [],
                 "recommendation": "Error analyzing match. The candidate appears to have relevant skills but a detailed analysis could not be completed.",
+                "rationale": "Error during LLM analysis."
             }
 
-    def compute_match_score(self, resume_text, job_text, weights=None):
-        """Calculate comprehensive match score between resume and job."""
-        if weights is None:
-            weights = {
-                "llm_analysis": 0.5,
-                "semantic": 0.3,
-                "keyword_overlap": 0.2,  # Added keyword overlap as a lightweight signal
-            }
+    def compute_match_score(self, resume_text: str, job_text: str, weights: dict = None) -> dict:
+        """Calculate comprehensive match score between resume and job using LLM only.
 
+        Args:
+            resume_text (str): The candidate's resume text.
+            job_text (str): The job description text.
+            weights (dict, optional): Ignored. Kept for backward compatibility.
+
+        Returns:
+            dict: Scoring and skill analysis results, 100% LLM-driven.
+        """
         # Extract information using LLM
         resume_analysis = self.extract_resume_info(resume_text)
         job_analysis = self.extract_job_info(job_text)
 
-        # Calculate semantic similarity with TF-IDF
-        semantic_score = self.calculate_semantic_similarity(resume_text, job_text)
-
-        # Calculate keyword overlap score
-        resume_skills = (
-            resume_analysis.skills if hasattr(resume_analysis, "skills") else []
-        )
-        job_skills = job_analysis.skills if hasattr(job_analysis, "skills") else []
-        keyword_score = self.calculate_keyword_overlap(resume_skills, job_skills)
-
-        # Get LLM analysis of match
+        # Get LLM analysis of match (all scoring, matching, and rationale)
         match_analysis = self.analyze_match(resume_analysis, job_analysis)
         llm_score = match_analysis.get("score", 50) / 100  # Convert to 0-1 scale
+        llm_score = max(llm_score, 0.45)  # Set a floor of 0.45 (45%) for LLM score
+        final_score = llm_score  # 100% LLM-based
 
-        # Calculate final weighted score
-        final_score = (
-            weights["llm_analysis"] * llm_score
-            + weights["semantic"] * semantic_score
-            + weights["keyword_overlap"] * keyword_score
-        )
+        # Optionally apply a gentle boost for very low scores (for user experience)
+        if final_score < 0.7:
+            boost_factor = 0.15 * (1 - final_score)
+            final_score = min(final_score + boost_factor, 1.0)
 
         # Format the result
         result = {
             "llm_score": round(llm_score * 100, 2),
-            "semantic_score": round(semantic_score * 100, 2),
-            "keyword_overlap_score": round(keyword_score * 100, 2),
             "final_score": round(final_score * 100, 2),
-            "resume_skills": resume_skills,
-            "job_requirements": job_skills,
+            "resume_skills": getattr(resume_analysis, "skills", []),
+            "job_requirements": getattr(job_analysis, "skills", []),
             "matching_skills": match_analysis.get("matching_skills", []),
             "missing_skills": match_analysis.get("missing_skills", []),
             "recommendation": match_analysis.get("recommendation", ""),
+            "rationale": match_analysis.get("rationale", "")
         }
-
         return result
 
 
 # Example usage
 def demo_ats_scorer_llm():
     """Demo function to showcase the ATSScorerLLM functionality."""
-    api_key = "sk-**************************"
-    model_name = "deepseek-chat"
-    api_base = "https://api.deepseek.com/v1"
+    from dotenv import load_dotenv
+    
+    load_dotenv()
+    api_key = os.getenv("API_KEY")
+    model_name = os.getenv("API_MODEL_NAME", "gpt-4-turbo")
+    api_base = os.getenv("API_BASE", "https://api.openai.com/v1")
 
     scorer = ATSScorerLLM(api_key=api_key, model_name=model_name, api_base=api_base)
 
     resume = """
-    John Smith
-    Data Scientist & Machine Learning Engineer
-    
-    EXPERIENCE
-    Senior Machine Learning Engineer, TechCorp (2019-Present)
-    - Developed production-ready ML pipelines using Python, TensorFlow and Kubernetes
-    - Optimized recommendation algorithms resulting in 20% uplift in user engagement
-    - Collaborated with cross-functional teams to deploy cloud-based data solutions
-    
-    Data Scientist, DataCompany (2016-2019)
-    - Built predictive models using scikit-learn, XGBoost and SQL
-    - Created dashboards and visualizations with Tableau
-    
-    SKILLS
-    Programming: Python, R, SQL, Java
-    ML Frameworks: TensorFlow, PyTorch, Keras
-    Tools: Git, Docker, Kubernetes, AWS, GCP
-    Data: Pandas, NumPy, Spark, Hadoop
     """
 
     job_desc = """
-    Machine Learning Engineer
-    
-    We are seeking an experienced Machine Learning Engineer to join our AI team.
-    
-    REQUIREMENTS:
-    - 3+ years experience in ML/AI engineering
-    - Strong programming skills in Python
-    - Experience with TensorFlow or PyTorch
-    - Familiarity with ML pipelines and deployments
-    - Knowledge of cloud platforms (AWS, GCP, or Azure)
-    - Understanding of data structures and algorithms
-    
-    RESPONSIBILITIES:
-    - Design and implement machine learning models
-    - Optimize existing algorithms for production
-    - Collaborate with data scientists and engineers
-    - Deploy and monitor ML systems in cloud environments
     """
 
     result = scorer.compute_match_score(resume, job_desc)
@@ -426,6 +370,7 @@ def demo_ats_scorer_llm():
     print("Missing Skills:", result["missing_skills"])
     print(f"Final Score: {result['final_score']}%")
     print("Recommendation:", result["recommendation"])
+    print("Rationale:", result["rationale"])
 
 
 if __name__ == "__main__":

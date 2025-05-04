@@ -36,3 +36,4 @@ langchain-openai
 PyPDF2
 scikit-learn
 sentence-transformers
+tiktoken
