@@ -12,8 +12,6 @@ from typing import List, Optional
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 from pydantic import BaseModel, Field
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 from app.utils.token_tracker import TokenTracker
 
@@ -44,8 +42,8 @@ class ATSScorerLLM:
     """Class for scoring resumes against job descriptions using AI techniques.
 
     This class provides methods to extract information from resumes and job descriptions,
-    calculate semantic similarity, and perform a comprehensive match analysis using
-    LLM-based techniques.
+    and perform a comprehensive match analysis using LLM-based techniques only.
+    All scoring, skill matching, and recommendations are 100% LLM-driven, making the system domain-agnostic and robust for any industry.
     """
 
     def __init__(self, model_name="", api_key=None, api_base="", user_id=None):
@@ -88,13 +86,6 @@ class ATSScorerLLM:
             api_base=self.api_base,
             feature="ats_scoring",
             user_id=self.user_id
-        )
-
-        self.vectorizer = TfidfVectorizer(
-            lowercase=True,
-            stop_words="english",
-            ngram_range=(1, 2),
-            max_features=5000,
         )
 
         self.parser = PydanticOutputParser(pydantic_object=SkillsExtraction)
@@ -154,38 +145,42 @@ class ATSScorerLLM:
             },
         )
 
-        # Prompt for skill matching and score analysis
+        # More optimistic and explicit scoring prompt with rationale
         self.matching_prompt = PromptTemplate(
-            template="""You are an expert ATS (Applicant Tracking System) analyzer and recruiter.
+            template="""
+            You are an expert ATS (Applicant Tracking System) analyzer and recruiter.
             Compare the candidate's skills and qualifications with the job requirements and provide an analysis.
-            
+
             CANDIDATE SKILLS AND QUALIFICATIONS:
             {resume_skills}
-            
+
             JOB REQUIREMENTS:
             {job_requirements}
-            
+
             Based on a detailed analysis, provide:
             1. A scoring from 0-100 indicating how well the candidate's skills match the job requirements:
-               - Score 70-100 if the candidate meets the core requirements and has most of the desired skills
+               - Score 95-100 if the candidate meets nearly all core and preferred requirements (90%+ match, including transferable skills and strong alignment)
+               - Score 80-94 if the candidate meets most core and preferred requirements (75-89% match)
+               - Score 70-79 if the candidate meets the core requirements and most desired skills
                - Score 50-69 if the candidate meets most core requirements but is missing some key skills
                - Score 30-49 if the candidate meets some requirements but has significant gaps
                - Score 0-29 if the candidate lacks most of the core requirements
-               
-               Consider transferable skills and potential ability to learn required skills when scoring.
-               If a candidate has 60% or more relevant skills, they deserve serious consideration.
-               
+
+               Be optimistic: If the candidate's resume is tailored and covers most requirements, reward with a high score. Consider transferable skills, synonyms, and implied experience. If the resume is almost a copy of the job description, score 95-100.
+
             2. A list of matching skills between the candidate and job requirements
             3. A list of important missing skills the candidate should highlight or develop
             4. A brief recommendation about the candidate's fit for this role
-            
+            5. A short rationale explaining the score (why this score was chosen, what was strong, what could be improved)
+
             Format your response as a JSON object with the following structure:
-            {{
-                "score": number,
-                "matching_skills": [list of strings],
-                "missing_skills": [list of strings],
-                "recommendation": string
-            }}
+{{
+    "score": number,
+    "matching_skills": [list of strings],
+    "missing_skills": [list of strings],
+    "recommendation": string,
+    "rationale": string
+}}
             """,
             input_variables=["resume_skills", "job_requirements"],
         )
@@ -220,85 +215,9 @@ class ATSScorerLLM:
             result = self.job_chain.invoke({"job_text": job_text})
             return result
 
-    def calculate_semantic_similarity(self, text1, text2):
-        """Calculate semantic similarity between two texts using TF-IDF and cosine similarity."""
-        try:
-            # Fit and transform the texts
-            tfidf_matrix = self.vectorizer.fit_transform([text1, text2])
-
-            # Calculate cosine similarity
-            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-            return similarity
-        except Exception as e:
-            print(f"Error calculating semantic similarity: {e}")
-            return 0.5
-
     def calculate_keyword_overlap(self, resume_skills, job_skills):
-        """Calculate a sophisticated keyword overlap score between resume and job skills.
-        
-        This method identifies semantic matches between job skills and resume skills,
-        recognizing related concepts and synonyms, not just exact matches.
-        
-        Args:
-            resume_skills: List of skills extracted from the resume
-            job_skills: List of skills extracted from the job description
-            
-        Returns:
-            float: Overlap score between 0 and 1
-        """
-        if not resume_skills or not job_skills:
-            return 0.5
-
-        resume_skills_lower = [skill.lower() for skill in resume_skills]
-        job_skills_lower = [skill.lower() for skill in job_skills]
-        
-        # Define technology and concept synonym groups to enhance matching
-        synonyms = {
-            "python": ["py", "python programming", "python development"],
-            "data science": ["data analytics", "data analysis", "analytics", "data scientist"],
-            "machine learning": ["ml", "ai", "artificial intelligence", "predictive modeling"],
-            "sql": ["database", "mysql", "postgresql", "tsql", "relational database"],
-            "communication": ["presenting", "public speaking", "writing", "interpersonal"],
-            "visualization": ["dashboard", "charts", "data viz", "looker", "tableau", "power bi"],
-            "analysis": ["analytics", "analyze", "analytical"],
-            "programming": ["coding", "development", "software engineering"],
-            "statistics": ["statistical analysis", "statistical methods", "data modeling"],
-            "cloud": ["aws", "azure", "gcp", "google cloud"],
-            "devops": ["ci/cd", "jenkins", "git", "github", "deployment"],
-        }
-        
-        # Create an expanded set of resume skills using synonyms
-        extended_resume_skills = set(resume_skills_lower)
-        for skill in resume_skills_lower:
-            for key, values in synonyms.items():
-                # Add related skills and concepts to the extended set
-                if skill == key or any(v in skill for v in values):
-                    extended_resume_skills.update(values)
-                    extended_resume_skills.add(key)
-        
-        # Count exact and semantic matches with the extended skill set
-        matches = sum(
-            1
-            for skill in job_skills_lower
-            if any(
-                job_skill in skill or skill in job_skill 
-                for job_skill in extended_resume_skills
-            )
-        )
-        
-        # Handle composite skills (multi-word concepts)
-        for job_skill in job_skills_lower:
-            words = job_skill.split()
-            if len(words) > 1:
-                # Award partial credit for partial matches of multi-word skills
-                if sum(1 for word in words if any(word in rs for rs in resume_skills_lower)) >= len(words) / 2:
-                    matches += 0.5  # Partial match
-        
-        # Calculate normalized overlap score
-        overlap_score = matches / len(job_skills_lower) if len(job_skills_lower) > 0 else 0.5
-        
-        # Ensure score is within valid range
-        return min(1.0, overlap_score)
+        """[DEPRECATED] No longer used. All matching is now LLM-based for domain-agnostic optimization."""
+        return 0.0
 
     def analyze_match(self, resume_analysis, job_analysis):
         """Have the LLM analyze the match between resume and job requirements."""
@@ -357,11 +276,22 @@ class ATSScorerLLM:
                 else "No specific recommendation provided."
             )
 
+            # Extract rationale
+            rationale_match = re.search(
+                r'["\']?rationale["\']?\s*:\s*["\']([^"\']+)["\']', result.content
+            )
+            rationale = (
+                rationale_match.group(1)
+                if rationale_match
+                else "No rationale provided."
+            )
+
             return {
                 "score": score,
                 "matching_skills": matching_skills,
                 "missing_skills": missing_skills,
                 "recommendation": recommendation,
+                "rationale": rationale,
             }
 
         except Exception as e:
@@ -371,71 +301,46 @@ class ATSScorerLLM:
                 "matching_skills": [],
                 "missing_skills": [],
                 "recommendation": "Error analyzing match. The candidate appears to have relevant skills but a detailed analysis could not be completed.",
+                "rationale": "Error during LLM analysis."
             }
 
-    def compute_match_score(self, resume_text, job_text, weights=None):
-        """Calculate comprehensive match score between resume and job."""
-        if weights is None:
-            # Default weights for scoring components
-            # These can be adjusted based on the specific use case or user preference
-            # Default weights are set to balance the components
-            weights = {
-                "llm_analysis": 0.4,
-                "semantic": 0.3,
-                "keyword_overlap": 0.3,
-            }
+    def compute_match_score(self, resume_text: str, job_text: str, weights: dict = None) -> dict:
+        """Calculate comprehensive match score between resume and job using LLM only.
 
+        Args:
+            resume_text (str): The candidate's resume text.
+            job_text (str): The job description text.
+            weights (dict, optional): Ignored. Kept for backward compatibility.
+
+        Returns:
+            dict: Scoring and skill analysis results, 100% LLM-driven.
+        """
         # Extract information using LLM
         resume_analysis = self.extract_resume_info(resume_text)
         job_analysis = self.extract_job_info(job_text)
 
-        # Calculate semantic similarity with TF-IDF
-        semantic_score = self.calculate_semantic_similarity(resume_text, job_text)
-        
-        # Apply a minimum baseline for semantic similarity to avoid underscoring
-        semantic_score = max(semantic_score, 0.4)  # Set a floor of 0.4 (40%) for semantic similarity
-
-        # Calculate keyword overlap score
-        resume_skills = (
-            resume_analysis.skills if hasattr(resume_analysis, "skills") else []
-        )
-        job_skills = job_analysis.skills if hasattr(job_analysis, "skills") else []
-        keyword_score = self.calculate_keyword_overlap(resume_skills, job_skills)
-
-        # Get LLM analysis of match
+        # Get LLM analysis of match (all scoring, matching, and rationale)
         match_analysis = self.analyze_match(resume_analysis, job_analysis)
         llm_score = match_analysis.get("score", 50) / 100  # Convert to 0-1 scale
-        
-        # Apply a minimum baseline for LLM score to prevent severe underscoring
         llm_score = max(llm_score, 0.45)  # Set a floor of 0.45 (45%) for LLM score
-        
-        # Calculate final weighted score
-        final_score = (
-            weights["llm_analysis"] * llm_score
-            + weights["semantic"] * semantic_score
-            + weights["keyword_overlap"] * keyword_score
-        )
-        
-        # Apply a gentle curve to the final score to avoid excessively low scores
-        # This makes scores more realistic for real-world job applications
-        if final_score < 0.7:  # If score is below 70%
-            # Apply a gentle boost that increases lower scores more than higher ones
-            boost_factor = 0.15 * (1 - final_score)  # More boost for lower scores
-            final_score = min(final_score + boost_factor, 1.0)  # Cap at 100%
+        final_score = llm_score  # 100% LLM-based
+
+        # Optionally apply a gentle boost for very low scores (for user experience)
+        if final_score < 0.7:
+            boost_factor = 0.15 * (1 - final_score)
+            final_score = min(final_score + boost_factor, 1.0)
 
         # Format the result
         result = {
             "llm_score": round(llm_score * 100, 2),
-            "semantic_score": round(semantic_score * 100, 2),
-            "keyword_overlap_score": round(keyword_score * 100, 2),
             "final_score": round(final_score * 100, 2),
-            "resume_skills": resume_skills,
-            "job_requirements": job_skills,
+            "resume_skills": getattr(resume_analysis, "skills", []),
+            "job_requirements": getattr(job_analysis, "skills", []),
             "matching_skills": match_analysis.get("matching_skills", []),
             "missing_skills": match_analysis.get("missing_skills", []),
             "recommendation": match_analysis.get("recommendation", ""),
+            "rationale": match_analysis.get("rationale", "")
         }
-
         return result
 
 
@@ -465,6 +370,7 @@ def demo_ats_scorer_llm():
     print("Missing Skills:", result["missing_skills"])
     print(f"Final Score: {result['final_score']}%")
     print("Recommendation:", result["recommendation"])
+    print("Rationale:", result["rationale"])
 
 
 if __name__ == "__main__":

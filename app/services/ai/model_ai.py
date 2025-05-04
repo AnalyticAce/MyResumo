@@ -144,6 +144,8 @@ class AtsResumeOptimizer:
         - Look for ways to showcase these skills in past experience descriptions
         - Ensure you're using the exact terminology as listed
         - Look for related skills or experience that could be reframed to match these requirements
+        - Reframe transferable or implied experience to match the job requirements where ethically possible
+        - Be assertive in surfacing any relevant experience, even if it is not an exact match, as long as it is truthful
         - Do NOT fabricate experience with these skills, only highlight them if they exist
         """
         
@@ -194,7 +196,8 @@ class AtsResumeOptimizer:
             - Ensure job titles, company names, dates, and locations are clearly formatted
             - Include a skills section with relevant hard and soft skills using job description terminology
             - Highlight both technical capabilities and relevant soft skills like communication, teamwork, leadership
-            - Emphasize transferable skills when direct experience is lacking
+            - Emphasize transferable skills and reframe related experience to match job requirements, even if not an exact match
+            - Be assertive in surfacing all relevant experience, including implied or adjacent skills, as long as it is truthful
 
         4. **ATS OPTIMIZATION TECHNIQUES**
             - Use standard section headings (e.g., "Work Experience" not "Career Adventures")
