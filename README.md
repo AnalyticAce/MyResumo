@@ -117,7 +117,7 @@ docker run -d --name myresumo \
   ghcr.io/analyticace/myresumo:latest
 ```
 
-<!--## 🖼️ Showcase
+## 🖼️ Showcase
 
 Below are screenshots showcasing the main features of MyResumo:
 
@@ -134,12 +134,22 @@ The user dashboard provides an overview of all your resumes, including ATS score
 ### Resume Optimization
 The resume optimization page analyzes your resume against job descriptions, providing detailed feedback on missing keywords, skills, and suggestions for improvement.
 
-![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimization.png)
+![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized1.png)
+
+![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized2.png)
 
 ### Resume Creation
 The intuitive resume creation interface allows you to build professional resumes with AI assistance, ensuring they're optimized for both ATS systems and human reviewers.
 
-![Resume Creation](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/creation.png) -->
+![Resume Creation](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/creation.png)
+
+![Resume Result](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/result.png)
+
+### Resume View
+The resume view page displays the generated resume in a clean, professional format, ready for download.
+![Resume View](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view.png)
+
+![Resume View](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view2.png)
 
 ## Alternative AI Models
 
