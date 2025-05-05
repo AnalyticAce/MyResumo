@@ -28,6 +28,44 @@
 - **Resume Generation**: Creates formatted, professional resumes in multiple formats
 - **Version Management**: Track different versions of your resume for various applications
 
+## 🖼️ Showcase
+
+Below are screenshots showcasing the main features of MyResumo:
+<div align="center">
+
+### Landing Page
+The landing page introduces users to the AI-powered resume optimization service, highlighting the key benefits of using MyResumo to tailor resumes for specific job applications.
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/landing-page.png" alt="MyResumo Landing Page"/>
+
+### Dashboard
+The user dashboard provides an overview of all your resumes, including ATS scores, last update dates, and quick access to actions like viewing, editing, downloading, or deleting each resume.
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/dashboard.png" alt="MyResumo Dashboard"/>
+
+### Resume Optimization
+The resume optimization page analyzes your resume against job descriptions, providing detailed feedback on missing keywords, skills, and suggestions for improvement.
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized1.png" alt="Resume Optimization"/>
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized2.png" alt="Resume Optimization"/>
+
+### Resume Creation
+The intuitive resume creation interface allows you to build professional resumes with AI assistance, ensuring they're optimized for both ATS systems and human reviewers.
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/creation.png" alt="Resume Creation"/>
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/result.png" alt="Resume Result"/>
+
+### Resume View
+The resume view page displays the generated resume in a clean, professional format, ready for download.
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view.png" alt="Resume View"/>
+
+<img src="https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view2.png" alt="Resume View"/>
+
+</div>
+
 ## 🚀 Technologies
 
 - **Backend**: [FastAPI](https://fastapi.tiangolo.com/), Python 3.8+
@@ -116,40 +154,6 @@ docker run -d --name myresumo \
   -e MONGODB_URI=mongodb://username:password@host:port/ \
   ghcr.io/analyticace/myresumo:latest
 ```
-
-## 🖼️ Showcase
-
-Below are screenshots showcasing the main features of MyResumo:
-
-### Landing Page
-The landing page introduces users to the AI-powered resume optimization service, highlighting the key benefits of using MyResumo to tailor resumes for specific job applications.
-
-![MyResumo Landing Page](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/landing-page.png)
-
-### Dashboard
-The user dashboard provides an overview of all your resumes, including ATS scores, last update dates, and quick access to actions like viewing, editing, downloading, or deleting each resume.
-
-![MyResumo Dashboard](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/dashboard.png)
-
-### Resume Optimization
-The resume optimization page analyzes your resume against job descriptions, providing detailed feedback on missing keywords, skills, and suggestions for improvement.
-
-![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized1.png)
-
-![Resume Optimization](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/optimized2.png)
-
-### Resume Creation
-The intuitive resume creation interface allows you to build professional resumes with AI assistance, ensuring they're optimized for both ATS systems and human reviewers.
-
-![Resume Creation](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/creation.png)
-
-![Resume Result](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/result.png)
-
-### Resume View
-The resume view page displays the generated resume in a clean, professional format, ready for download.
-![Resume View](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view.png)
-
-![Resume View](https://github.com/AnalyticAce/MyResumo/blob/main/.github/assets/resume_view2.png)
 
 ## Alternative AI Models
 
