@@ -14,9 +14,6 @@ httpx
 websockets
 slowapi
 pandas
-google-api-python-client
-google-auth-httplib2
-google-auth-oauthlib
 fastapi-sso
 asgiref
 pymongo
@@ -37,3 +34,5 @@ PyPDF2
 scikit-learn
 sentence-transformers
 tiktoken
+mkdocs
+mkdocs-material
