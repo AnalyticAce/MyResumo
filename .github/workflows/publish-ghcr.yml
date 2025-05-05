@@ -17,6 +17,7 @@ on:
       - 'Dockerfile'
       - 'requirements.txt'
       - '.github/workflows/publish-ghcr.yml'
+  workflow_dispatch:
 
 jobs:
   build_and_publish:

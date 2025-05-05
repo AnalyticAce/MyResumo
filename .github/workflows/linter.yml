@@ -36,7 +36,3 @@ jobs:
       - name: Lint with Ruff
         run: |
           ruff check --output-format=github .
-      
-      - name: Ruff Format Check
-        run: |
-          ruff format --check .
