@@ -1,11 +1,13 @@
 site_name: MyResumo Documentation
+site_url: https://analyticace.github.io/MyResumo/
 site_description: >-
   MyResumo is a powerful tool that helps you summarize and analyze your data
   efficiently. This documentation provides a comprehensive guide to using
   MyResumo, including setup instructions, business logic, and AI integration.
 site_author: DOSSEH Shalom
-site_url: https://analyticace.github.io/MyResumo/
-site_repo: https://github.com/AnalyticAce/MyResumo
+
+repo_name: AnalyticAce/MyResumo
+repo_url: https://github.com/AnalyticAce/MyResumo
 
 theme:
   name: material
@@ -43,8 +45,8 @@ theme:
       toggle:
         icon: material/toggle-switch-off
         name: Switch to system preference
-
-  favicon: assets/image/favicon.ico
+  # logo: assets/image/logo.png
+  # favicon: assets/image/favicon.ico
   icon:
     repo: fontawesome/brands/github
 
@@ -76,14 +78,14 @@ extra:
             Thanks for your feedback!
 
 markdown_extensions:
-  - pymdownx.arithmatex:
-      generic: true
   - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - admonition
+  - pymdownx.arithmatex:
+      generic: true
   - footnotes
   - pymdownx.details
   - pymdownx.mark
@@ -125,17 +127,15 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
-
-extra_javascript:
-  - javascripts/katex.js
-  - https://unpkg.com/katex@0/dist/katex.min.js
-  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
-
-extra_css:
-  - https://unpkg.com/katex@0/dist/katex.min.css
 
 nav:
   - Home: index.md
